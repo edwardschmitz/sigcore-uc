@@ -1,0 +1,833 @@
+REQUIREMENTS OF THE AUTO-UPDATE SYSTEM
+=======================================
+
+A. BUILDER (PC-side)
+--------------------
+
+A1. Packaging
+    - A working SCU archive creator exists.
+    - Files are copied into the package from the update source directory.
+    - SCU format is implemented: header + file entries + data blocks.
+    - Permissions may or may not be preserved depending on OS behavior.
+    - Current implementation appears stable but not fully validated.
+
+A2. Manifest Generation
+    - Manifest.json is produced.
+    - It includes:
+        - hardware_rev
+        - latest_version
+        - versions array
+        - SHA-256 hash
+        - signature (string produced by builder)
+        - URL for update download
+    - Manifest.sig is produced using the private key.
+    - Manifest fingerprints and version selection appear correct.
+
+A3. Signing
+    - SCU file is signed with the private key.
+    - Manifest is signed with the private key.
+    - Signatures are stored next to their files.
+    - Validation steps have not yet been fully tested against corrupted files.
+
+A4. Output Structure
+    - Builder writes output into: update/<revision>/<version>/
+    - Folder contains:
+        - update.scu
+        - update.scu.sig
+        - manifest.json
+        - manifest.sig
+    - No automatic cleanup or pruning of old versions exists.
+
+A5. Reliability
+    - Builder behaves consistently for known inputs.
+    - No automated tests are in place.
+    - Error-handling is minimal but functional.
+    - Previous versions are not overwritten.
+
+
+B. LAUNCHER (Pi-side)
+----------------------
+
+B1. Update Detection
+    - Reads identity.json to determine hardware revision.
+    - Constructs URL based on revision.
+    - Retrieves manifest.json from remote server.
+    - Compares local version vs manifest.latest_version.
+    - Currently supports manual testing but not scheduled execution.
+
+B2. Manifest Verification
+    - Public key is stored on the Pi.
+    - Manifest.sig verification logic is implemented.
+    - Verification must pass before continuing.
+    - No fallback behavior is defined for malformed manifests.
+
+B3. Download and Validation
+    - Launcher downloads update.scu only when needed.
+    - SCU signature verification exists.
+    - SCU file is checked against manifest hash.
+    - Error handling exists but needs strengthening.
+
+B4. Extract and Stage
+    - Staging directory: /opt/sigcore/staging
+    - Extracts SCU contents into staging.
+    - Directory structure is preserved.
+    - Validation of required files is not fully implemented.
+
+B5. Apply Update
+    B5a. System Prep
+        - Stops SigCore Server and WebBridge manually (logic exists but is not final).
+        - Remounts filesystem read-write.
+        - No versioned backup directory exists yet, but placeholder logic is in place.
+
+    B5b. File Deployment
+        - Copies binaries to /opt/sigcore/.
+        - Copies website files to /var/www/html/.
+        - Writes new version to identity.json.
+        - Some deployments still done with shell commands wrapped in code.
+
+    B5c. Cleanup
+        - Remounts filesystem read-only.
+        - Restarts SigCore Server and WebBridge.
+        - Staging directory removed on success.
+
+B6. Failure Handling
+    - Verification failures stop the update.
+    - Apply failures cause early-return behavior.
+    - Automated rollback logic is not fully implemented.
+    - System safety behavior has not been fully validated.
+
+B7. Logging
+    - Console logging exists.
+    - No persistent log file yet.
+    - Intended future path: /var/log/sigcore/update.log.
+
+B8. Manual Control
+    - Command-line “run once” behavior works now.
+    - No CLI arguments for status yet.
+    - Launcher is not yet registered as a system service.
+
+
+SIGCORE UPDATE BUILDER — FILE PURPOSES
+======================================
+
+A. ROOT BUILDER FILES
+---------------------
+
+Program.cs
+    - Entry point for the SigCore Update Builder.
+    - Validates that 4 arguments were provided:
+        - revision
+        - version
+        - notes
+        - private_key.pem
+    - Instantiates UpdateBuilder with the given parameters.
+    - Executes builder.Run() to perform the entire build process.
+    - Contains no build logic — purely orchestration.
+
+UpdateBuilder.cs
+    - Central orchestrator for building a complete SCU-based update release.
+    - Responsibilities:
+        - Stores revision, version, notes, and private key path.
+        - Defines absolute paths for:
+            - sigcoreserver executable
+            - WebBridge executable
+            - local website root directory
+            - public key for fingerprinting
+        - Creates a temporary build root (temp directory).
+        - Creates destination paths:
+            - /opt/sigcore
+            - /var/www/html
+        - Copies:
+            - sigcoreserver → opt/sigcore/sigcoreserver
+            - WebBridge → opt/sigcore/WebBridge
+            - Website contents → var/www/html/**
+        - Creates staging output directory:
+            C:\Users\eddie\OneDrive\Documents\sigcore\updates\<revision>\<version>\
+        - Invokes ScuArchive.Create() to produce update.scu
+        - Extracts update.scu into a verify_extract/ folder for self-validation
+        - Signs update.scu into update.scu.sig
+        - Constructs manifest.json containing:
+            - hardware_rev
+            - latest_version
+            - public_key_fingerprint
+            - versions array (with all metadata)
+        - Saves manifest.json
+        - Signs manifest.json into manifest.sig
+        - Prints summary of generated files
+    - Includes helpers:
+        - CopyFile()
+        - CopyDirectory()
+    - Entire update packaging workflow lives here.
+
+
+B. COMMON "UPDATE" LIBRARY FILES
+--------------------------------
+
+FingerprintHelper.cs
+    - Computes a SHA-256 fingerprint of a PEM public key.
+    - Loads RSA key from PEM.
+    - Exports the DER-encoded SubjectPublicKeyInfo block.
+    - Hashes the DER with SHA-256.
+    - Returns lowercase hex fingerprint string.
+    - Used to embed public key fingerprint inside manifest.json.
+    - Prints the fingerprint to console for debug visibility.
+
+HashHelper.cs
+    - Provides SHA-256 hashing utilities.
+    - Sha256File(path)
+        - Opens file as a stream.
+        - Hashes contents.
+        - Returns lowercase hex SHA-256 string.
+    - Sha256Bytes(data)
+        - Hashes in-memory byte array.
+    - Internal BytesToHex()
+        - Converts byte[] to lowercase hex.
+    - Used for SCU archive hashing inside the manifest.
+
+ManifestModel.cs
+    - Full data model for manifest.json (serialized/deserialized via Newtonsoft.Json).
+    - Top-level fields:
+        - hardware_rev
+        - latest_version
+        - public_key_fingerprint
+        - versions[] array
+    - VersionEntry fields:
+        - version
+        - release_date
+        - hash_sha256
+        - signature (URL to update.scu.sig)
+        - url (URL to update.scu)
+        - notes
+        - executables (list of files the launcher must make executable)
+    - Methods:
+        - Load(path)
+        - Save(path)
+    - Used directly by UpdateBuilder when constructing manifest.json.
+
+ScuArchive.cs
+    - Implements the SCU1 archive format used by SigCore updates.
+    - Magic header: "SCU1"
+    - Create(rootFolder, outputFile)
+        - Scans all files under rootFolder (recursive)
+        - Writes:
+            - Magic ("SCU1")
+            - File count
+            - For each file:
+                - Relative path (UTF-8 bytes)
+                - Path length (ushort)
+                - File length (ulong)
+                - Raw file bytes
+        - Ensures cross-platform safe relative paths (uses forward slashes)
+    - Extract(scuFile, targetFolder)
+        - Validates magic header
+        - Reads file entries and size metadata
+        - Recreates directory structure in targetFolder
+        - Restores files exactly as archived
+    - GetRelativePath()
+        - Uses Uri logic to compute a clean platform-independent path
+    - Used by the builder to package **and self-verify** update.scu.
+
+SignatureHelper.cs
+    - RSA signing and verification utilities for SCU and manifest.
+    - SignFile(privateKeyPem, inputFile, signatureOutputFile)
+        - Reads file data.
+        - Produces RSA SHA-256 PKCS#1 signature.
+        - Writes signature bytes to .sig file.
+    - VerifyFile(publicKeyPem, inputFile, signatureFile)
+        - Reads both data and signature.
+        - Uses RSA public key to verify signature.
+    - SignData / VerifyData
+        - Core RSA signing logic.
+    - LoadPrivateKeyFromPem()
+        - Supports encrypted PEM (password currently hardcoded).
+        - Supports unencrypted PEM.
+    - LoadPublicKeyFromPem()
+        - Loads RSA public key.
+    - Entire cryptographic signing layer for SCU and manifest is here.
+
+
+
+SIGCORE LAUNCHER — FILE PURPOSES
+================================
+
+
+A. DOWNLOAD AND VALIDATION COMPONENTS
+-------------------------------------
+
+ManifestDownloader.cs
+    - Downloads manifest.json and manifest.sig from the update server.
+    - Uses HttpClient to fetch both files as raw byte arrays.
+    - Writes results to local disk paths provided by caller.
+    - CancellationToken supported for clean shutdown.
+    - No validation performed here — strictly a fetch utility.
+
+ManifestValidator.cs
+    - Fully validates a manifest + manifest.sig pair.
+    - Steps:
+        - Uses SignatureHelper.VerifyFile() to confirm manifest.sig is valid.
+        - Loads manifest.json into ManifestModel.
+        - Computes the fingerprint of the public key on the device.
+        - Compares:
+            - expectedFingerprint → from Launcher config / identity
+            - actualFingerprint → recomputed from local public key
+            - manifest.PublicKeyFingerprint → declared by the builder
+        - All 3 must match.
+    - Purpose:
+        - Prevent tampering.
+        - Ensure the manifest belongs to the correct hardware revision.
+        - Ensure nobody swapped the keypair.
+
+
+ScuVerifier.cs
+    - Responsible for downloading + verifying update.scu and update.scu.sig.
+    - DownloadAsync():
+        - Downloads SCU and its corresponding signature.
+    - Validate():
+        - Verifies SHA-256 hash matches manifest entry.
+        - Verifies signature matches local public key.
+    - Returns boolean success/failure.
+    - This is the integrity gate before extraction or installation.
+
+
+
+B. INSTALLATION COMPONENTS
+--------------------------
+
+AtomicInstaller.cs
+    - Applies a verified SCU update safely and atomically.
+    - Steps:
+        - Deletes existing extractRoot if present.
+        - Extracts SCU using ScuArchive.Extract().
+        - Locates extracted:
+            - opt/sigcore contents
+            - var/www/html contents
+        - Installs files into live filesystem using atomic replace logic.
+
+    - InstallDirectoryAtomic():
+        - Iterates all files under src directory.
+        - Maps each to corresponding path under dest.
+        - Creates dirs as needed.
+        - Uses AtomicReplaceFile() for each file.
+
+    - AtomicReplaceFile():
+        - Writes new file as *.new
+        - Renames old file to *.bak if present
+        - Moves *.new → final filename
+        - Removes *.bak if everything succeeded
+    - Goal:
+        - Never leave corrupted partial files, even after power loss.
+
+
+
+C. LOCAL STATE COMPONENTS
+-------------------------
+
+InstalledVersionReader.cs
+    - Simple utility to read:
+        - revision.txt
+        - version.txt
+    - If file missing:
+        - Revision: returns "unknown"
+        - Version: returns "0.0.0"
+    - Used by UpdateSupervisor / Launcher to compare local state vs manifest.
+
+
+
+D. MAIN RUNTIME / PROCESS SUPERVISION
+-------------------------------------
+
+Launcher.cs
+    - Main runtime supervisor for:
+        - SigCoreServer process
+        - WebBridge process
+    - Fields:
+        - serverExe = /opt/sigcore/sigcoreserver
+        - bridgeExe = /opt/sigcore/WebBridge
+        - revisionPath, versionPath
+        - manifest URLs (currently hardcoded to revA)
+        - public-key path
+        - expectedFingerprint (static for now)
+    - RunAsync():
+        - Runs update supervisor first.
+        - Starts both processes.
+        - Enters supervision loop:
+            - Every 2 seconds, checks if each process is alive.
+            - Restarts dead processes automatically.
+        - On token cancellation:
+            - Stops both processes gracefully.
+    - StartServer() / StartBridge():
+        - Launch processes with redirected output.
+    - ProcessAlive():
+        - Safe check ensuring process hasn't crashed.
+    - StopAsync():
+        - Kills both server and bridge.
+    - Primary role:
+        - Keep SigCoreServer and WebBridge alive.
+        - Ensure updates are applied before processes start.
+
+
+
+E. LAUNCHER VARIANT (OLDER DESIGN)
+----------------------------------
+
+LauncherManager.cs
+    - An older, alternative launcher architecture.
+    - Not used by the current Program.cs entry point.
+    - Responsibilities:
+        - Loads identity.json
+        - Derives revision + version from identity
+        - Validates public key presence
+        - Invokes UpdateSupervisor with revision-based URLs
+        - Starts SigCoreServer then WebBridge
+        - Handles Ctrl+C shutdown
+        - Terminates both processes on exit
+    - Contains:
+        - IdentityModel / HardwareInfo / SoftwareInfo inline classes
+    - Notes:
+        - This may be retired or folded into the new Launcher class.
+        - Duplicates responsibilities found in Launcher.cs
+        - May be a leftover from a previous architecture.
+
+
+
+F. ENTRY POINT
+--------------
+
+Program.cs
+    - Entry point for the launcher service.
+    - Writes startup banner.
+    - Registers signal handlers (Ctrl+C, ProcessExit).
+    - Allocates CancellationTokenSource.
+    - Instantiates Launcher and calls RunAsync().
+    - On exceptions:
+        - Outputs diagnostic information.
+    - On shutdown:
+        - Cancels token and allows launcher to stop server + bridge.
+    - Contains no update or process logic — purely coordinator.
+
+
+G. UPDATE EXECUTION LAYER
+-------------------------
+
+UpdateRunner.cs
+    - Executes the full update cycle once an update has been approved.
+    - Responsibilities:
+        - Downloads manifest.json + manifest.sig into /tmp/SigCoreUpdate
+        - Validates the manifest via ManifestValidator
+        - Parses manifest to extract latest version info
+        - Downloads update.scu and update.scu.sig
+        - Validates:
+            - SHA-256 hash
+            - RSA signature
+        - Extracts update.scu into /tmp/SigCoreUpdateExtract
+        - Applies update via AtomicInstaller.Install()
+        - Applies executable permissions to any paths listed in manifest.Executables
+    - Constructor sets:
+        - temp file paths
+        - extractRoot for SCU extraction
+        - optTarget (e.g. /opt/sigcore)
+        - webTarget (e.g. /var/www/html)
+    - RunAsync():
+        - Returns true on success, false on failure.
+        - Primary single-shot update installer.
+
+
+H. UPDATE SUPERVISION AND DECISION LOGIC
+----------------------------------------
+
+UpdateSupervisor.cs
+    - Higher-level orchestrator that decides whether an update is needed.
+    - Responsibilities:
+        - Reads installed revision.txt and version.txt using InstalledVersionReader
+        - Downloads manifest.json + manifest.sig
+        - Validates manifest via ManifestValidator
+        - Uses UpdateDecisionEngine to decide whether update should occur
+            - NoUpdate
+            - WrongHardwareRevision
+            - ManifestInvalid
+            - UpdateAvailable
+        - If update required:
+            - Creates UpdateRunner and executes RunAsync()
+        - Logs all decisions
+    - Inputs:
+        - manifest URLs
+        - public key path
+        - expected fingerprint
+        - installed revision/version files
+        - target installation directories
+    - Run order:
+        - Validate manifest
+        - Evaluate decision
+        - If update needed, run updater
+        - Return true on success or “no update required”
+        - Return false on hardware mismatch or failure
+
+
+UpdateDecisionEngine.cs
+    - Decides whether an update is required.
+    - Conditions checked:
+        - manifest is null → ManifestInvalid
+        - hardware revision mismatch → WrongHardwareRevision
+        - manifest contains no versions → ManifestInvalid
+        - version comparison:
+            - installedVersion >= latestVersion → NoUpdate
+            - installedVersion < latestVersion → UpdateAvailable
+    - Uses VersionComparer to compare semantic-like version strings.
+    - Pure logic only — no file I/O.
+
+
+I. VERSION COMPARISON AND VERSION STAMPING
+------------------------------------------
+
+VersionComparer.cs
+    - Parses version strings like "1.2.3.4" or "1.0" or "2".
+    - Splits on "." and compares each numeric segment.
+    - Missing segments treated as zero.
+    - Non-numeric segments treated as zero.
+    - Returns:
+        - -1 if a < b
+        - +1 if a > b
+        - 0 if equal
+    - Used by UpdateDecisionEngine.
+
+
+VersionStampWriter.cs
+    - Writes revision.txt and version.txt *safely* after successful installation.
+    - WriteInstalledVersion():
+        - Writes both revision and version using atomic-safe logic.
+    - WriteSafe():
+        - Writes *.new file
+        - Moves old file to *.bak
+        - Renames *.new to official path
+        - Cleans *.bak
+    - Ensures partial writes cannot corrupt version tracking.
+
+
+J. SYSTEMD SERVICE CONTROL
+--------------------------
+
+ServiceController.cs
+    - Utilities for controlling Linux systemd services.
+    - Provides:
+        - StopService(name)
+        - StartService(name)
+        - IsActive(name)
+        - IsInactive(name)
+    - All functions wrap systemctl commands via /bin/bash.
+    - Used for service-based architectures where SigCoreServer/WebBridge may run as systemd units instead of standalone processes.
+    - Currently not used in the new Launcher.cs but remains part of legacy support.
+
+
+K. SUMMARY OF THE UPDATE PIPELINE (FOR CROSS-FILE CONTEXT)
+-----------------------------------------------------------
+
+    1. Launcher.cs starts → calls UpdateSupervisor
+    2. UpdateSupervisor:
+        - Reads installed version/revision
+        - Downloads + validates manifest
+        - Uses UpdateDecisionEngine to decide if update needed
+    3. If update required:
+        - Creates UpdateRunner
+    4. UpdateRunner:
+        - Downloads SCU + sig
+        - Validates both
+        - Extracts SCU
+        - Installs via AtomicInstaller
+        - Ensures executables are +x
+    5. VersionStampWriter writes new version/revision
+    6. Launcher starts services (server + bridge)
+
+
+SIGCORE AUTO-UPDATE SYSTEM — LIVING SPECIFICATION
+=================================================
+
+
+A. PURPOSE AND GOALS
+--------------------
+- Provide authenticated, atomic, hardware-aware updates for SigCore UC.
+- Ensure updates cannot brick the device.
+- Ensure updates cannot be spoofed or tampered with.
+- Ensure the update runs BEFORE Server and WebBridge start.
+- Ensure Pi runtime always has verified, latest valid software.
+- Support offline-safe extraction and atomic replacement.
+
+
+B. MAJOR COMPONENTS
+-------------------
+- Builder (Windows): packages, signs, and publishes updates.
+- SCU Archive Format: custom binary package containing all update files.
+- Manifest: JSON definition describing update metadata and security.
+- Launcher (Pi): performs update-check, validation, installation, and process supervision.
+- UpdateSupervisor: decision logic for whether and when to update.
+- UpdateRunner: performs actual installation.
+- AtomicInstaller: performs atomic file replacement.
+- Version tracking: revision.txt and version.txt.
+
+
+C. FILE PATHS (PI SIDE)
+-----------------------
+- Executables:
+    - /opt/sigcore/sigcoreserver
+    - /opt/sigcore/WebBridge
+- Keys:
+    - /opt/sigcore/keys/sigcore_public.pem
+- Installed version state:
+    - /opt/sigcore/version.txt
+    - /opt/sigcore/revision.txt
+- Website:
+    - /var/www/html
+- Temp update locations:
+    - /tmp/SigCoreUpdate
+    - /tmp/SigCoreUpdateExtract
+
+
+D. SCU ARCHIVE FORMAT
+---------------------
+- Magic header: "SCU1"
+- uint32: file count
+- Per file:
+    - ushort: UTF-8 path length
+    - bytes: UTF-8 path
+    - ulong: file size
+    - raw file bytes
+- Paths stored normalized with forward slashes.
+- Archive contains:
+    - opt/sigcore/*    (server, bridge, identities, keys, version files)
+    - var/www/html/*   (website)
+- Extraction reproduces exact tree.
+
+
+E. MANIFEST FORMAT
+------------------
+- hardware_rev (string)
+- latest_version (string)
+- public_key_fingerprint (hex SHA-256 of DER key)
+- versions[]:
+    - version
+    - release_date
+    - hash_sha256 (of update.scu)
+    - signature (URL to update.scu.sig)
+    - url (URL to update.scu)
+    - notes
+    - executables[] (files requiring chmod +x)
+
+
+F. SECURITY MODEL
+-----------------
+- Builder holds private key (never distributed).
+- Pi holds public key in /opt/sigcore/keys/.
+- Builder signs:
+    - manifest.json
+    - update.scu
+- Launcher validates:
+    - manifest.sig → matches manifest
+    - manifest.PublicKeyFingerprint → matches local public key fingerprint
+    - SCU hash → matches manifest.hash_sha256
+    - SCU signature → matches public key
+- Update is rejected if:
+    - signature mismatch
+    - hash mismatch
+    - fingerprint mismatch
+    - wrong hardware revision
+
+
+G. UPDATE DECISION LOGIC
+------------------------
+- Read installed:
+    - revision.txt
+    - version.txt
+- Download manifest + sig.
+- Validate manifest.
+- Compare installedRevision vs manifest.hardware_rev:
+    - mismatch → reject update.
+- Compare installedVersion vs latestVersion using VersionComparer:
+    - installed >= latest → no update.
+    - installed < latest → update available.
+
+
+H. UPDATE PROCESS FLOW (PI SIDE)
+--------------------------------
+1. Launcher starts.
+2. Calls UpdateSupervisor.
+3. UpdateSupervisor:
+    - Reads installed version/revision.
+    - Downloads manifest + sig.
+    - Validates manifest.
+    - Applies UpdateDecisionEngine.
+4. If update needed:
+    - Create UpdateRunner.
+    - Download SCU + sig.
+    - Validate hash + signature.
+    - Extract SCU into /tmp/SigCoreUpdateExtract.
+    - AtomicInstaller.Install() replaces live files.
+    - Apply executable flags.
+    - Write new version.txt and revision.txt.
+5. Launcher starts processes.
+
+
+I. ATOMIC INSTALLATION RULES
+----------------------------
+- All installation done under extractRoot.
+- For each file:
+    - dest.new → write
+    - dest.bak → old (if exists)
+    - dest.new → dest (move)
+    - delete dest.bak
+- Ensures:
+    - No partial files
+    - No corruption from sudden shutdown
+    - Every update is all-or-nothing
+
+
+J. RUNTIME PROCESS SUPERVISION
+------------------------------
+- Launcher starts:
+    - sigcoreserver
+    - WebBridge
+- Checks every ~2 seconds:
+    - if process dead → restart
+- On shutdown:
+    - kill both processes safely.
+
+
+K. BUILDER INPUTS & OUTPUTS
+----------------------------
+Inputs:
+    - revision
+    - version
+    - notes
+    - private_key.pem
+    - paths to:
+        - sigcoreserver binary
+        - WebBridge binary
+        - website root
+
+Outputs:
+    - update.scu
+    - update.scu.sig
+    - manifest.json
+    - manifest.sig
+
+Directory layout:
+    update/<revision>/<version>/update.scu
+    update/<revision>/<version>/update.scu.sig
+    update/<revision>/<version>/manifest.json
+    update/<revision>/<version>/manifest.sig
+
+
+L. VERSIONING RULES
+-------------------
+- Versions are dot-separated numerics: A.B.C.D
+- Extra segments allowed.
+- Missing segments treated as zero.
+- Non-numeric segments treated as zero.
+- VersionComparer decides:
+    - <0: installed older
+    - =0: equal
+    - >0: installed newer
+
+
+M. CODEBASE SUMMARY (BUILDER)
+------------------------------
+- Program.cs
+    - CLI entry point.
+- UpdateBuilder.cs
+    - Master build orchestrator.
+- FingerprintHelper.cs
+    - Public key fingerprint generation.
+- HashHelper.cs
+    - SHA-256 hashing utilities.
+- ManifestModel.cs
+    - Manifest JSON schema.
+- ScuArchive.cs
+    - SCU1 binary packaging/extraction.
+- SignatureHelper.cs
+    - RSA signing/verification utilities.
+
+
+N. CODEBASE SUMMARY (LAUNCHER)
+------------------------------
+- ManifestDownloader.cs
+    - Downloads manifest + signature.
+- ManifestValidator.cs
+    - Validates manifest.signature + fingerprint.
+- ScuVerifier.cs
+    - Downloads + validates SCU.
+- InstalledVersionReader.cs
+    - Reads installed version/revision.
+- AtomicInstaller.cs
+    - Atomic installation logic.
+- UpdateDecisionEngine.cs
+    - Determines whether update needed.
+- VersionComparer.cs
+    - Compares semantic versions.
+- VersionStampWriter.cs
+    - Atomically writes installed version files.
+- UpdateSupervisor.cs
+    - High-level update logic: decide → run.
+- UpdateRunner.cs
+    - Performs actual update install.
+- ServiceController.cs
+    - systemd control utilities (not used in current Launcher).
+- Launcher.cs
+    - Starts, supervises SigCoreServer + WebBridge.
+- Program.cs (launcher)
+    - Entry point, shutdown management.
+
+
+O. REQUIRED ENVIRONMENT
+-----------------------
+- Linux ARM64 (Pi 4 or Pi 5).
+- Read-only root filesystem during operation (future final state).
+- Ability to remount rw during update installation (future).
+- /opt/sigcore owned by runtime user.
+- Web server serves /var/www/html.
+
+
+P. OPERATIONAL GUIDANCE
+-----------------------
+- To trigger update manually:
+    - Restart launcher.
+- To review update errors:
+    - Console logs now; future: /var/log/sigcore/update.log.
+- To replace public key:
+    - Update public key file.
+    - Update fingerprint in the builder.
+    - Push new manifest with updated fingerprint.
+- To test updates:
+    - Run builder.
+    - Upload update folder to server.
+    - Restart launcher on Pi.
+
+
+Q. FUTURE IMPROVEMENTS
+----------------------
+- Centralized logging.
+- Rollback mechanism.
+- Configurable URLs for manifest.
+- Non-hardcoded fingerprint.
+- Removal of deprecated LauncherManager.
+- Option for daily scheduled update checks (service timer).
+- Read-only root filesystem enforcement.
+
+ASSISTANT GROUND RULES
+----------------------
+
+- Do not use var in any C# code. All types must be explicitly declared.
+- Do not insert comments into source code unless explicitly instructed.
+- Do not invent or assume the contents of any class, method, or structure. Ask the user when information is missing.
+- Do not change method signatures, constructors, or argument structures unless the fix requires it and the user approves.
+- Apply fixes one at a time. Do not bundle multiple fixes.
+- All code changes must be precise, minimal, and limited to the stated fix.
+- Do not alter logging, console output, or filenames unless explicitly instructed.
+- Do not assume any library method or helper exists unless the user has shown it. Request missing definitions.
+- Do not introduce new dependencies, namespaces, or classes unless explicitly requested.
+- When providing updated code files, provide the complete corrected file unless the user requests a fragment.
+- Follow sequencing instructions exactly as given.
+- Do not reinterpret, generalize, or expand user instructions.
+- Do not provide meta-explanations unless requested.
+- Apply all stated code-style rules consistently.
+- Ask when uncertain.
+- When the user requests “text only format,” the assistant must output plain text only,
+  without commentary, without markup, without embellishment, and without any structure
+  beyond exactly what the user requested and in a code section. 

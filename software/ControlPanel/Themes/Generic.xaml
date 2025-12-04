@@ -1,0 +1,715 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:ControlPanel"
+    xmlns:control="clr-namespace:ControlPanel.Controls"
+    >
+
+    <control:BooleanToOnOffConverter x:Key="BooleanToOnOffConverter"/>
+    <control:MouseOverHighlightConverter x:Key="MouseOverHighlightConverter"/>
+    <control:BooleanToOffColorConverter x:Key="BooleanToOffColorConverter"/>
+    <control:InvertBooleanConverter x:Key="InvertBooleanConverter"/>
+    <control:CalEnabledToVisibilityConverter x:Key="CalEnabledToVisibilityConverter"/>
+    <control:UnitsHasParenthesis x:Key="UnitsHasParenthesis"/>
+    <control:BooleanToAutoModeTextConverter x:Key="BooleanToAutoModeTextConverter"/>
+    <control:AutoModeHoverBackgroundConverter x:Key="AutoModeHoverBackgroundConverter"/>
+
+
+    <Style TargetType="{x:Type control:ButtonCheckBox}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:ButtonCheckBox}">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="2"
+                            Padding="5"
+                            CornerRadius="4">
+                        <TextBlock Text="{Binding IsChecked, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToOnOffConverter}}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                   FontSize="24" FontWeight="Bold"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Background" Value="Red"/>
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Style.Triggers>
+            <!-- ON State -->
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background" Value="#00FF00"/>
+                <Setter Property="BorderBrush" Value="Black"/>
+            </Trigger>
+
+            <!-- OFF State -->
+            <Trigger Property="IsChecked" Value="False">
+                <Setter Property="Background" Value="Red"/>
+                <Setter Property="BorderBrush" Value="Black"/>
+            </Trigger>
+
+            <!-- Mouse Over Behavior -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="{Binding IsChecked, RelativeSource={RelativeSource Self}, Converter={StaticResource MouseOverHighlightConverter}}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type control:LedIndicator}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:LedIndicator}">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse x:Name="IndicatorEllipse" Width="20" Height="20"
+                                    Stroke="Black" StrokeThickness="2"
+                                    Fill="{Binding CurrentColor, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        <TextBlock Text="{Binding Label, RelativeSource={RelativeSource TemplatedParent}}" 
+                                   FontSize="14" FontWeight="Bold" 
+                                   Margin="5,2"/>
+                    </StackPanel>
+
+                    <!-- Add DataTriggers inside the ControlTemplate -->
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsOn, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                            <Setter TargetName="IndicatorEllipse" Property="Fill"
+                                Value="{Binding OnColor, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsOn, RelativeSource={RelativeSource TemplatedParent}}" Value="False">
+                            <Setter TargetName="IndicatorEllipse" Property="Fill"
+                                Value="{Binding OffColor, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style TargetType="{x:Type control:HamburgerButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:HamburgerButton}">
+                    <Button Background="Transparent" BorderThickness="0"
+                        Command="{TemplateBinding Command}"
+                        CommandParameter="{TemplateBinding CommandParameter}">
+                        <Grid Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                                <Rectangle Width="20" Height="3" Fill="Black" Margin="0,2,0,2"/>
+                                <Rectangle Width="20" Height="3" Fill="Black" Margin="0,2,0,2"/>
+                                <Rectangle Width="20" Height="3" Fill="Black" Margin="0,2,0,2"/>
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style TargetType="{x:Type control:AutoModeButton}">
+        <Setter Property="Background" Value="Red"/>
+        <Setter Property="BorderBrush" Value="Black"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Padding" Value="10,4"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:AutoModeButton}">
+                    <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="2"
+                        CornerRadius="4"
+                        Padding="{TemplateBinding Padding}">
+                        <TextBlock x:Name="LabelText"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Text="{TemplateBinding OffText}" />
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="LabelText" Property="Text"
+                                Value="{Binding OnText, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <Setter Property="Background" Value="LightGreen"/>
+                        </Trigger>
+
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter TargetName="LabelText" Property="Text"
+                                Value="{Binding OffText, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <Setter Property="Background" Value="Red"/>
+                        </Trigger>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Opacity" Value="0.9"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type control:RelayControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:RelayControl}">
+                    <Border Background="#F9F3EB" CornerRadius="15" Padding="2" BorderBrush="DimGray" BorderThickness="2">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Indicators -->
+                            <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0" Margin="5">
+                                <control:LedIndicator IsOn="{Binding IsRelayOn, RelativeSource={RelativeSource TemplatedParent}}"  
+                                                Label="N/O"
+                                                OnColor="#00FF00"
+                                                OffColor="DimGray"
+                                                Margin="5,2"/>
+
+                                <control:LedIndicator IsOn="{Binding IsRelayOn, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InvertBooleanConverter}}"  
+                                                Label="N/C"
+                                                OnColor="#FF0000"
+                                                OffColor="DimGray"
+                                                Margin="5,2"/>
+                            </StackPanel>
+
+                            <control:HamburgerButton x:Name="HamburgerBtn" Grid.Column="1" 
+                                                     VerticalAlignment="Top" Margin="5" 
+                                                     ToolTip="Edit Properties"
+                                                     Command="{Binding ConfigCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     CommandParameter="{Binding Channel, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     />
+
+                            <!-- Relay Toggle Button -->
+                            <control:ButtonCheckBox Grid.Row="1" Grid.Column="0" Width="120" Height="40"
+                                              Grid.ColumnSpan="2"
+                                              Content="{Binding IsRelayOn, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource BooleanToOnOffConverter}}"
+                                              IsChecked="{Binding IsRelayOn, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                              HorizontalAlignment="Center"/>
+
+                            <!-- Label -->
+                            <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                   Text="{Binding Label, RelativeSource={RelativeSource TemplatedParent}}" 
+                                   FontSize="24" FontWeight="Bold" 
+                                   HorizontalAlignment="Center" 
+                                   Margin="5,2"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                                   Text="{Binding UserID, RelativeSource={RelativeSource TemplatedParent}}" 
+                                   FontSize="16" FontWeight="Bold" 
+                                   HorizontalAlignment="Center" 
+                                   Margin="5,2"/>
+
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+    <Style TargetType="{x:Type control:DigitalInputControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:DigitalInputControl}">
+                    <Border Background="#F9F3EB" CornerRadius="15" Padding="2" BorderBrush="DimGray" BorderThickness="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Indicator -->
+                            <control:LedIndicator Grid.Column="0" Width="20" Height="20"
+                                            IsOn="{Binding IsInputActive, RelativeSource={RelativeSource TemplatedParent}}"
+                                            OnColor="#00FF00"
+                                            OffColor="DimGray"
+                                            Margin="10,2,5,2"/>
+
+                            <!-- Label and UserID -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" 
+                                    Margin="5"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Label, RelativeSource={RelativeSource TemplatedParent}}" 
+                                       FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text=": " FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding UserID, RelativeSource={RelativeSource TemplatedParent}}" 
+                                       FontSize="18" FontWeight="Bold" Opacity="1"/>
+                            </StackPanel>
+
+                            <control:HamburgerButton x:Name="HamburgerBtn" Grid.Column="1" 
+                                                     VerticalAlignment="Top" Margin="5" 
+                                                     HorizontalAlignment="Right"
+                                                     ToolTip="Edit Properties"
+                                                     Command="{Binding ConfigCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     CommandParameter="{Binding Channel, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     />
+
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type control:AnalogInputControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:AnalogInputControl}">
+                    <Border Background="#F9F3EB" CornerRadius="15" Padding="2" BorderBrush="DimGray" BorderThickness="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Value Display -->
+                            <Border Grid.Column="0" Width="120" Background="White" Padding="5" 
+                                BorderThickness="1" BorderBrush="Black" Margin="10,2">
+                                <TextBlock Text="{Binding FormattedValue, RelativeSource={RelativeSource TemplatedParent}}"
+                                           FontSize="18" FontWeight="Bold" TextAlignment="Right" Height="25" />
+                            </Border>
+
+                            <!-- Label -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Label, RelativeSource={RelativeSource TemplatedParent}}" FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text=": " FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding UserID, RelativeSource={RelativeSource TemplatedParent}}" FontSize="18" FontWeight="Bold" Opacity="1"/>
+                                <TextBlock Text=" (" FontSize="18" FontWeight="Bold" 
+                                           Visibility="{Binding Units, 
+                                                                RelativeSource={RelativeSource TemplatedParent}, 
+                                                                Converter={StaticResource UnitsHasParenthesis}}"/>
+                                <TextBlock Text="{Binding Units, RelativeSource={RelativeSource TemplatedParent}}" FontSize="18" FontWeight="Bold" Opacity="1"/>
+                                <TextBlock Text=")" FontSize="18" FontWeight="Bold" 
+                                           Visibility="{Binding Units, 
+                                                                RelativeSource={RelativeSource TemplatedParent}, 
+                                                                Converter={StaticResource UnitsHasParenthesis}}"/>
+                            </StackPanel>
+
+                            <control:HamburgerButton x:Name="HamburgerBtn" Grid.Column="1" 
+                                                     VerticalAlignment="Top" Margin="5" 
+                                                     HorizontalAlignment="Right"
+                                                     ToolTip="Edit Properties"
+                                                     Command="{Binding ConfigCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     CommandParameter="{Binding Channel, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     />
+
+
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+    <Style TargetType="{x:Type control:GroupControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:GroupControl}">
+                    <Border Background="DarkGray" CornerRadius="20" Padding="10" BorderBrush="DimGray" BorderThickness="2">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <!-- Header -->
+                            <DockPanel Grid.Row="0" LastChildFill="False">
+                                <TextBlock Text="{TemplateBinding Header}" FontSize="36" FontWeight="Bold" Foreground="Black" Margin="20,-10,0,0" DockPanel.Dock="Left"/>
+                                <ToggleButton x:Name="PART_ExpanderButton" Width="36" Height="36" Margin="20,0,0,0" FontSize="18" FontWeight="Bold" Content="▲" ToolTip="Expand / Collapse" DockPanel.Dock="Right" Visibility="Collapsed"/>
+                            </DockPanel>
+                            <!-- Animated Content -->
+                            <Grid x:Name="ContentContainer" Grid.Row="1" Margin="5" Background="Transparent" RenderTransformOrigin="0.5,0">
+                                <Grid.RenderTransform>
+                                    <ScaleTransform x:Name="ContentScale" ScaleY="1"/>
+                                </Grid.RenderTransform>
+                                <ContentPresenter x:Name="ContentArea"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    <!-- Triggers -->
+                    <ControlTemplate.Triggers>
+                        <!-- Show the button when collapsible -->
+                        <Trigger Property="IsCollapsible" Value="True">
+                            <Setter TargetName="PART_ExpanderButton" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <!-- Collapse / expand animation -->
+                        <Trigger SourceName="PART_ExpanderButton" Property="IsChecked" Value="True">
+                            <!-- Collapse animation -->
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <!-- Shrink & fade -->
+                                        <DoubleAnimation Storyboard.TargetName="ContentScale" Storyboard.TargetProperty="ScaleY" To="0" Duration="0:0:0.25" AccelerationRatio="0.3" DecelerationRatio="0.7"/>
+                                        <DoubleAnimation Storyboard.TargetName="ContentContainer" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.25"/>
+                                        <!-- Actually hide at the end -->
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentContainer" Storyboard.TargetProperty="Visibility" BeginTime="0:0:0.25">
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Collapsed}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <!-- Expand animation -->
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <!-- Make visible immediately -->
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ContentContainer" Storyboard.TargetProperty="Visibility" BeginTime="0:0:0">
+                                            <DiscreteObjectKeyFrame KeyTime="0:0:0" Value="{x:Static Visibility.Visible}"/>
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <!-- Grow & fade in -->
+                                        <DoubleAnimation Storyboard.TargetName="ContentScale" Storyboard.TargetProperty="ScaleY" From="0" To="1" Duration="0:0:0.25" AccelerationRatio="0.3" DecelerationRatio="0.7"/>
+                                        <DoubleAnimation Storyboard.TargetName="ContentContainer" Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.25"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                            <Setter TargetName="PART_ExpanderButton" Property="Content" Value="▼"/>
+                        </Trigger>
+                        <!-- Always visible if not collapsible -->
+                        <Trigger Property="IsCollapsible" Value="False">
+                            <Setter TargetName="ContentContainer" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type control:AnalogOutputControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:AnalogOutputControl}">
+
+                    <Border Background="#F9F3EB"
+                        CornerRadius="15"
+                        Padding="2"
+                        BorderBrush="DimGray"
+                        BorderThickness="2">
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- DISPLAY VALUE -->
+                            <Border x:Name="PART_OpenPopup"
+                                Grid.Column="0"
+                                Background="Transparent"
+                                Cursor="Hand"
+                                VerticalAlignment="Center">
+                                <TextBlock Text="{Binding DisplayValue, RelativeSource={RelativeSource TemplatedParent}}"
+                                       FontSize="18"
+                                       FontWeight="Bold"
+                                       HorizontalAlignment="Right"
+                                       Margin="5,2"
+                                         />
+                            </Border>
+
+                            <!-- LABEL / NAME / UNITS -->
+                            <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    Margin="10,0,0,0">
+
+                                <TextBlock Text="{Binding Label, RelativeSource={RelativeSource TemplatedParent}}"
+                                       FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text=": " FontSize="18" FontWeight="Bold"/>
+
+                                <TextBlock Text="{Binding UserID, RelativeSource={RelativeSource TemplatedParent}}"
+                                       FontSize="18" FontWeight="Bold"/>
+
+                                <TextBlock Text=" (" FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Units, RelativeSource={RelativeSource TemplatedParent}}"
+                                       FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text=")" FontSize="18" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <!-- CONFIG BUTTON -->
+                            <control:HamburgerButton Grid.Column="2"
+                                                 Margin="5"
+                                                 VerticalAlignment="Center"
+                                                 Command="{Binding ConfigCommand, RelativeSource={RelativeSource TemplatedParent}}"
+                                                 CommandParameter="{Binding Channel, RelativeSource={RelativeSource TemplatedParent}}"/>
+
+                            <!-- POPUP -->
+                            <Popup x:Name="PART_Popup"
+                               Placement="Bottom"
+                               PlacementTarget="{Binding ElementName=PART_OpenPopup}"
+                               StaysOpen="False">
+
+                                <Border Background="White"
+                                    Padding="10"
+                                    CornerRadius="8"
+                                    BorderBrush="Black"
+                                    BorderThickness="1">
+
+                                    <StackPanel Orientation="Vertical">
+
+                                        <!-- INPUT BOX -->
+                                        <TextBox x:Name="PART_EditBox"
+                                             Width="140"
+                                             FontSize="20"
+                                             Padding="5,2"
+                                             HorizontalContentAlignment="Right"
+                                             Text="{Binding EditValue,
+                                                            RelativeSource={RelativeSource TemplatedParent},
+                                                            Mode=TwoWay,
+                                                            UpdateSourceTrigger=LostFocus}"/>
+
+
+                                    </StackPanel>
+                                </Border>
+
+                            </Popup>
+
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type control:PidLoopControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type control:PidLoopControl}">
+                    <Border Background="#dddddd"
+                            BorderBrush="#333333"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Padding="5"
+                            Width="250">
+                        <StackPanel>
+                            <Border Background="#c4c4c4"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="4">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Text="{Binding Title, RelativeSource={RelativeSource TemplatedParent}}"
+                                               FontWeight="Bold" FontSize="20"
+                                               Foreground="#030303"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               Grid.Column="0" Grid.Row="0"/>
+
+                                    <control:HamburgerButton x:Name="HamburgerButton"
+                                                             Grid.Column="0" Grid.Row="0"
+                                                             ToolTip="Edit PID Properties"
+                                                             Width="20" Height="20"
+                                                             VerticalAlignment="Center"
+                                                             HorizontalAlignment="Right"
+                                                             Margin="4,0,0,0"
+                                                             Command="{Binding ConfigCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </Grid>
+                            </Border>
+
+                            <Border x:Name="BodyContainer">
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Labels -->
+                                    <TextBlock Text="SP:" FontWeight="Bold"
+                                                Grid.Column="0" Grid.Row="0"
+                                                TextAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Margin="5,2"/>
+                                    <TextBlock Text="PV:" FontWeight="Bold"
+                                        Grid.Column="0" Grid.Row="1"
+                                        TextAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Margin="5,2"/>
+                                    <TextBlock Text="Output:" FontWeight="Bold"
+                                        Grid.Column="0" Grid.Row="2"
+                                        TextAlignment="Right"
+                                        VerticalAlignment="Center"
+                                    Margin="5,2"/>
+
+                                    <!-- Editable Fields -->
+                                    <TextBox x:Name="SetpointBox"
+                                        Text="{Binding Setpoint, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000, StringFormat=F3}"
+                                        TextAlignment="Right" Margin="5,2" Padding="5,2"
+                                        Grid.Column="1" Grid.Row="0"/>
+
+                                    <TextBox Text="{Binding ProcessValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000, StringFormat=F3}"
+                                        TextAlignment="Right" Margin="5,2" Padding="5,2"
+                                        Grid.Column="1" Grid.Row="1"
+                                        IsReadOnly="True"/>
+
+                                    <TextBox x:Name="OutputBox"
+                                        Text="{Binding Output, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000, StringFormat=F3}"
+                                        TextAlignment="Right" Margin="5,2" Padding="5,2"
+                                        Grid.Column="1" Grid.Row="2"/>
+
+
+                                    <control:AutoModeButton x:Name="AutoModeButton"
+                                                    Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2"
+                                                    Margin="10,10" Padding="10,2"
+                                                    FontSize="16" FontWeight="Bold"
+                                                    OnText="AUTO MODE"
+                                                    OffText="MANUAL MODE"
+                                                    IsChecked="{Binding IsAutoMode, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"/>
+
+                                    <TextBlock Text="Ramp Time:" FontWeight="Bold"
+                                        Grid.Column="0" Grid.Row="4"
+                                        TextAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Margin="5,2"/>
+                                    <TextBox x:Name="RampTime"
+                                        Text="{Binding RampTime, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000, StringFormat=F3}"
+                                        TextAlignment="Right" Margin="5,2" Padding="5,2"
+                                        Grid.Column="1" Grid.Row="4"/>
+                                    <TextBlock Text="Ramp Target:" FontWeight="Bold"
+                                        Grid.Column="0" Grid.Row="5"
+                                        TextAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Margin="5,2"/>
+                                    <TextBox x:Name="RampTarget"
+                                        Text="{Binding RampTarget, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000, StringFormat=F3}"
+                                        TextAlignment="Right" Margin="5,2" Padding="5,2"
+                                        Grid.Column="1" Grid.Row="5"/>
+                                    <control:AutoModeButton x:Name="RampButton"
+                                                    Grid.Column="0" Grid.Row="6" Grid.ColumnSpan="2"
+                                                    Margin="10,10" Padding="10,2"
+                                                    FontSize="16" FontWeight="Bold"
+                                                    OnText="RAMPING ON"
+                                                    OffText="RAMPING OFF"
+                                                    IsChecked="{Binding Ramp, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+
+                                    <Separator Grid.Column="0" Grid.Row='8' Grid.ColumnSpan="2"/>
+
+                                    <TextBlock Text="Tolerance:" FontWeight="Bold"
+                                    Grid.Column="0" Grid.Row="9"
+                                    TextAlignment="Right"
+                                    VerticalAlignment="Center"
+                                    Margin="5,2"/>
+                                    <TextBox x:Name="ToleranceBox"
+                                        Text="{Binding Tolerance, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000, StringFormat=F3}"
+                                        TextAlignment="Right" Margin="5,2" Padding="5,2"
+                                        Grid.Column="1" Grid.Row="9"/>
+
+                                    <control:ToleranceIndicator Grid.ColumnSpan="2"
+                                                    Grid.Column="0" Grid.Row="10"
+                                                    Height="20"
+                                                    Tolerance="{Binding Tolerance, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                    Setpoint="{Binding Setpoint, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                    ProcessValue="{Binding ProcessValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                    Margin="5,2" />
+
+                                    <control:OutputLevelIndicator Grid.Column="2" Grid.Row="0"
+                                                        Grid.RowSpan="11"
+                                                        Margin="2,2"
+                                                        Width="7"
+                                                        Crossover="{Binding Crossover, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                        TickInterval="{Binding TickInterval, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                        OutputMinimum="{Binding OutputValueMinimum, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        OutputMaximum="{Binding OutputValueMaximum, RelativeSource={RelativeSource TemplatedParent}}"
+                                                        OutputValue="{Binding Output, RelativeSource={RelativeSource TemplatedParent}}" />
+
+                                    <control:PVLevelIndicator Grid.Column="3" Grid.Row="0"
+                                                    Grid.RowSpan="11"
+                                                    Width="20"
+                                                    Margin="2,2"
+                                                    PVMinimum="{Binding ProcessValueMinimum, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    PVMaximum="{Binding ProcessValueMaximum, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    Setpoint="{Binding Setpoint, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                    PV="{Binding ProcessValue, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                                    TickInterval="{Binding TickInterval, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- BEHAVIOR TRIGGERS -->
+                    <ControlTemplate.Triggers>
+
+                        <!-- Auto ON: SP enabled, OUT disabled -->
+                        <Trigger Property="IsAutoMode" Value="True">
+                            <Setter TargetName="SetpointBox" Property="IsEnabled" Value="True"/>
+                            <Setter TargetName="OutputBox" Property="IsEnabled" Value="False"/>
+                        </Trigger>
+
+                        <!-- Auto OFF: SP disabled, OUT enabled -->
+                        <Trigger Property="IsAutoMode" Value="False">
+                            <Setter TargetName="SetpointBox" Property="IsEnabled" Value="False"/>
+                            <Setter TargetName="OutputBox" Property="IsEnabled" Value="True"/>
+                        </Trigger>
+
+                        <!-- Global Disable: Freeze all but the Hamburger -->
+                        <Trigger Property="IsUiEnabled" Value="False">
+                            <Setter TargetName="BodyContainer" Property="Opacity" Value="0.4"/>
+
+                            <!-- Disable editable fields -->
+                            <Setter TargetName="SetpointBox" Property="IsEnabled" Value="False"/>
+                            <Setter TargetName="OutputBox" Property="IsEnabled" Value="False"/>
+
+                            <!-- Disable mode buttons and inputs -->
+                            <Setter TargetName="AutoModeButton" Property="IsEnabled" Value="False"/>
+                            <Setter TargetName="RampTime" Property="IsEnabled" Value="False"/>
+                            <Setter TargetName="RampTarget" Property="IsEnabled" Value="False"/>
+                            <Setter TargetName="RampButton" Property="IsEnabled" Value="False"/>
+                            <Setter TargetName="ToleranceBox" Property="IsEnabled" Value="False"/>
+
+                            <!-- Keep Hamburger active -->
+                            <Setter TargetName="HamburgerButton" Property="IsHitTestVisible" Value="True"/>
+                            <Setter TargetName="HamburgerButton" Property="IsEnabled" Value="True"/>
+                            <Setter TargetName="HamburgerButton" Property="Opacity" Value="1.0"/>
+                        </Trigger>
+
+                        <Trigger Property="IsUiEnabled" Value="True">
+                            <Setter TargetName="BodyContainer" Property="Opacity" Value="1.0"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+
+</ResourceDictionary>

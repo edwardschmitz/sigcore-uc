@@ -1,0 +1,58 @@
+﻿<Window x:Class="ControlPanel.Dialogs.StatusDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="System Status"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        FontFamily="Segoe UI"
+        FontSize="14">
+
+    <Border CornerRadius="8"
+            BorderBrush="#888"
+            BorderThickness="1"
+            Background="White"
+            Padding="10"
+            Margin="10">
+
+        <Border.Effect>
+            <DropShadowEffect Color="#805C40"
+                              Opacity=".4"
+                              BlurRadius="10"
+                              ShadowDepth="6"/>
+        </Border.Effect>
+
+        <StackPanel>
+
+            <TextBlock Grid.ColumnSpan="2"
+                       Text="System Status"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="5,0,5,10"/>
+            
+            <ScrollViewer Height="400"
+              VerticalScrollBarVisibility="Auto"
+              HorizontalScrollBarVisibility="Disabled"
+              Margin="0 0 0 10"
+              MaxWidth="600">
+                <RichTextBox x:Name="rtb"
+                 IsReadOnly="True"
+                 BorderThickness="0"
+                 Padding="5,2"
+                 Width="560" />
+            </ScrollViewer>
+
+            <Button Content="Close"
+                    Width="100"
+                    HorizontalAlignment="Center"
+                    Margin="5,2"
+                    Click="Close_Click"/>
+        </StackPanel>
+
+    </Border>
+</Window>

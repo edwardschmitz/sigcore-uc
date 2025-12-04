@@ -1,0 +1,109 @@
+﻿<Window x:Class="ControlPanel.Dialogs.GlobalConfigDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ControlPanel.Dialogs"
+        Title="System Configuration"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        FontFamily="Segoe UI"
+        FontSize="14">
+
+    <Window.Resources>
+        <local:BoolToCollapsedConverter x:Key="BoolToCollapsedConverter"/>
+    </Window.Resources>
+    
+    <Border CornerRadius="8" BorderBrush="#888" BorderThickness="1" Padding="10" Background="White" Margin="10">
+        <Border.Effect>
+            <DropShadowEffect Color="#805C40" Opacity=".4" BlurRadius="10" ShadowDepth="6"/>
+        </Border.Effect>
+
+        <Grid Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.ColumnSpan="2"
+                       Text="System Configuration"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="5,0,5,10"/>
+
+            <!-- System Info -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="System Name:" VerticalAlignment="Center" TextAlignment="Right" Margin="5,2"/>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SystemName, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Serial Number:" VerticalAlignment="Center" TextAlignment="Right" Margin="5,2"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SystemSerialNumber}"  Margin="5,2" Padding="5,2"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Hardware Version:" VerticalAlignment="Center" TextAlignment="Right" Margin="5,2"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding HardwareVersion}" Margin="5,2" Padding="5,2"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Software Version:" VerticalAlignment="Center" TextAlignment="Right" Margin="5,2"/>
+            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SoftwareVersion}" Margin="5,2" Padding="5,2"/>
+
+            <!-- Analog and PWM -->
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Analog Sampling Rate:" VerticalAlignment="Center" TextAlignment="Right" Margin="5,2"/>
+            <ComboBox Grid.Row="5" Grid.Column="1" ItemsSource="{x:Static local:GlobalConfigDlg.SampleRates}" 
+                      SelectedItem="{Binding AnalogSamplingRate, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
+
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="PWM Frequency (Hz):" VerticalAlignment="Center" TextAlignment="Right" Margin="5,2"/>
+            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding PWMFrequency, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
+
+            <!-- Network -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Hostname:" VerticalAlignment="Center" TextAlignment="Right" Margin="5,2"/>
+            <TextBlock Grid.Row="7" Grid.Column="1" Text="{Binding Hostname, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
+            <CheckBox Grid.Row="8" Content="Use DHCP" 
+                      IsChecked="{Binding DhcpEnabled, Mode=TwoWay}" 
+                      Margin="10,4,0,4"/>
+
+
+            <StackPanel Grid.Row="9" Grid.ColumnSpan="2" Orientation="Vertical" Margin="5,5,5,0"
+                        Visibility="{Binding DhcpEnabled, Converter={StaticResource BoolToCollapsedConverter}, ConverterParameter=True}">
+                <TextBlock Text="Static IP Settings" FontWeight="Bold" Margin="0,4"/>
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="IP Address:" Width="100" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding IpAddress, Mode=TwoWay}" Width="140" Margin="5,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="Subnet Mask:" Width="100" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding SubnetMask, Mode=TwoWay}" Width="140" Margin="5,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="Gateway:" Width="100" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding Gateway, Mode=TwoWay}" Width="140" Margin="5,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="DNS:" Width="100" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding Dns, Mode=TwoWay}" Width="140" Margin="5,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Horizontal"
+                        HorizontalAlignment="Center" Margin="5,10,5,0">
+                <Button Content="OK" Width="80" Margin="5,2" Padding="5,2" IsDefault="True" Click="Ok_Click"/>
+                <Button Content="Cancel" Width="80" Margin="5,2" Padding="5,2" IsCancel="True"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

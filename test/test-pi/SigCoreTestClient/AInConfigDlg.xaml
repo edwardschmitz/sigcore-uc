@@ -1,0 +1,64 @@
+﻿<Window x:Class="SigCoreTestClient.AInConfigDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:SigCoreCommon;assembly=SigCoreCommon"
+        WindowStartupLocation="CenterScreen"
+        Title="Analog Input Configuration" Height="500" Width="500">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Labels and Inputs -->
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Name:" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Name}" Margin="4" Padding="5,2"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="Units:" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Units}" Margin="4" Padding="5,2"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="Averaging Samples:" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding AveragingSamples}" Margin="4" Padding="5,2"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="Calibration Type:" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <ComboBox Grid.Row="3" Grid.Column="2" ItemsSource="{Binding CalTypeValues}" SelectedItem="{Binding CalibrationType}" Margin="4" Padding="5,2"/>
+
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="Input Range:" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{Binding RangeValues}" SelectedItem="{Binding InputRange}" Margin="4" Padding="5,2"/>
+
+        <TextBlock Grid.Row="5" Grid.Column="1" Text="M (Scale):" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="5" Grid.Column="2" Text="{Binding M}" Margin="4" Padding="5,2"/>
+
+        <TextBlock Grid.Row="6" Grid.Column="1" Text="B (Offset):" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding B}" Margin="4" Padding="5,2"/>
+
+        <TextBlock Grid.Row="7" Grid.Column="1" Text="Input Points:" VerticalAlignment="Top" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="7" Grid.Column="2" Text="{Binding InputPoints}" Margin="4" Padding="5,2"/>
+
+        <TextBlock Grid.Row="8" Grid.Column="1" Text="Adjusted Points:" VerticalAlignment="Top" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="8" Grid.Column="2" Text="{Binding AdjustedPoints}" Margin="4" Padding="5,2"/>
+
+        <TextBlock Grid.Row="9" Grid.Column="1" Text="Poly Coefficients:" VerticalAlignment="Top" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="9" Grid.Column="2" Text="{Binding PolynomialCoefficients}" Margin="4" Padding="5,2"/>
+
+        <!-- Buttons on the left -->
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="11" Orientation="Vertical" VerticalAlignment="Top">
+            <Button x:Name="SaveBtn" Content="Save" Width="80" Margin="4"/>
+            <Button x:Name="CloseBtn" Content="Cancel" Width="80" Margin="4"/>
+        </StackPanel>
+    </Grid>
+</Window>

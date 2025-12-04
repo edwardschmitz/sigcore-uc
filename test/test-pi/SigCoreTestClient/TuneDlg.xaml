@@ -1,0 +1,119 @@
+﻿<Window x:Class="SigCoreTestClient.TuneDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SigCoreTestClient"
+        mc:Ignorable="d"
+        Title="TuneDlg" Height="600" Width="520">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Enough rows for all fields -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <!-- Buttons -->
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="20">
+            <Button x:Name="Close" IsCancel="True" Content="Close"
+                    Margin="5,2" Padding="20,2"/>
+            <Button x:Name="SendValues" Content="Send Values"
+                    Margin="5,2" Padding="20,2"/>
+        </StackPanel>
+
+        <!-- Name / Number -->
+        <TextBlock Text="Name" TextAlignment="Right" Grid.Column="1" Grid.Row="0"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBlock Text="Number" TextAlignment="Right" Grid.Column="1" Grid.Row="1"
+                   Margin="5,2" Padding="5,2"/>
+
+        <TextBox x:Name="NameTxt" Grid.Column="2" Grid.Row="0"
+                 Margin="5,2" Padding="5,2" IsReadOnly="True"/>
+        <TextBox x:Name="NumberTxt" Grid.Column="2" Grid.Row="1"
+                 Margin="5,2" Padding="5,2" IsReadOnly="True"/>
+
+        <!-- PID Parameters -->
+        <TextBlock Text="Kp" TextAlignment="Right" Grid.Column="1" Grid.Row="2"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBox x:Name="KpTxt" Grid.Column="2" Grid.Row="2"
+                 Margin="5,2" Padding="5,2" IsReadOnly="False"/>
+
+        <TextBlock Text="Ki" TextAlignment="Right" Grid.Column="1" Grid.Row="3"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBox x:Name="KiTxt" Grid.Column="2" Grid.Row="3"
+                 Margin="5,2" Padding="5,2" IsReadOnly="False"/>
+
+        <TextBlock Text="Kd" TextAlignment="Right" Grid.Column="1" Grid.Row="4"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBox x:Name="KdTxt" Grid.Column="2" Grid.Row="4"
+                 Margin="5,2" Padding="5,2" IsReadOnly="False"/>
+
+        <!-- Output range -->
+        <TextBlock Text="Output Min" TextAlignment="Right" Grid.Column="1" Grid.Row="5"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBox x:Name="OutputMinTxt" Grid.Column="2" Grid.Row="5"
+                 Margin="5,2" Padding="5,2" IsReadOnly="False"/>
+
+        <TextBlock Text="Output Max" TextAlignment="Right" Grid.Column="1" Grid.Row="6"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBox x:Name="OutputMaxTxt" Grid.Column="2" Grid.Row="6"
+                 Margin="5,2" Padding="5,2" IsReadOnly="False"/>
+
+        <!-- PV range -->
+        <TextBlock Text="PV Min" TextAlignment="Right" Grid.Column="1" Grid.Row="7"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBox x:Name="PvMinTxt" Grid.Column="2" Grid.Row="7"
+                 Margin="5,2" Padding="5,2" IsReadOnly="False"/>
+
+        <TextBlock Text="PV Max" TextAlignment="Right" Grid.Column="1" Grid.Row="8"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBox x:Name="PvMaxTxt" Grid.Column="2" Grid.Row="8"
+                 Margin="5,2" Padding="5,2" IsReadOnly="False"/>
+
+        <TextBlock Text="Auto Mode" TextAlignment="Right" Grid.Column="1" Grid.Row="17"
+                   Margin="5,2" Padding="5,2"/>
+        <CheckBox x:Name="IsAutoChk" Grid.Column="2" Grid.Row="17"
+                  Margin="5,2" Padding="5,2"/>
+
+        <!-- Channel mapping -->
+        <TextBlock Text="PV Source" TextAlignment="Right" Grid.Column="1" Grid.Row="18"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBox x:Name="PvSourceTxt" Grid.Column="2" Grid.Row="18"
+                 Margin="5,2" Padding="5,2" IsReadOnly="False"/>
+
+        <TextBlock Text="Output Destination" TextAlignment="Right" Grid.Column="1" Grid.Row="19"
+                   Margin="5,2" Padding="5,2"/>
+        <TextBox x:Name="OutputDestTxt" Grid.Column="2" Grid.Row="19"
+                 Margin="5,2" Padding="5,2" IsReadOnly="False"/>
+    </Grid>
+</Window>

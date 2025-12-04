@@ -1,0 +1,734 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #e6e6e6;
+}
+
+header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 50px;
+    background-color: #4f4f4f;
+    color: white;
+}
+
+footer {
+    background-color: #4f4f4f;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+    footer a {
+        color: #ffffff; /* keep link white */
+        text-decoration: none; /* remove underline */
+    }
+
+        footer a:hover {
+            text-decoration: underline; /* add underline on hover */
+            color: #dddddd; /* slightly lighter on hover */
+        }
+
+nav ul.nav-menu {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+}
+
+    nav ul.nav-menu li a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+.hamburger {
+    display: none;
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.section-title {
+    font-size: 2.4rem;
+    color: #3a3a3a;
+    margin-bottom: 15px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .section-title .small-text {
+        font-size: 3.2rem;
+    }
+
+    .section-title .large-text {
+        font-size: 4.8rem;
+        font-weight: bold;
+    }
+
+.logo {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+    .logo img {
+        height: 40px; /* or whatever fits your header */
+        object-fit: contain;
+        display: block;
+    }
+
+
+.tagline {
+    font-size: 1.2rem;
+    font-style: italic;
+    font-weight: 300;
+    color: #555;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1300px;
+    padding: 40px 20px;
+    margin: 0 auto;
+}
+
+.card {
+    width: 380px;
+    height: 520px;
+    background-color: #f9f3eb;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background-color: #cc0000;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .card h2 {
+        font-size: 1.6rem;
+        color: #3a3a3a;
+        margin: 20px 0 10px;
+    }
+
+/* Wrap all interior elements in a .card-content div */
+.card-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+    /* Apply to description */
+    .card-content p {
+        font-size: 1rem;
+        color: #333;
+        line-height: 1.4;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        overflow: hidden;
+        margin-bottom: 15px;
+        flex-grow: 1;
+    }
+
+.view-article-button {
+    margin-top: auto;
+    background-color: #4f4f4f;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+    .view-article-button:hover {
+        background-color: #cc0000;
+    }
+
+.card-link-wrapper {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+}
+.note {
+    font-size: 0.85rem;
+    color: #555;
+    font-weight: bold;
+    text-align: left;
+    margin: 0;
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 4px 0 15px 0;
+    background-color: #f2f2f2;
+}
+    .image-container img {
+        width: 100%;
+        max-width: 600px;
+        border-radius: 8px;
+        border: 2px solid #4f4f4f;
+        object-fit: contain;
+    }
+
+.slideshow-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 8/5;
+    height: 500px;
+    margin: auto;
+    background: #f4f4f4;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    z-index: 1;
+}
+
+    .slide.active {
+        opacity: 1;
+        z-index: 10;
+    }
+
+    .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        cursor: pointer;
+    }
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    color: white;
+    font-size: 24px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    line-height: 50px;
+    user-select: none;
+    border: none;
+    z-index: 100;
+}
+
+    .prev:hover, .next:hover {
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+.prev {
+    left: 10px;
+}
+
+.next {
+    right: 10px;
+}
+
+.pause-play {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    font-size: 16px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    align-items: center;
+    justify-content: center;
+}
+
+    .modal img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 10px;
+    }
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+}
+
+.specs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto 50px;
+}
+
+/* Individual specification and diagram cards */
+.spec-card {
+    background-color: #f9f3eb; /* Matches existing card background */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .spec-card p {
+        font-size: 1.2rem;
+        color: #333;
+        margin-top: 10px;
+        margin-left: 40px;
+        margin-right: 40px;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+
+    .spec-card pre {
+        margin-right: 40px;
+    }
+
+
+    /* Hover effect consistent with main page cards */
+    /*    .spec-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    }
+*/
+    .spec-card h1 {
+        font-size: 1.8rem;
+        color: #800000;
+        margin-bottom: 12px;
+        text-align: center;
+    }
+    /* Headings inside spec cards */
+    .spec-card h2 {
+        font-size: 1.4rem;
+        color: #3a3a3a;
+        margin-top: 30px;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+
+    .spec-card h3 {
+        font-size: 1.2rem;
+        color: #3a3a3a;
+        text-align: left;
+        margin-left: 40px;
+        margin-top: 20px;
+    }
+
+    /* Bullet point lists inside spec cards */
+    .spec-card ol {
+        margin-left: 40px;
+        margin-right: 40px;
+        font-size: 1.2rem;
+        list-style: disc inside;
+        margin-top: 10px;
+    }
+
+    .spec-card ul {
+        margin-left: 40px;
+        margin-right: 40px;
+        font-size: 1.2rem;
+        list-style: disc inside;
+        margin-top: 10px;
+    }
+
+        .spec-card ul li {
+            text-indent: -1.5em; /* Pulls the first line back */
+            padding-left: 1.5em; /* Indents all lines equally */
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+    .spec-card ol li {
+        text-indent: -1.5em; /* Pulls the first line back */
+        padding-left: 1.5em; /* Indents all lines equally */
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 8px;
+        text-align: left;
+    }
+
+    .spec-card pre {
+        background: #e6e6e6;
+        padding: 1rem;
+        overflow-x: auto;
+        border-left: 4px solid #ffcb85;
+        text-align: left;
+        margin-left: 40px;
+        text-indent: 0em; /* Pulls the first line back */
+        padding-left: 10px; /* Indents all lines equally */
+        font-size: 1.2rem;
+    }
+
+    .spec-card ol pre {
+        margin-left: 0px;
+    }
+
+    .spec-card code {
+        font-family: Consolas, monospace;
+        font-size: 0.95em;
+        text-align: left;
+    }
+
+    /* Notes or footnotes inside cards */
+    .spec-card .note {
+        font-size: 0.9rem;
+        font-style: italic;
+        color: #555;
+        margin-top: 12px;
+    }
+
+    .spec-card a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4f4f4f;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        margin-top: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .spec-card a:hover {
+            background-color: #cc0000;
+        }
+
+.spec-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+    .spec-image-container img {
+        width: 100%;
+        max-width: 800px;
+        border-radius: 8px;
+        border: 2px solid #4f4f4f;
+        object-fit: contain;
+        background-color: #f7f7f7;
+    }
+
+
+/* Grid wrapper */
+.press-photo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center; /* centers rows */
+}
+
+/* Frame around each photo */
+.photo-frame {
+    width: 220px; /* fixed frame width */
+    height: 180px; /* fixed frame height */
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+    /* Image scaling inside frame */
+    .photo-frame img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; /* keeps proportions */
+    }
+
+    /* Hover effect */
+    .photo-frame:hover {
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+        transform: scale(1.03);
+    }
+
+.docs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 60px;
+}
+
+.doc-card {
+    background-color: #f9f3eb;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    /* Headings inside doc-card */
+    .doc-card h1 {
+        margin-top: 20px;
+        margin-bottom: 15px;
+        font-size: 1.6rem; /* slightly smaller if needed */
+        line-height: 1.4;
+    }
+
+    .doc-card h2 {
+        margin-top: 18px;
+        margin-bottom: 10px;
+        font-size: 1.3rem;
+        line-height: 1.4;
+    }
+
+    /* Paragraph spacing for readability */
+    .doc-card p {
+        margin-bottom: 12px;
+        text-align: left;
+        font-size: 1.2rem;
+        color: #333;
+    }
+    .doc-card h3 {
+        font-size: 1.8rem;
+        color: #3a3a3a;
+        margin-bottom: 12px;
+    }
+
+    /* Captions inside doc-card */
+    .doc-card .doc-caption {
+        text-align: center;
+        font-size: 0.9rem;
+        font-style: italic;
+        color: #555; /* softer gray */
+        margin-top: 8px;
+    }
+
+    .doc-card ul {
+        font-size: 1.2rem;
+    }
+
+.doc-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+    .doc-image-container img {
+        width: 100%;
+        max-width: 800px;
+        border-radius: 8px;
+        border: 2px solid #4f4f4f;
+        object-fit: contain;
+        background-color: #f7f7f7;
+    }
+ul {
+    text-align: left; /* makes list text left-justified */
+    padding-left: 40px; /* adds indentation for bullets */
+    margin-left: 0; /* prevents double indentation */
+    list-style-position: outside;
+}
+
+.card-title {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-bottom: 25px;
+    color: #222;
+}
+
+/* Scoped step blocks */
+.step-block {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.step-num {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #444;
+    margin-right: 12px;
+    line-height: 1.5;
+}
+
+.step-text h3 {
+    font-size: 1.1rem;
+    margin: 0 0 6px 0;
+    font-weight: 600;
+}
+
+.step-text p {
+    margin: 0 0 10px 0;
+    line-height: 1.5;
+}
+
+/* Download buttons */
+.download-btn {
+    display: inline-block;
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+    .download-btn:hover {
+        background-color: #555;
+    }
+
+/* Code and pre blocks */
+pre {
+    background-color: #f4f4f4;
+    padding: 12px 16px;
+    border-left: 4px solid orange;
+    font-size: 0.95rem;
+    overflow-x: auto;
+    border-radius: 5px;
+    margin-top: 8px;
+}
+
+/* Support link styling */
+.support-link {
+    font-weight: 600;
+    color: #333;
+    text-decoration: underline;
+}
+
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 10px;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        flex-wrap: wrap;
+    }
+
+        .section-title .small-text {
+            font-size: 2rem;
+        }
+
+        .section-title .large-text {
+            font-size: 3rem;
+        }
+
+    .card-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    nav ul.nav-menu {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background-color: #4f4f4f;
+        flex-direction: column;
+        padding: 10px;
+        width: 200px;
+        border-radius: 0 0 5px 5px;
+        z-index: 999;
+    }
+
+        nav ul.nav-menu.show {
+            display: flex;
+        }
+
+    .hamburger {
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        z-index: 1000;
+    }
+
+}

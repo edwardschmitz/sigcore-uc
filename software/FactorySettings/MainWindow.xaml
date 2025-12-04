@@ -1,0 +1,175 @@
+﻿<Window x:Class="FactorySettings.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Title="Factory Settings" Width="500" Height="400">
+
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- CONNECTION STATUS -->
+        <TextBlock Grid.Row="0"
+                   Grid.ColumnSpan="2"
+                   Text="{Binding ConnectionStatus}"
+                   FontSize="18"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"
+                   Margin="0,0,0,15" />
+
+
+        <!-- MAIN CONTENT -->
+        <Grid Grid.Row="1" Grid.ColumnSpan="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT BUTTON STACK -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Top">
+
+                <Button Content="Connect"
+                        Padding="20,2"
+                        Margin="5,2"
+                        Command="{Binding ConnectCmd}" />
+
+                <Button Content="Generate Factory Settings"
+                        Padding="20,2"
+                        Margin="5,2"
+                        Command="{Binding GenerateFactorySettingsCmd}"
+                        IsEnabled="{Binding IsConnected}" />
+
+                <Button Content="Apply Factory Settings"
+                        Padding="20,2"
+                        Margin="5,2"
+                        Command="{Binding ApplyFactorySettingsCmd}"
+                        IsEnabled="{Binding IsConnected}" />
+
+                <Button Content="Print Labels"
+                        Padding="20,2"
+                        Margin="5,2"
+                        Command="{Binding PrintLabelsCmd}"
+                        IsEnabled="{Binding IsConnected}" />
+
+                <Button Content="Close"
+                        Padding="20,2"
+                        Margin="5,2"
+                        IsCancel="True"
+                        Click="Cancel_Click" />
+            </StackPanel>
+
+
+            <!-- RIGHT FIELDS -->
+            <Grid Grid.Column="1" Margin="20,0,0,0">
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+
+                <!-- DATE -->
+                <TextBlock Grid.Row="0" Grid.Column="0"
+                           Text="Date:"
+                           HorizontalAlignment="Right"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+                <TextBlock Grid.Row="0" Grid.Column="1"
+                           Text="{Binding Date}"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+
+                <!-- SERIAL -->
+                <TextBlock Grid.Row="1" Grid.Column="0"
+                           Text="Serial:"
+                           HorizontalAlignment="Right"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+                <TextBox Grid.Row="1" Grid.Column="1"
+                         Text="{Binding Serial}"
+                         Margin="5,2"
+                         Padding="5,2"/>
+
+
+                <!-- REVISION -->
+                <TextBlock Grid.Row="2" Grid.Column="0"
+                           Text="Revision:"
+                           HorizontalAlignment="Right"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+                <TextBox Grid.Row="2" Grid.Column="1"
+                         Text="{Binding Revision}"
+                         Margin="5,2"
+                         Padding="5,2"/>
+
+
+                <!-- VERSION -->
+                <TextBlock Grid.Row="3" Grid.Column="0"
+                           Text="Version:"
+                           HorizontalAlignment="Right"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+                <TextBox Grid.Row="3" Grid.Column="1"
+                         Text="{Binding Version}"
+                         Margin="5,2"
+                         Padding="5,2"/>
+
+
+                <!-- HOSTNAME -->
+                <TextBlock Grid.Row="6" Grid.Column="0"
+                           Text="Hostname:"
+                           HorizontalAlignment="Right"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+                <TextBox Grid.Row="6" Grid.Column="1"
+                         Text="{Binding Hostname}"
+                         Margin="5,2"
+                         Padding="5,2"/>
+
+
+                <!-- SYSTEM NAME -->
+                <TextBlock Grid.Row="7" Grid.Column="0"
+                           Text="System Name:"
+                           HorizontalAlignment="Right"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+                <TextBox Grid.Row="7" Grid.Column="1"
+                         Text="{Binding SystemName}"
+                         Margin="5,2"
+                         Padding="5,2"/>
+
+            </Grid>
+        </Grid>
+
+    </Grid>
+</Window>

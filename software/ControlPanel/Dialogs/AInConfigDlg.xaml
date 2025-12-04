@@ -1,0 +1,150 @@
+﻿<Window x:Class="ControlPanel.Dialogs.AInConfigDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ControlPanel.Dialogs"
+        xmlns:sigcore="clr-namespace:SigCoreCommon;assembly=SigCoreCommon"
+        Title="Analog Input Configuration"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        FontFamily="Segoe UI"
+        FontSize="14">
+
+    <Window.Resources>
+        <local:CalTypeToVisibilityConverter x:Key="CalTypeVisibility"/>
+    </Window.Resources>
+
+    <Border CornerRadius="8" BorderBrush="#888" BorderThickness="1" Padding="10" Background="White" Margin="10">
+        <Border.Effect>
+            <DropShadowEffect Color="#805C40" Opacity=".4" BlurRadius="10" ShadowDepth="6"/>
+        </Border.Effect>
+
+        <Grid Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.ColumnSpan="2"
+                       Text="Analog Input Configuration"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="5,0,5,10"/>
+
+            <!-- Name -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Name:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBox Grid.Row="1" Grid.Column="1" 
+                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5,2" Padding="5,2"/>
+
+            <!-- Units -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Units:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBox Grid.Row="2" Grid.Column="1" 
+                     Text="{Binding Units, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5,2" Padding="5,2"/>
+
+            <!-- Averaging -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Averaging:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBox Grid.Row="3" Grid.Column="1"
+                     Text="{Binding AveragingSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5,2" Padding="5,2"/>
+
+            <!-- Precision -->
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Precision:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBox Grid.Row="4" Grid.Column="1"
+                     Text="{Binding Precision, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5,2" Padding="5,2"/>
+
+            <!-- Display Format -->
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Display:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <ComboBox Grid.Row="5" Grid.Column="1"
+                      Margin="5,2" Padding="5,2"
+                      ItemsSource="{x:Static local:AInConfigDlg.DisplayFormats}"
+                      SelectedItem="{Binding Display, Mode=TwoWay}"/>
+
+            <!-- Input Range -->
+            <ComboBox Grid.Row="6" Grid.Column="1"
+                      Margin="5,2" Padding="5,2"
+                      ItemsSource="{x:Static local:AInConfigDlg.Ranges}"
+                      SelectedItem="{Binding InputRange, Mode=TwoWay}"/>
+
+            <!-- Calibration Type -->
+            <ComboBox Grid.Row="7" Grid.Column="1"
+                      Margin="5,2" Padding="5,2"
+                      ItemsSource="{x:Static local:AInConfigDlg.CalTypes}"
+                      SelectedItem="{Binding CalibrationType, Mode=TwoWay}"/>
+
+            <!-- mX+b -->
+            <StackPanel Grid.Row="8" Grid.ColumnSpan="2" Orientation="Vertical" 
+                        Visibility="{Binding CalibrationType, Converter={StaticResource CalTypeVisibility}, ConverterParameter=mXplusB}">
+                <TextBlock Text="y = m·x + b" FontWeight="Bold" Margin="5,5,5,0"/>
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="m:" VerticalAlignment="Center" Margin="5,2" Padding="5,2"/>
+                    <TextBox Text="{Binding M, Mode=TwoWay}" Width="80" Margin="5,2" Padding="5,2"/>
+                    <TextBlock Text="b:" VerticalAlignment="Center" Margin="10,2" Padding="5,2"/>
+                    <TextBox Text="{Binding B, Mode=TwoWay}" Width="80" Margin="5,2" Padding="5,2"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Polynomial -->
+            <StackPanel Grid.Row="9" Grid.ColumnSpan="2" Orientation="Vertical"
+                        Visibility="{Binding CalibrationType, Converter={StaticResource CalTypeVisibility}, ConverterParameter=Polynomial}">
+                <TextBlock Text="Polynomial Coefficients:" FontWeight="Bold" Margin="5,5,5,0"/>
+                <TextBox Text="{Binding PolynomialCoefficientsString, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
+                <TextBlock Text="Enter the coefficients in a comma delimited list" 
+                           FontStyle="Italic" Foreground="Gray" Margin="5,2" Padding="5,2"/>
+                <TextBlock Text="example: 3 + 2x + 1x² is '3, 2, 1'" 
+                           FontStyle="Italic" Foreground="Gray" Margin="5,2" Padding="5,2"/>
+            </StackPanel>
+
+            <!-- MultiPoint -->
+            <StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Vertical"
+                        Visibility="{Binding CalibrationType, Converter={StaticResource CalTypeVisibility}, ConverterParameter=MultiPoint}">
+                <TextBlock Text="Multi-Point Calibration:" FontWeight="Bold" Margin="5,5,5,0"/>
+                <TextBox Text="{Binding PiecewisePairsString, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
+                <TextBlock Text="Enter point pairs as 'x1:y1, x2:y2, x3:y3'" 
+                           FontStyle="Italic" Foreground="Gray" Margin="5,2" Padding="5,2"/>
+                <TextBlock Text="example: 0:0, 1:2, 2:5" 
+                           FontStyle="Italic" Foreground="Gray" Margin="5,2" Padding="5,2"/>
+            </StackPanel>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="11" Grid.ColumnSpan="2" Orientation="Horizontal"
+                        HorizontalAlignment="Center" Margin="5,10,5,0">
+                <Button Content="OK" Width="80" Margin="5,2" Padding="5,2" IsDefault="True" Click="Ok_Click"/>
+                <Button Content="Cancel" Width="80" Margin="5,2" Padding="5,2" IsCancel="True"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

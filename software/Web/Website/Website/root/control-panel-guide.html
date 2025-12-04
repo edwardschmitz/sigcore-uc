@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel User's Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+    <main class="main-content">
+
+        <div class="section-title">
+            <p class="large-text" style="margin-left: 15px;">Control Panel User's Guide</p>
+        </div>
+
+        <div class="specs-container">
+
+            <div class="spec-card" id="main-window-layout">
+                <h1>Main Window Layout</h1>
+                <div class="slideshow-container" style=" width: 90%;">
+                    <div class="slide active" style="opacity: 100;">
+                        <img src="images/software.png" alt="angle view" />
+                    </div>
+                </div>
+                <p>
+                    The Main Window provides a comprehensive view of the current system status and control interface.
+                    It is divided into clearly labeled sections for interacting with hardware components and managing
+                    system functions.
+                </p>
+
+                <p>The layout includes:</p>
+                <ul>
+                    <li><strong>Relay Outputs</strong> (Top row, center)</li>
+                    <li><strong>Digital Inputs</strong> (Lower left)</li>
+                    <li><strong>Analog Inputs</strong> (Lower center)</li>
+                    <li><strong>Analog Outputs</strong> (Lower right center)</li>
+                    <li><strong>Functions</strong> (Lower right)</li>
+                </ul>
+
+                <p>
+                    Each I/O element includes status indicators and allows user interaction such as toggling,
+                    renaming, or configuration.
+                </p>
+            </div>
+
+            <div class="spec-card">
+                <h2>Relay Outputs</h2>
+                <p>Eight relay output channels (R1-R8) are displayed in individual blocks. Each block shows:</p>
+                <ul>
+                    <li>
+                        <strong>Current State:</strong>
+                        <ul>
+                            <li><strong>Red = OFF</strong></li>
+                            <li><strong>Green = ON</strong></li>
+                        </ul>
+                    </li>
+                    <li><strong>Contact Type:</strong> Radio buttons indicate Normally Open (N/O) or Normally Closed (N/C)</li>
+                    <li><strong>Label:</strong> Each relay includes a user-defined name (e.g., <em>Power</em>, <em>Valve</em>, <em>Motor</em>, <em>Pump</em>)</li>
+                </ul>
+                <p>
+                    Click the <strong>menu button</strong> next to any relay to open the properties panel.
+                    This panel allows you to customize the name of the input (e.g., vent valve, scroll pump, power enable).
+                </p>
+
+                <h3>Relay Properties</h3>
+                <p>
+                    Each relay can be individually configured using the Relay Properties Window. Options include:
+                </p>
+                <ul>
+                    <li><strong>Name:</strong> Assign a descriptive label for easy identification</li>
+                </ul>
+                <p>
+                    <div style="text-align: center;">
+                        <img src="images/relay-properties.png" alt="Relay Properties Window"
+                             style="align-items: center; max-width: 100%; height: auto;">
+                    </div>
+                </p>
+            </div>
+
+            <div class="spec-card">
+                <h2>Digital Inputs</h2>
+                <p>This section shows eight digital input channels (DI1-DI8). Each displays:</p>
+                <ul>
+                    <li>A <strong>green circle</strong> if the input is active (logical HIGH)</li>
+                    <li>A <strong>gray circle</strong> if inactive (logical LOW)</li>
+                    <li>A user-defined label (e.g., <em>Power ON</em>, <em>Valve OPEN</em>)</li>
+                </ul>
+                <p>
+                    Right-clicking a digital input opens the <strong>Digital Input Properties Window</strong>,
+                    where the label can be edited.
+                </p>
+                <h3>Digital Input Properties</h3>
+                <p>
+                    Click the <strong>menu button</strong> next to any digital input to open the properties panel.
+                    This panel allows you to customize the name of the input (e.g., door status, valve open, motor running).
+                </p>
+                <ul>
+                    <li><strong>Name:</strong> Enter a user-defined label for the input (e.g., "TEST R1 - NO")</li>
+                    <li><strong>Auto Save:</strong> The name is preserved across sessions if autosave is enabled</li>
+                </ul>
+                <div style="text-align: center;">
+                    <img src="images/digital-input-properties.png" alt="Digital Input Properties Popup"
+                         style="align-items: center; max-width: 100%; height: auto;">
+                </div>
+            </div>
+
+            <div class="spec-card">
+                <h2>Analog Inputs</h2>
+                <p>Up to four analog input channels (AI1-AI4) are shown, each with:</p>
+                <ul>
+                    <li>A numeric display of the current input value</li>
+                    <li>A user-defined label and unit (e.g., <em>Motor Temperature (ºC)</em>, <em>Pump Speed (RPM)</em>)</li>
+                    <li>A context menu button to access the <strong>Analog Input Properties</strong></li>
+                </ul>
+                <p>
+                    Analog inputs can be configured for calibration, filtering, and custom units.
+                </p>
+                <h3>Analog Input Properties</h3>
+                <p>
+                    Clicking the <strong>menu button</strong> on the right side of any analog input opens the properties panel.
+                    This panel allows you to customize the behavior and display of the selected channel.
+                </p>
+                <ul>
+                    <li><strong>Name:</strong> Set a user-defined label (e.g., "Pump Speed" or "Temp Sensor")</li>
+                    <li><strong>Units:</strong> Define engineering units like ºC, PSI, RPM</li>
+                    <li><strong>Filter:</strong> Enable signal smoothing using a low-pass filter</li>
+                    <li><strong>Enable Calibration:</strong> Apply a two-point linear calibration</li>
+                </ul>
+                <p><strong>Calibration Fields:</strong></p>
+                <ul>
+                    <li><strong>Input 1 / Corrected 1:</strong> First calibration point (raw input vs desired output)</li>
+                    <li><strong>Input 2 / Corrected 2:</strong> Second calibration point</li>
+                </ul>
+                <div style="text-align: center;">
+                    <img src="images/analog-input-properties.png" alt="Analog Input Properties Window"
+                         style="align-items: center; max-width: 100%; height: auto;">
+                </div>
+            </div>
+
+            <div class="spec-card">
+                <h2>Analog Outputs</h2>
+                <p>Two analog output channels (AO1 and AO2) appear at the bottom right of the analog I/O area. Each includes:</p>
+                <ul>
+                    <li>A numeric field showing the current output value</li>
+                    <li>A drop-down or slider for adjusting the value</li>
+                    <li>A user-defined label and unit (e.g., <em>Motor Speed (RPM)</em>)</li>
+                    <li>A context menu button for the <strong>Analog Output Properties</strong></li>
+                </ul>
+                <p>
+                    Analog outputs can be calibrated to convert display values into actual voltage output.
+                </p>
+                <h3>Analog Output Properties</h3>
+                <p>
+                    Click the <strong>menu button</strong> next to any analog output channel to open the properties panel.
+                    This dialog lets you define how the channel is labeled and scaled.
+                </p>
+                <ul>
+                    <li><strong>Name:</strong> Set a descriptive label for the output (e.g., "Pump Setpoint")</li>
+                    <li><strong>Units:</strong> Specify the units for user-facing display (e.g., V, PSI, RPM)</li>
+                    <li><strong>Enable Calibration:</strong> Apply a linear mapping between voltage and display value</li>
+                </ul>
+                <p><strong>Calibration Fields:</strong></p>
+                <ul>
+                    <li><strong>Voltage Out 1 / Display Value 1:</strong> Defines the first point on the calibration curve</li>
+                    <li><strong>Voltage Out 2 / Display Value 2:</strong> Defines the second point</li>
+                </ul>
+                <div style="text-align: center;">
+                    <img src="images/analog-output-properties.png" alt="Analog Output Properties Window"
+                         style="align-items: center; max-width: 100%; height: auto;">
+                </div>
+            </div>
+
+            <div class="spec-card">
+                <h2>Functions: Reset and Settings</h2>
+                <p>This section includes two system-level functions:</p>
+                <ul>
+                    <li>
+                        <strong>Reset:</strong>
+                        <ul>
+                            <li>Immediately sets all outputs to their configured default state</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong>Settings:</strong>
+                        <ul>
+                            <li>Opens the <strong>Settings Window</strong> to adjust system-wide parameters, such as:</li>
+                            <li>Sampling interval</li>
+                            <li>Default relay states</li>
+                            <li>Startup behavior</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>Settings Window</h3>
+                <p>
+                    Clicking the <strong>Settings</strong> button opens the Device Settings window, where you can control
+                    timing and default startup behavior.
+                </p>
+                <ul>
+                    <li><strong>Sampling Interval:</strong> Sets the rate (in ms) at which the system polls all inputs and updates outputs.</li>
+                    <li><strong>Default Output States:</strong> Sets the initial state of all relays (R1-R8) on startup or reset.</li>
+                    <li><strong>Save:</strong> Saves the selected sampling interval and relay defaults to persistent storage.</li>
+                    <li><strong>Close:</strong> Exits the window without saving changes.</li>
+                </ul>
+                <div style="text-align: center;">
+                    <img src="images/settings.png" alt="Settings Window"
+                         style="align-items: center; max-width: 100%; height: auto;">
+                </div>
+            </div>
+            <div class="spec-card">
+
+                <h2>Troubleshooting</h2>
+
+                <h3>Relays are unresponsive</h3>
+                <p>Check if 120VAC power is connected. This is required for the relays to function correctly.</p>
+
+                <h3>The window is blank when the Control Panel is launched</h3>
+                <ul>
+                    <li>This usually means the USB cable is not properly connected. Ensure it is securely attached at both ends and relaunch the application.</li>
+                    <li>The D88A42 might be open in another software instance.</li>
+                </ul>
+
+                <h3>Digital inputs are not responding</h3>
+                <ul>
+                    <li>The input voltage may not be high enough to register as "on"</li>
+                    <li>The external input circuit may not share a common ground with the Control Panel</li>
+                </ul>
+
+                <h3>Analog inputs show unexpected values</h3>
+                <ul>
+                    <li>The sensor may not be connected properly.</li>
+                    <li>The input may not be calibrated, or the wrong calibration values were entered.</li>
+                    <li>Noise in the wiring could be affecting readings - try enabling the filter.</li>
+                    <li>The external device might need a common ground with the control panel.</li>
+                </ul>
+
+                <h3>Analog outputs don't control the external device</h3>
+                <ul>
+                    <li>Check the calibration mapping - a bad scale could send unexpected voltages.</li>
+                    <li>The device might need a common ground with the control panel.</li>
+                </ul>
+
+                <h3>The app is slow or unresponsive</h3>
+                <ul>
+                    <li>The sampling interval might be set too low. 250ms is a good sampling rate. Set this value in the settings window on the main window</li>
+                </ul>
+
+            </div>
+
+            <div class="spec-card">
+
+                <h2>PID Control</h2>
+
+                <div style="text-align: center;">
+                    <img src="images/PID.png" alt="PID Window"
+                         style="align-items: center; max-width: 90%; height: auto;">
+                </div>
+                <h3>Purpose</h3>
+                <p>
+                    The PID Control system provides automated regulation of analog output channels using real-time feedback from analog inputs. Each loop applies Proportional–Integral–Derivative (PID) logic to minimize the difference between a desired setpoint and the actual process value. This enables precise closed-loop control of temperature, pressure, flow, or other analog processes.
+                </p>
+
+                <h3>Accessing and Managing PID Loops</h3>
+                <p>
+                    Go to the <strong>System Settings</strong> tab. Scroll to the <strong>PIDs</strong> section. Click <strong>Add PID</strong> to create a new loop. Each loop appears as a control panel with real-time data and a menu button (≡) for configuration.
+                </p>
+
+                <h3>PID Panel Overview</h3>
+                <p>
+                    <strong>SP (Setpoint)</strong> – Desired target value. <br>
+                    <strong>PV (Process Value)</strong> – Current input value from the assigned analog input. <br>
+                    <strong>Output</strong> – Control signal applied to the output channel. <br>
+                    <strong>Tolerance</strong> – Defines acceptable PV deviation from the SP. <br>
+                    <strong>Auto Mode</strong> – Enables or disables automatic control. <br>
+                    <strong>Menu Button (≡)</strong> – Opens the configuration interface.
+                </p>
+
+                <h3>Visual Indicators</h3>
+
+                <h4>PV Bar (Red, Vertical – Far Right)</h4>
+                <p>
+                    Displays the current Process Value on a vertical scale from PV Min (bottom) to PV Max (top). A taller red bar indicates a higher PV.
+                </p>
+
+                <h4>Output Bar (Gray, Vertical – Right of Center)</h4>
+                <p>
+                    Shows the current Output level. The gray bar fills proportionally between Output Min and Output Max, indicating the strength of the control signal.
+                </p>
+
+                <h4>Tolerance Bar (Horizontal – Bottom)</h4>
+                <p>
+                    Visualizes how close the PV is to the Setpoint. The <strong>black vertical line</strong> represents the setpoint. The <strong>green band</strong> shows when PV is within ±1× tolerance (on target). The <strong>red band</strong> shows when PV is within ±2× tolerance (approaching limits). If the PV moves <strong>outside the red</strong>, it is out of the tolerance range.
+                </p>
+
+                <h3>Configuration Panel</h3>
+                <div style="text-align: center;">
+                    <img src="images/PID-config.png" alt="PID Config Window"
+                         style="align-items: center; max-width: 90%; height: auto;">
+                </div>
+                <p>
+                    <strong>Title</strong> – Display name for the PID loop. <br>
+                    <strong>PV Source</strong> – Analog input address providing the process value. <br>
+                    <strong>Output Dest</strong> – Output address controlled by the PID loop.
+                </p>
+
+                <h3>Tuning Parameters</h3>
+                <p>
+                    <strong>Kp</strong> – Proportional gain (current error). <br>
+                    <strong>Ki</strong> – Integral gain (accumulated error). <br>
+                    <strong>Kd</strong> – Derivative gain (rate of change). <br>
+                    <strong>Deadband</strong> – Suppresses output changes near SP. <br>
+                    <strong>Integral Zone</strong> – Restricts integral effect to small errors. <br>
+                    <strong>Deriv on PV</strong> – Applies derivative to PV instead of error. <br>
+                    <strong>Filter Factor</strong> – Smooths derivative response.
+                </p>
+
+                <h3>Output Range</h3>
+                <p>
+                    <strong>Output Min / Max</strong> – Limits output voltage range. <br>
+                    <strong>Crossover</strong> – Determines direction of control action. <br>
+                    <strong>Reverse</strong> – Reverses the output logic (useful for cooling loops). <br>
+                    <strong>Duty Cycle</strong> – Scales output for pulsed control. <br>
+                    <strong>Anti-Windup</strong> – Prevents integrator from oversaturating the output.
+                </p>
+
+                <h3>PV Range</h3>
+                <p>
+                    <strong>PV Min / Max</strong> – Defines scaling bounds for the Process Value input.
+                </p>
+
+                <h3>Runtime Behavior</h3>
+                <p>
+                    PID loops run continuously at the configured sampling interval. In <strong>Auto Mode</strong>, the loop automatically calculates output. In <strong>Manual Mode</strong>, the output can be set directly by the user. Click <strong>Remove</strong> to delete a PID loop from the system.
+                </p>
+
+            </div>
+
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+</body>
+</html>

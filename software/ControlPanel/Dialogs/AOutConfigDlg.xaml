@@ -1,0 +1,197 @@
+﻿<Window x:Class="ControlPanel.Dialogs.AOutConfigDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sigcore="clr-namespace:SigCoreCommon;assembly=SigCoreCommon"
+        xmlns:local="clr-namespace:ControlPanel.Dialogs"
+        Title="Analog Output Configuration"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        FontSize="14"
+        FontFamily="Segoe UI">
+
+    <Border CornerRadius="8"
+            BorderBrush="#888"
+            BorderThickness="1"
+            Padding="10"
+            Background="White"
+            Margin="10">
+        <Border.Effect>
+            <DropShadowEffect Color="#805C40" Opacity=".4" BlurRadius="10" ShadowDepth="6"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="220"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Header -->
+            <TextBlock Text="Analog Output Configuration"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       Margin="5,0,5,10"/>
+
+            <!-- Name -->
+            <TextBlock Text="Name:"
+                       Grid.Row="1"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <TextBox Grid.Row="1"
+                     Grid.Column="1"
+                     Margin="5,2"
+                     Padding="5,2"
+                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Units -->
+            <TextBlock Text="Units:"
+                       Grid.Row="2"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <TextBox Grid.Row="2"
+                     Grid.Column="1"
+                     Margin="5,2"
+                     Padding="5,2"
+                     Text="{Binding Units, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Precision -->
+            <TextBlock Text="Precision:"
+                       Grid.Row="3"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <TextBox Grid.Row="3"
+                     Grid.Column="1"
+                     Margin="5,2"
+                     Padding="5,2"
+                     Width="100"
+                     HorizontalAlignment="Left"
+                     Text="{Binding Precision, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Display Format -->
+            <TextBlock Text="Display:"
+                       Grid.Row="4"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <ComboBox Grid.Row="4"
+                      Grid.Column="1"
+                      Margin="5,2"
+                      Padding="5,2"
+                      ItemsSource="{x:Static local:AOutConfigDlg.DisplayFormats}"
+                      SelectedItem="{Binding Display, Mode=TwoWay}"/>
+
+            <!-- Voltage Scale M -->
+            <TextBlock Text="Voltage Scale (m):"
+                       Grid.Row="5"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <TextBox Grid.Row="5"
+                     Grid.Column="1"
+                     Language="en-US"
+                     Width="100"
+                     Margin="5,2"
+                     Padding="5,2"
+                     HorizontalAlignment="Left" 
+                     Text="{Binding VoltageScaleM, Mode=TwoWay, UpdateSourceTrigger=Default, ConverterCulture=en-US}"/>
+
+            <!-- Voltage Scale B -->
+            <TextBlock Text="Voltage Offset (b):"
+                       Grid.Row="6"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <TextBox Grid.Row="6"
+                     Grid.Column="1"
+                     Width="100"
+                     Margin="5,2"
+                     Padding="5,2"
+                     HorizontalAlignment="Left"
+                     Text="{Binding VoltageScaleB, Mode=TwoWay, UpdateSourceTrigger=Default}"/>
+
+            <!-- Mode -->
+            <TextBlock Text="Mode:"
+                       Grid.Row="7"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <ComboBox Grid.Row="7"
+                      Grid.Column="1"
+                      Margin="5,2"
+                      Padding="5,2"
+                      ItemsSource="{x:Static local:AOutConfigDlg.Modes}"
+                      SelectedItem="{Binding Mode, Mode=TwoWay}"/>
+
+            <!-- Auto -->
+            <TextBlock Text="Automatic Mode:"
+                       Grid.Row="8"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <CheckBox Grid.Row="8"
+                      Grid.Column="1"
+                      IsChecked="{Binding IsAuto, Mode=TwoWay}"
+                      VerticalAlignment="Bottom"
+                      Margin="10,2"
+                      Padding="5,10"/>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="9"
+                        Grid.ColumnSpan="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="5,10,5,0">
+                <Button Content="OK"
+                        Width="80"
+                        Margin="5,2"
+                        Padding="5,2"
+                        IsDefault="True"
+                        Click="Ok_Click"/>
+                <Button Content="Cancel"
+                        Width="80"
+                        Margin="5,2"
+                        Padding="5,2"
+                        IsCancel="True"/>
+            </StackPanel>
+
+        </Grid>
+    </Border>
+</Window>

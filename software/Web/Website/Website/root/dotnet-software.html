@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.Net User's Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+
+
+    <main class="main-content">
+
+        <div class="section-title">
+            <p class="large-text" style="margin-left: 15px;">.Net User's Guide</p>
+        </div>
+        <div class="specs-container">
+
+            <div class="spec-card" id="introduction">
+                <h1 id="overview">Overview</h1>
+                <p>
+                    The <code>ControlPanelManager</code> class provides a unified interface for interacting with a programmable control panel device.
+                    It manages digital inputs, relay outputs, analog inputs, and analog outputs, while also supporting configuration persistence,
+                    calibration, filtering, and event-based notifications.
+                </p>
+                <p>
+                    This library is designed for real-time hardware interaction in environments such as automation systems, test benches,
+                    environmental chambers, or any custom control panel application.
+                </p>
+
+                <h2 id="general-usage">General Usage Flow</h2>
+                <ol>
+                    <li>
+                        <strong>Device Discovery and Initialization</strong><br />
+                        Start by finding available control panel devices using <code>FindControlPanels()</code>. Create a new <code>ControlPanelManager</code>
+                        instance using either the default constructor or by selecting from the discovered list.
+<pre><code class="language-csharp">var available = ControlPanelManager.FindControlPanels();
+var panel = new ControlPanelManager(available[0]);
+</code></pre>
+                    </li>
+                    <li>
+                        <strong>Optional: Load Configuration</strong><br />
+                        Load previously saved settings to restore the panel to its last known configuration.
+<pre><code class="language-csharp">panel.LoadConfig();</code></pre>
+                    </li>
+                    <li>
+                        <strong>Configure Behavior</strong><br />
+                        Set default output states, assign user-friendly names to channels, define units, and apply calibration parameters.
+<pre><code class="language-csharp">panel.SetUserID(AnalogInputs.AI1, "TemperatureSensor");
+panel.SetUnit(AnalogInputs.AI1, "ºC");
+panel.SetRelayDefaultState(Relays.R1, false);</code></pre>
+                    </li>
+                    <li>
+                        <strong>Start Sampling</strong><br />
+                        Begin automatic polling of inputs and updating of outputs using <code>StartSampling()</code>.
+<pre><code class="language-csharp">panel.StartSampling(250); // Poll every 250ms</code></pre>
+                    </li>
+                    <li>
+                        <strong>Monitor or Control</strong><br />
+                        Read inputs and write outputs as needed:
+<pre><code class="language-csharp">bool isPressed = panel.GetDigitalInput(DigitalInputs.DI1);
+panel.SetAnalogOutput(AnalogOutputs.AO1, 2.5);</code></pre>
+                    </li>
+                    <li>
+                        <strong>Optional: Respond to Events</strong><br />
+                        Subscribe to events to respond in real time when input values change.
+<pre><code class="language-csharp">panel.DigitalInputChanged += (s, e) => {
+    Console.WriteLine($"{e.Input} changed to {e.NewValue}");
+};</code></pre>
+                    </li>
+                    <li>
+                        <strong>Optional: Save Configuration</strong><br />
+                        Save your custom settings so they persist across sessions.
+<pre><code class="language-csharp">panel.SaveConfig();</code></pre>
+                    </li>
+                    <li>
+                        <strong>Shut Down Cleanly</strong><br />
+                        Disconnect from the control panel and stop background processing.
+<pre><code class="language-csharp">panel.Stop();</code></pre>
+                    </li>
+                </ol>
+                <h2 id="who-should-use">Who Should Use This Library?</h2>
+                <ul>
+                    <li>Engineers building test rigs or control systems</li>
+                    <li>Developers integrating with custom control panels</li>
+                    <li>OEMs embedding programmable I/O functionality into their hardware</li>
+                    <li>Anyone needing a simple, code-driven interface to physical inputs and outputs</li>
+                </ul>
+
+            </div>
+            <div class="spec-card" id="introduction">
+                <h1 id="constructors">Constructor Overloads</h1>
+
+                <h2>ControlPanelManager()</h2>
+                <p><strong>Purpose:</strong> Creates a new instance by automatically detecting and connecting to the first available control panel device.</p>
+                <p><strong>Usage:</strong> Use this when only one device is expected to be connected, and no device selection is needed.</p>
+<pre><code class="language-csharp">var panel = new ControlPanelManager();</code></pre>
+                <p>If no compatible device is found, an exception will be thrown.</p>
+
+                <h2>ControlPanelManager(Units unit)</h2>
+                <p><strong>Purpose:</strong> Connects to a specific control panel device using its serial and part numbers.</p>
+                <p><strong>Usage:</strong> Use this when working with multiple devices, or when selecting from a list returned by <code>FindControlPanels()</code>.</p>
+<pre><code class="language-csharp">var available = ControlPanelManager.FindControlPanels();
+if (available.Count > 0)
+{
+    var panel = new ControlPanelManager(available[0]);
+}</code></pre>
+                <p>This ensures the correct device is selected in systems with multiple connected units.</p>
+
+            </div>
+            <div class="spec-card" id="introduction">
+                <h1 id="device-properties">Device Properties</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>string</code></td>
+                            <td><code>SerialNum</code></td>
+                            <td>Gets the unique serial number of the connected control panel device.</td>
+                        </tr>
+                        <tr>
+                            <td><code>string</code></td>
+                            <td><code>CPSerialNum</code></td>
+                            <td>Gets the control panel's user-defined serial number.</td>
+                        </tr>
+                        <tr>
+                            <td><code>string</code></td>
+                            <td><code>CPPartNum</code></td>
+                            <td>Gets or sets the control panel's part number.</td>
+                        </tr>
+                        <tr>
+                            <td><code>string</code></td>
+                            <td><code>Name</code></td>
+                            <td>Gets or sets a user-defined name for the control panel.</td>
+                        </tr>
+                        <tr>
+                            <td><code>int</code></td>
+                            <td><code>SamplingInterval</code></td>
+                            <td>Gets or sets the sampling interval in milliseconds for reading input data.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="spec-card" id="introduction">
+                <h1 id="sampling-and-polling">Sampling and Polling</h1>
+                <p>
+                    This set of methods manages background activity that reads inputs and updates outputs on a continuous loop.
+                    The sampling process runs on a separate thread, providing real-time interaction with the control panel without blocking the main application.
+                </p>
+
+                <h2>StartSampling</h2>
+<pre><code class="language-csharp">void StartSampling(int SamplingIntervalMs)</code></pre>
+                <p><strong>Purpose:</strong> Begins continuous input polling and output updates in the background.</p>
+                <p><strong>Usage:</strong> Call this method to start automatic sampling at a fixed interval (in milliseconds). Once started, the control panel will read all digital and analog inputs and make the latest values available for use in your application. If filtering is enabled on an analog input, averaged results are also calculated and dispatched via the <code>AnalogInputChanged</code> event.</p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.StartSampling(250); // Sample every 250 milliseconds</code></pre>
+
+                <h2>StopPolling</h2>
+<pre><code class="language-csharp">void StopPolling()</code></pre>
+                <p><strong>Purpose:</strong> Temporarily stops the sampling thread without shutting down the device.</p>
+                <p><strong>Usage:</strong> Call this method when you want to pause real-time monitoring. This is useful if you need to change configurations or minimize resource usage without a full shutdown.</p>
+
+                <h2>Reset</h2>
+<pre><code class="language-csharp">void Reset()</code></pre>
+                <p><strong>Purpose:</strong> Restores outputs to their default state and clears any filtered input history.</p>
+                <p><strong>Usage:</strong> This method is useful for initializing the control panel to a known state. It resets all digital outputs (relays) and analog outputs to their defined defaults, and clears internal buffers used for filtering analog input data.</p>
+
+                <h2>Stop</h2>
+<pre><code class="language-csharp">void Stop()</code></pre>
+                <p><strong>Purpose:</strong> Fully stops all background processes and disconnects the control panel device.</p>
+                <p><strong>Usage:</strong> Call this when you are finished using the control panel. It gracefully ends the polling thread, releases all resources, and ensures a clean shutdown of the system.</p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.Stop(); // Fully disconnect and clean up</code></pre>
+
+            </div>
+            <div class="spec-card" id="introduction">
+                <h1 id="digital-inputs-and-outputs">Digital Inputs and Outputs</h1>
+                <p>
+                    These methods allow your application to monitor external digital signals and control digital output relays.
+                    Each digital input and relay output is individually addressable using the provided enumerations.
+                </p>
+
+                <h2>GetDigitalInput</h2>
+<pre><code class="language-csharp">bool GetDigitalInput(DigitalInputs input)</code></pre>
+                <p><strong>Purpose:</strong> Returns the current state of the specified digital input.</p>
+                <p>
+                    <strong>Usage:</strong> Call this method to check whether a digital input (such as a button or sensor) is currently active.
+                    The return value is <code>true</code> if the input is high (on) or <code>false</code> if it is low (off).
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">bool doorOpen = panel.GetDigitalInput(DigitalInputs.DI1);</code></pre>
+
+                <h2>GetDigitalOutput</h2>
+<pre><code class="language-csharp">bool GetDigitalOutput(Relays relay)</code></pre>
+                <p><strong>Purpose:</strong> Returns the current on/off state of the specified relay output.</p>
+                <p><strong>Usage:</strong> Use this method to check whether a relay is currently energized (<code>true</code>) or not (<code>false</code>).</p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">bool isHeaterOn = panel.GetDigitalOutput(Relays.R2);</code></pre>
+
+                <h2>SetDigitalOutput</h2>
+<pre><code class="language-csharp">void SetDigitalOutput(Relays relay, bool value)</code></pre>
+                <p><strong>Purpose:</strong> Sets the state of a relay output.</p>
+                <p>
+                    <strong>Usage:</strong> This method turns a specific relay on or off. Pass <code>true</code> to turn the relay on or <code>false</code> to turn it off.
+                    Use this to control external devices like lights, valves, or alarms.
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.SetDigitalOutput(Relays.R2, true);  // Turn on relay R2
+panel.SetDigitalOutput(Relays.R2, false); // Turn off relay
+</code></pre>
+
+            </div>
+            <div class="spec-card" id="introduction">
+                <h1 id="default-states">Default States</h1>
+                <p>
+                    This section describes how to configure default values that will be applied to the control panel's outputs upon startup or reset.
+                    Default states are useful for ensuring the system enters a known-safe condition after a power cycle or software reboot.
+                    Relays and analog outputs can be preset to a defined value, allowing critical outputs to be off or set to a safe voltage by default.
+                </p>
+
+                <h2>GetRelayDefaultState</h2>
+<pre><code class="language-csharp">bool GetRelayDefaultState(Relays relay)</code></pre>
+                <p><strong>Purpose:</strong> Returns the configured default power-on state of a relay output.</p>
+                <p>
+                    <strong>Usage:</strong> Use this method to query the initial on/off state a relay should assume when the control panel is powered on or reset.
+                    This is helpful for confirming fail-safe or startup behaviors.
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">bool defaultState = panel.GetRelayDefaultState(Relays.R5);
+Console.WriteLine($"Relay R5 default state is: {(defaultState ? "ON" : "OFF")}");
+</code></pre>
+
+                <h2>SetRelayDefaultState</h2>
+<pre><code class="language-csharp">void SetRelayDefaultState(Relays relay, bool value)</code></pre>
+                <p><strong>Purpose:</strong> Sets the power-on default state for a relay output.</p>
+                <p>
+                    <strong>Usage:</strong> Call this method to define the desired initial state of a relay (on or off) at startup.
+                    Useful for ensuring that connected devices (like pumps or alarms) behave safely during power restoration or system resets.
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.SetRelayDefaultState(Relays.R5, false); // Ensure R5 is OFF by default
+</code></pre>
+
+                <h2>GetAODefaultState</h2>
+<pre><code class="language-csharp">double GetAODefaultState(AnalogOutputs ao)</code></pre>
+                <p><strong>Purpose:</strong> Retrieves the default voltage assigned to an analog output on startup.</p>
+                <p>
+                    <strong>Usage:</strong> Use this method to read the power-on default voltage level configured for an analog output.
+                    This is helpful when you need to verify the expected voltage applied to external devices during system initialization.
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">double defaultVoltage = panel.GetAODefaultState(AnalogOutputs.AO1);
+Console.WriteLine($"AO1 default voltage: {defaultVoltage}V");
+</code></pre>
+
+                <h2>SetAODefaultState</h2>
+<pre><code class="language-csharp">void SetAODefaultState(AnalogOutputs ao, double value)</code></pre>
+                <p><strong>Purpose:</strong> Assigns a power-on default voltage to an analog output channel.</p>
+                <p>
+                    <strong>Usage:</strong> Use this method to define the voltage that should be output on a specific analog channel when the system is powered up or reset.
+                    This is useful for controlling devices that need a known voltage at startup.
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.SetAODefaultState(AnalogOutputs.AO1, 2.5); // Set AO1 to 2.5V at startup
+</code></pre>
+
+            </div>
+            <div class="spec-card" id="introduction">
+                <h1 id="metadata-and-configuration">Metadata and Configuration</h1>
+                <p>This section allows you to manage additional descriptive properties for each I/O channel. These metadata values help make your control panel setup more readable, understandable, and tailored to the application at hand. You can assign friendly names (user IDs), define engineering units for analog values, and control whether a low-pass filter is applied to analog inputs.</p>
+
+                <h2>GetUserID</h2>
+<pre><code class="language-csharp">string GetUserID&lt;TEnum&gt;(TEnum key)</code></pre>
+                <p><strong>Purpose:</strong> Retrieves the user-defined ID (friendly name) associated with the specified input or output channel.</p>
+                <p><strong>Usage:</strong> Use this to access any custom label previously set for a relay, digital input, analog input, or analog output.</p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">string name = panel.GetUserID(AnalogInputs.AI1); // Returns "TemperatureSensor", if previously set
+</code></pre>
+
+                <h2>SetUserID</h2>
+<pre><code class="language-csharp">void SetUserID&lt;TEnum&gt;(TEnum key, string userID)</code></pre>
+                <p><strong>Purpose:</strong> Assigns a user-defined ID (friendly name) to the specified I/O channel.</p>
+                <p><strong>Usage:</strong> Useful for labeling inputs and outputs with meaningful identifiers, such as "FanControl", "FlowSensor", or "Valve1".</p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.SetUserID(Relays.R3, "CoolingFan");
+</code></pre>
+
+                <h2>GetUnit</h2>
+<pre><code class="language-csharp">string GetUnit&lt;TEnum&gt;(TEnum key)</code></pre>
+                <p><strong>Purpose:</strong> Retrieves the unit string associated with a specific analog input or output.</p>
+                <p><strong>Usage:</strong> Useful when displaying analog values, so you can automatically label them with the correct engineering units (e.g., ºC, PSI, Volts).</p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">string unit = panel.GetUnit(AnalogInputs.AI2); // Might return "ºC"
+</code></pre>
+
+                <h2>SetUnit</h2>
+<pre><code class="language-csharp">void SetUnit&lt;TEnum&gt;(TEnum key, string unit)</code></pre>
+                <p><strong>Purpose:</strong> Sets a unit string for the given analog input or output.</p>
+                <p><strong>Usage:</strong> This helps clarify what the analog values represent in user interfaces or reports.</p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.SetUnit(AnalogOutputs.AO1, "V"); // Sets unit for AO1 to "Volts"
+</code></pre>
+
+                <h2>GetFilter</h2>
+<pre><code class="language-csharp">bool GetFilter(AnalogInputs key)</code></pre>
+                <p><strong>Purpose:</strong> Checks if input filtering is enabled for a specific analog input channel.</p>
+                <p><strong>Usage:</strong> Use this to verify whether the input signal is being averaged over time to reduce noise.</p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">bool isFiltering = panel.GetFilter(AnalogInputs.AI3);
+</code></pre>
+
+                <h2>SetFilter</h2>
+<pre><code class="language-csharp">void SetFilter(AnalogInputs key, bool value)</code></pre>
+                <p><strong>Purpose:</strong> Enables or disables low-pass filtering for an analog input.</p>
+                <p><strong>Usage:</strong> Set this to true for noisy signals where smoothing improves accuracy. Set to false to get raw values instantly.</p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.SetFilter(AnalogInputs.AI3, true); // Enable filtering on AI3
+</code></pre>
+
+            </div>
+            <div class="spec-card" id="introduction">
+                <h1 id="calibration">Calibration</h1>
+                <p>
+                    Calibration allows analog inputs and outputs to be corrected for sensor drift, scaling mismatches, or voltage offsets.
+                    Each analog channel can apply a linear calibration equation to convert raw hardware values into meaningful engineering units like volts, psi, or ºC.
+                    This improves accuracy and consistency across devices.
+                </p>
+
+                <h2>GetCalibrationValue</h2>
+<pre><code class="language-csharp">double GetCalibrationValue&lt;TEnum&gt;(TEnum key, CalVals calVal)</code></pre>
+                <p><strong>Purpose:</strong> Retrieves a specific calibration parameter associated with an analog input or output channel.</p>
+                <p>
+                    <strong>Usage:</strong> Use this method to inspect calibration parameters such as raw input values or their corresponding corrected values.
+                    Calibration consists of a linear transformation based on two input-value pairs.
+                </p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>key</code>: The analog input or output (e.g., <code>AnalogInputs.AI1</code>, <code>AnalogOutputs.AO2</code>)</li>
+                    <li><code>calVal</code>: The calibration parameter to retrieve (e.g., <code>CalVals.INPUT1</code>, <code>CalVals.CORRECTION2</code>)</li>
+                </ul>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">double correction = panel.GetCalibrationValue(AnalogInputs.AI2, CalVals.CORRECTION1);
+Console.WriteLine($"Correction 1 for AI2: {correction}");
+</code></pre>
+
+                <h2>SetCalibrationValue</h2>
+<pre><code class="language-csharp">void SetCalibrationValue&lt;TEnum&gt;(TEnum key, CalVals calVal, double value)</code></pre>
+                <p><strong>Purpose:</strong> Sets a calibration parameter for an analog input or output.</p>
+                <p>
+                    <strong>Usage:</strong> Use this method to programmatically adjust the calibration curve for an analog input or output.
+                    For example, you can align a sensor's raw voltage to a real-world physical measurement.
+                </p>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>key</code>: The analog input or output to calibrate</li>
+                    <li><code>calVal</code>: The calibration parameter to set (e.g., <code>CalVals.ISCAL</code>, <code>CalVals.INPUT1</code>)</li>
+                    <li><code>value</code>: The value to assign</li>
+                </ul>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.SetCalibrationValue(AnalogOutputs.AO1, CalVals.CORRECTION2, 10.0); // Output should map to 10.0V
+</code></pre>
+
+            </div>
+            <div class="spec-card" id="introduction">
+                <h1 id="persistence">Persistence</h1>
+                <p>
+                    The control panel library supports saving and restoring configuration data.
+                    This includes user-defined labels, sampling settings, filter options, default output states, and calibration parameters.
+                    Configurations are saved to disk in a readable JSON format, allowing easy inspection or version control.
+                </p>
+
+                <h2>SaveConfig</h2>
+<pre><code class="language-csharp">void SaveConfig()</code></pre>
+                <p><strong>Purpose:</strong> Saves the current control panel configuration to a file.</p>
+                <p>
+                    <strong>Usage:</strong> Call this method to persist all customized settings so they can be restored after a reboot or software restart.
+                    Useful for deploying systems with predefined calibration and naming conventions.
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.SaveConfig(); // Save current configuration to disk
+</code></pre>
+
+                <h2>LoadConfig</h2>
+<pre><code class="language-csharp">void LoadConfig()</code></pre>
+                <p><strong>Purpose:</strong> Loads a saved configuration from disk. Falls back to defaults if no saved config is found.</p>
+                <p>
+                    <strong>Usage:</strong> Call this method during initialization to restore saved settings for a specific device.
+                    If the configuration file does not exist, it will initialize with factory defaults.
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.LoadConfig(); // Load previous config or fall back to default values
+</code></pre>
+
+            </div>
+            <div class="spec-card" id="introduction">
+                <h1 id="event-system">Event System</h1>
+                <p>
+                    The control panel supports event-driven programming, allowing your application to respond automatically when inputs change.
+                    These events are ideal for updating user interfaces in real-time, triggering alarms, or logging state changes without constantly polling the device.
+                </p>
+
+                <h2>DigitalInputChanged</h2>
+<pre><code class="language-csharp">event EventHandler&lt;DigitalInputChangedEventArgs&gt; DigitalInputChanged</code></pre>
+                <p><strong>Purpose:</strong> Raised whenever the state of a digital input changes (e.g., a button press or sensor signal).</p>
+                <p>
+                    <strong>Usage:</strong> Subscribe to this event to receive notifications when a digital input is toggled.
+                    The event arguments provide the input channel and its new state.
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.DigitalInputChanged += (sender, e) =>
+{
+    Console.WriteLine($"Digital input {e.Input} changed to {e.NewValue}");
+};
+</code></pre>
+
+                <h2>AnalogInputChanged</h2>
+<pre><code class="language-csharp">event EventHandler&lt;AnalogInputChangedEventArgs&gt; AnalogInputChanged</code></pre>
+                <p><strong>Purpose:</strong> Raised periodically for each analog input during sampling, delivering the latest value.</p>
+                <p>
+                    <strong>Usage:</strong> Subscribe to this event to receive smoothed or raw analog input values as they are read.
+                    The frequency depends on the sampling interval and whether filtering is enabled.
+                </p>
+                <p><strong>Example:</strong></p>
+<pre><code class="language-csharp">panel.AnalogInputChanged += (sender, e) =>
+{
+    Console.WriteLine($"Analog input {e.Input} now reads {e.NewValue:F2}");
+};
+</code></pre>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+
+
+
+
+</body>
+</html>

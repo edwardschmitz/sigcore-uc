@@ -1,0 +1,624 @@
+﻿<Window x:Class="SigCoreTestClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SigCoreTestClient"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="1200" Width="1500"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanResize">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" MinWidth="850" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0">
+            <Button Content="Discovery" x:Name="Discovery" Click="Discovery_Click" 
+                    Margin="5,2" Padding="5,2"/>
+            <Button Content="Open" x:Name="Open" Click="Open_Click" 
+                    Margin="5,2" Padding="20,2"/>
+            <Button Content="Close" x:Name="Close"
+                    Margin="5,2" Padding="20,2" Click="Close_Click"/>
+            <Separator Margin="10,5"/>
+            <Button Content="Ping" x:Name="Ping"
+                    Margin="5,2" Padding="20,2" Click="Ping_Click"/>
+            <Separator Margin="10,5"/>
+            <Button Content="Clear Stability" x:Name="Clear"
+                    Margin="5,2" Padding="20,2" Click="Clear_Click"/>
+            <Separator Margin="10,5"/>
+            <Button x:Name="GlobalConfig" Content="Global" Padding="20,2" Margin="5,2" 
+                    Click="GlobalConfig_Click"/>
+            <Button x:Name="GetFRAM" Content="FRAM" Padding="20,2" Margin="5,2" Click="GetFRAM_Click"/>
+
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="1">
+
+            <Label Content="PID" Margin="20,2"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   />
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+
+                    <!-- PID 1 -->
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Margin="8" Padding="8">
+                        <StackPanel Orientation="Vertical" Width="150">
+                            <TextBlock x:Name="PID1Label" Text="PID 1"
+                           FontSize="16" FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="SP:" Width="45" VerticalAlignment="Center" TextAlignment="Right"/>
+                                <TextBox x:Name="PID1SP" Width="80" Margin="5,0"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="PV:" Width="45" VerticalAlignment="Center" TextAlignment="Right"/>
+                                <TextBox x:Name="PID1PV" Width="80" Margin="5,0" IsReadOnly="True"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="Out:" Width="45" VerticalAlignment="Center" TextAlignment="Right"/>
+                                <TextBox x:Name="PID1Output" Width="80" Margin="5,0" IsReadOnly="True"/>
+                            </StackPanel>
+
+                            <!-- Auto/Config buttons -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                                <Button x:Name="PID1AutoBtn" Content="Auto"
+                            Padding="8,3" Margin="3" FontWeight="Bold"/>
+                                <Button x:Name="PID1ConfigBtn" Content="Config"
+                            Padding="8,3" Margin="3" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <!-- Reset button below -->
+                            <Button x:Name="PID1ResetBtn" Content="Reset"
+                        Padding="8,3" Margin="3,6,3,0"
+                        FontWeight="Bold"
+                        HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- PID 2 -->
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Margin="8" Padding="8">
+                        <StackPanel Orientation="Vertical" Width="150">
+                            <TextBlock x:Name="PID2Label" Text="PID 2"
+                           FontSize="16" FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="SP:" Width="45" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="PID2SP" Width="80" Margin="5,0"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="PV:" Width="45" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="PID2PV" Width="80" Margin="5,0" IsReadOnly="True"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="Out:" Width="45" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="PID2Output" Width="80" Margin="5,0" IsReadOnly="True"/>
+                            </StackPanel>
+
+                            <!-- Auto/Config buttons -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                                <Button x:Name="PID2AutoBtn" Content="Auto"
+                            Padding="8,3" Margin="3" FontWeight="Bold"/>
+                                <Button x:Name="PID2ConfigBtn" Content="Config"
+                            Padding="8,3" Margin="3" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <!-- Reset button below -->
+                            <Button x:Name="PID2ResetBtn" Content="Reset"
+                        Padding="8,3" Margin="3,6,3,0"
+                        FontWeight="Bold"
+                        HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- PID 3 -->
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Margin="8" Padding="8">
+                        <StackPanel Orientation="Vertical" Width="150">
+                            <TextBlock x:Name="PID3Label" Text="PID 3"
+                           FontSize="16" FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="SP:" Width="45" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="PID3SP" Width="80" Margin="5,0"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="PV:" Width="45" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="PID3PV" Width="80" Margin="5,0" IsReadOnly="True"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="Out:" Width="45" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="PID3Output" Width="80" Margin="5,0" IsReadOnly="True"/>
+                            </StackPanel>
+
+                            <!-- Auto/Config buttons -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                                <Button x:Name="PID3AutoBtn" Content="Auto"
+                            Padding="8,3" Margin="3" FontWeight="Bold"/>
+                                <Button x:Name="PID3ConfigBtn" Content="Config"
+                            Padding="8,3" Margin="3" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <!-- Reset button below -->
+                            <Button x:Name="PID3ResetBtn" Content="Reset"
+                        Padding="8,3" Margin="3,6,3,0"
+                        FontWeight="Bold"
+                        HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- PID 4 -->
+                    <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Margin="8" Padding="8">
+                        <StackPanel Orientation="Vertical" Width="150">
+                            <TextBlock x:Name="PID4Label" Text="PID 4"
+                           FontSize="16" FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="SP:" Width="45" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="PID4SP" Width="80" Margin="5,0"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="PV:" Width="45" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="PID4PV" Width="80" Margin="5,0" IsReadOnly="True"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="Out:" Width="45" TextAlignment="Right" VerticalAlignment="Center"/>
+                                <TextBox x:Name="PID4Output" Width="80" Margin="5,0" IsReadOnly="True"/>
+                            </StackPanel>
+
+                            <!-- Auto/Config buttons -->
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                                <Button x:Name="PID4AutoBtn" Content="Auto"
+                            Padding="8,3" Margin="3" FontWeight="Bold"/>
+                                <Button x:Name="PID4ConfigBtn" Content="Config"
+                            Padding="8,3" Margin="3" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <!-- Reset button below -->
+                            <Button x:Name="PID4ResetBtn" Content="Reset"
+                        Padding="8,3" Margin="3,6,3,0"
+                        FontWeight="Bold"
+                        HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <Separator Margin="20,0"/>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Relays" Margin="20,2" Padding="20,2"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       />
+                <Button x:Name="AllON" Content="All ON"
+                        Padding="20,2" Margin="5,2"
+                        Height="25"
+                        VerticalAlignment="Center"
+                        />
+                <Button x:Name="AllOFF" Content="All OFF"
+                        Padding="20,2" Margin="5,2"
+                        Height="25"
+                        VerticalAlignment="Center"
+                        />
+            </StackPanel>
+            <!-- ================= RELAYS ================= -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="8">
+                <!-- Relay 1 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="Relay1Label" Text="Relay 1"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="Relay1Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="Relay1Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Relay 2 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="Relay2Label" Text="Relay 2"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="Relay2Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="Relay2Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Relay 3 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="Relay3Label" Text="Relay 3"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="Relay3Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="Relay3Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Relay 4 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="Relay4Label" Text="Relay 4"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="Relay4Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="Relay4Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Relay 5 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="Relay5Label" Text="Relay 5"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="Relay5Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="Relay5Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Relay 6 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="Relay6Label" Text="Relay 6"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="Relay6Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="Relay6Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Relay 7 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="Relay7Label" Text="Relay 7"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="Relay7Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="Relay7Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Relay 8 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="Relay8Label" Text="Relay 8"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="Relay8Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="Relay8Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+
+            <!-- ================= DIGITAL INPUTS ================= -->
+            <Separator Margin="20,6"/>
+            <Label Content="Digital Inputs" Margin="20,2"
+       FontSize="24" FontWeight="Bold"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="8">
+                <!-- DIn 1 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="DIn1Label" Text="D In 1"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="DIn1Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="DIn1Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- DIn 2 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="DIn2Label" Text="D In 2"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="DIn2Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="DIn2Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- DIn 3 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="DIn3Label" Text="D In 3"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="DIn3Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="DIn3Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- DIn 4 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="DIn4Label" Text="D In 4"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="DIn4Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="DIn4Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- DIn 5 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="DIn5Label" Text="D In 5"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="DIn5Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="DIn5Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- DIn 6 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="DIn6Label" Text="D In 6"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="DIn6Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="DIn6Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- DIn 7 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="DIn7Label" Text="D In 7"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="DIn7Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="DIn7Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- DIn 8 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="3" Margin="3" Padding="4">
+                    <StackPanel Orientation="Vertical" Width="95">
+                        <TextBlock x:Name="DIn8Label" Text="D In 8"
+                       HorizontalAlignment="Center" Margin="0,0,0,3" FontSize="13"/>
+                        <Button x:Name="DIn8Btn" Content="Off"
+                    Width="75" Padding="4,2" Margin="0,2"
+                    FontSize="13" FontWeight="Bold" HorizontalAlignment="Center"/>
+                        <Button x:Name="DIn8Configure" Content="Config"
+                    Width="75" Padding="4,2" Margin="0,2" FontSize="12"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <Separator Margin="20,0"/>
+
+            <Label Content="Analog Outputs" Margin="20,2"
+       FontSize="24"
+       FontWeight="Bold"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+
+                <!-- AOut 1 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5" Padding="6">
+                    <StackPanel Orientation="Vertical" Width="140">
+                        <TextBlock x:Name="AOut1Label" Text="A Out 1"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBox x:Name="AOut1Val" Width="100" Text="1.00"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" HorizontalAlignment="Center"/>
+                        <Button x:Name="AOut1Btn" Content="Set Value"
+                    Width="100" Padding="6,3" Margin="0,3"
+                    FontSize="14" FontWeight="Bold"
+                    HorizontalAlignment="Center"/>
+                        <Button x:Name="AOut1Configure" Content="Configure"
+                    Width="100" Padding="6,3" Margin="0,3"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- AOut 2 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5" Padding="6">
+                    <StackPanel Orientation="Vertical" Width="140">
+                        <TextBlock x:Name="AOut2Label" Text="A Out 2"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBox x:Name="AOut2Val" Width="100" Text="1.00"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" HorizontalAlignment="Center"/>
+                        <Button x:Name="AOut2Btn" Content="Set Value"
+                    Width="100" Padding="6,3" Margin="0,3"
+                    FontSize="14" FontWeight="Bold"
+                    HorizontalAlignment="Center"/>
+                        <Button x:Name="AOut2Configure" Content="Configure"
+                    Width="100" Padding="6,3" Margin="0,3"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- AOut 3 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5" Padding="6">
+                    <StackPanel Orientation="Vertical" Width="140">
+                        <TextBlock x:Name="AOut3Label" Text="A Out 3"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBox x:Name="AOut3Val" Width="100" Text="1.00"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" HorizontalAlignment="Center"/>
+                        <Button x:Name="AOut3Btn" Content="Set Value"
+                    Width="100" Padding="6,3" Margin="0,3"
+                    FontSize="14" FontWeight="Bold"
+                    HorizontalAlignment="Center"/>
+                        <Button x:Name="AOut3Configure" Content="Configure"
+                    Width="100" Padding="6,3" Margin="0,3"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- AOut 4 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5" Padding="6">
+                    <StackPanel Orientation="Vertical" Width="140">
+                        <TextBlock x:Name="AOut4Label" Text="A Out 4"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBox x:Name="AOut4Val" Width="100" Text="1.00"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" HorizontalAlignment="Center"/>
+                        <Button x:Name="AOut4Btn" Content="Set Value"
+                    Width="100" Padding="6,3" Margin="0,3"
+                    FontSize="14" FontWeight="Bold"
+                    HorizontalAlignment="Center"/>
+                        <Button x:Name="AOut4Configure" Content="Configure"
+                    Width="100" Padding="6,3" Margin="0,3"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+
+            <Separator Margin="20,0"/>
+
+            <Label Content="Analog Inputs" Margin="20,2"
+       FontSize="24"
+       FontWeight="Bold"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+
+                <!-- AIn 1 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5" Padding="6">
+                    <StackPanel Orientation="Vertical" Width="140">
+                        <TextBlock x:Name="AIn1Label" Text="A In 1"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBox x:Name="AIn1Val" Width="100" Text="0.000"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" IsReadOnly="True"
+                     HorizontalAlignment="Center"/>
+                        <TextBox x:Name="AIn1Stab" Width="100" Text="0.000"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" IsReadOnly="True"
+                     HorizontalAlignment="Center"/>
+                        <Button x:Name="AIn1Configure" Content="Configure"
+                    Width="100" Padding="6,3" Margin="0,3"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- AIn 2 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5" Padding="6">
+                    <StackPanel Orientation="Vertical" Width="140">
+                        <TextBlock x:Name="AIn2Label" Text="A In 2"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBox x:Name="AIn2Val" Width="100" Text="0.000"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" IsReadOnly="True"
+                     HorizontalAlignment="Center"/>
+                        <TextBox x:Name="AIn2Stab" Width="100" Text="0.000"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" IsReadOnly="True"
+                     HorizontalAlignment="Center"/>
+                        <Button x:Name="AIn2Configure" Content="Configure"
+                    Width="100" Padding="6,3" Margin="0,3"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- AIn 3 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5" Padding="6">
+                    <StackPanel Orientation="Vertical" Width="140">
+                        <TextBlock x:Name="AIn3Label" Text="A In 3"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBox x:Name="AIn3Val" Width="100" Text="0.000"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" IsReadOnly="True"
+                     HorizontalAlignment="Center"/>
+                        <TextBox x:Name="AIn3Stab" Width="100" Text="0.000"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" IsReadOnly="True"
+                     HorizontalAlignment="Center"/>
+                        <Button x:Name="AIn3Configure" Content="Configure"
+                    Width="100" Padding="6,3" Margin="0,3"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- AIn 4 -->
+                <Border BorderBrush="Black" BorderThickness="1" CornerRadius="4" Margin="5" Padding="6">
+                    <StackPanel Orientation="Vertical" Width="140">
+                        <TextBlock x:Name="AIn4Label" Text="A In 4"
+                       HorizontalAlignment="Center" Margin="0,0,0,4"/>
+                        <TextBox x:Name="AIn4Val" Width="100" Text="0.000"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" IsReadOnly="True"
+                     HorizontalAlignment="Center"/>
+                        <TextBox x:Name="AIn4Stab" Width="100" Text="0.000"
+                     FontSize="16" FontWeight="Bold"
+                     Margin="0,3" Padding="5,3"
+                     TextAlignment="Right" IsReadOnly="True"
+                     HorizontalAlignment="Center"/>
+                        <Button x:Name="AIn4Configure" Content="Configure"
+                    Width="100" Padding="6,3" Margin="0,3"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </StackPanel>
+        <TextBox Grid.Row="0" Grid.Column="2" x:Name="Log"
+         Grid.RowSpan="2"
+         Margin="5,2" Padding="5,2"
+         FontFamily="Consolas" />
+    </Grid>
+</Window>

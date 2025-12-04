@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SigCore UC - Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+        h1, h2 {
+            color: #222;
+        }
+
+        ul {
+            font-family: monospace;
+            font-size: 1.1em;
+            padding: 10px;
+            background: #f3f3f3;
+            border-radius: 6px;
+            width: 250px;
+            list-style: none;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>SigCore UC Status</h1>
+
+    <section>
+        <h2>Analog Inputs</h2>
+        <ul id="ain-values">
+            <li>AIN 0: <span id="ain0">-</span></li>
+            <li>AIN 1: <span id="ain1">-</span></li>
+            <li>AIN 2: <span id="ain2">-</span></li>
+            <li>AIN 3: <span id="ain3">-</span></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Analog Outputs</h2>
+        <ul id="aout-values">
+            <li>AOUT 0: <span id="aout0">-</span></li>
+            <li>AOUT 1: <span id="aout1">-</span></li>
+            <li>AOUT 2: <span id="aout2">-</span></li>
+            <li>AOUT 3: <span id="aout3">-</span></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Digital Inputs</h2>
+        <ul id="din-values">
+            <li>DIN 0: <span id="din0">-</span></li>
+            <li>DIN 1: <span id="din1">-</span></li>
+            <li>DIN 2: <span id="din2">-</span></li>
+            <li>DIN 3: <span id="din3">-</span></li>
+            <li>DIN 4: <span id="din4">-</span></li>
+            <li>DIN 5: <span id="din5">-</span></li>
+            <li>DIN 6: <span id="din6">-</span></li>
+            <li>DIN 7: <span id="din7">-</span></li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Relay Outputs</h2>
+        <ul id="relay-values">
+            <li>RLY 0: <span id="rly0">-</span></li>
+            <li>RLY 1: <span id="rly1">-</span></li>
+            <li>RLY 2: <span id="rly2">-</span></li>
+            <li>RLY 3: <span id="rly3">-</span></li>
+            <li>RLY 4: <span id="rly4">-</span></li>
+            <li>RLY 5: <span id="rly5">-</span></li>
+            <li>RLY 6: <span id="rly6">-</span></li>
+            <li>RLY 7: <span id="rly7">-</span></li>
+        </ul>
+    </section>
+
+    <script>
+        const ws = new WebSocket(`ws://${location.host}/ws/status`);
+
+        ws.onopen = () => console.log("[WS] Connected to /ws/status");
+        ws.onerror = err => console.error("[WS] Error:", err);
+        ws.onclose = () => console.log("[WS] Closed");
+
+        ws.onmessage = event => {
+            console.log("[WS] raw:", event.data);
+
+            try {
+                const msg = JSON.parse(event.data);
+                const cmd = msg.Command;
+                const p = msg.Payload || {};
+
+                switch (cmd) {
+                    case 39: { // AInChangeAlert
+                        const vals = p.values;
+                        if (Array.isArray(vals)) {
+                            for (let i = 0; i < vals.length && i < 4; i++) {
+                                document.getElementById(`ain${i}`).textContent =
+                                    Number(vals[i]).toFixed(3);
+                            }
+                        }
+                        break;
+                    }
+
+                    case 41: { // AOutChangeAlert
+                        const ch = p.channel;
+                        const val = p.value;
+                        if (ch !== undefined && val !== undefined) {
+                            const el = document.getElementById(`aout${ch}`);
+                            if (el) el.textContent = Number(val).toFixed(3);
+                        }
+                        break;
+                    }
+
+                    case 38: { // DInChangeAlert
+                        const vals = p.values;
+                        if (Array.isArray(vals)) {
+                            for (let i = 0; i < vals.length && i < 8; i++) {
+                                const el = document.getElementById(`din${i}`);
+                                if (el) el.textContent = vals[i] ? "ON" : "OFF";
+                            }
+                        }
+                        break;
+                    }
+
+                    case 40: { // RelayChangeAlert
+                        const ch = p.channel;
+                        const val = p.value;
+                        if (ch !== undefined && val !== undefined) {
+                            const el = document.getElementById(`rly${ch}`);
+                            if (el) el.textContent = val ? "ON" : "OFF";
+                        }
+                        break;
+                    }
+
+                    default:
+                        break;
+                }
+            } catch (e) {
+                console.error("WebSocket parse error:", e);
+            }
+        };
+    </script>
+</body>
+</html>

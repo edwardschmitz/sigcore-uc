@@ -1,0 +1,54 @@
+﻿<Window x:Class="SigCoreTestClient.AOutConfigDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:SigCoreCommon;assembly=SigCoreCommon"
+        WindowStartupLocation="CenterScreen"
+        Title="Analog Output Configuration" Height="500" Width="500">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Buttons on the left -->
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.RowSpan="7" Orientation="Vertical" VerticalAlignment="Top">
+            <Button x:Name="SaveBtn" Content="Save" Width="80" Margin="4"/>
+            <Button x:Name="CloseBtn" Content="Cancel" Width="80" Margin="4"/>
+        </StackPanel>
+
+        <!-- Name -->
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="Name:" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="0" Grid.Column="2" Text="{Binding Name}" Margin="4" Padding="5,2"/>
+
+        <!-- Units -->
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="Units:" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding Units}" Margin="4" Padding="5,2"/>
+
+        <!-- Voltage Scale M -->
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="Voltage Scale (M):" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding VoltageScaleM}" Margin="4" Padding="5,2"/>
+
+        <!-- Voltage Offset B -->
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="Voltage Offset (B):" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding VoltageScaleB}" Margin="4" Padding="5,2"/>
+
+        <!-- Output Mode -->
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="Output Mode:" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{Binding ModeValues}" SelectedItem="{Binding Mode}" Margin="4" Padding="5,2"/>
+
+        <!-- Auto Mode -->
+        <TextBlock Grid.Row="5" Grid.Column="1" Text="Auto Mode:" VerticalAlignment="Center" Margin="4" TextAlignment="Right"/>
+        <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding IsAuto}" Margin="4" Padding="5,2"/>
+    </Grid>
+</Window>

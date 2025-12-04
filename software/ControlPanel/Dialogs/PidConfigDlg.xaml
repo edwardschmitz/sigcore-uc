@@ -1,0 +1,150 @@
+﻿<Window x:Class="ControlPanel.Dialogs.PidConfigDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ControlPanel.Dialogs"
+        Title="PID Controller Configuration"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        FontFamily="Segoe UI"
+        FontSize="14">
+
+    <Border CornerRadius="8" BorderBrush="#888" BorderThickness="1" Padding="10" Background="White" Margin="10">
+        <Border.Effect>
+            <DropShadowEffect Color="#805C40" Opacity=".4" BlurRadius="10" ShadowDepth="6"/>
+        </Border.Effect>
+
+        <Grid Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.ColumnSpan="2"
+                       Text="PID Controller Configuration"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="5,0,5,10"/>
+
+            <!-- Title -->
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Title:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBox Grid.Row="1" Grid.Column="1" 
+                     Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5,2" Padding="5,2"/>
+
+            <!-- Kp -->
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Kp:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBox Grid.Row="2" Grid.Column="1"
+                     Text="{Binding Kp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5,2" Padding="5,2"/>
+
+            <!-- Ki -->
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Ki:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBox Grid.Row="3" Grid.Column="1"
+                     Text="{Binding Ki, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5,2" Padding="5,2"/>
+
+            <!-- Kd -->
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Kd:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBox Grid.Row="4" Grid.Column="1"
+                     Text="{Binding Kd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5,2" Padding="5,2"/>
+
+            <!-- Output Range -->
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Output Range:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="5,2">
+                <TextBox Width="80"
+                         Text="{Binding OutputMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Margin="5,2" Padding="5,2"/>
+                <TextBlock Text="to" VerticalAlignment="Center" Margin="5,2"/>
+                <TextBox Width="80"
+                         Text="{Binding OutputMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Margin="5,2" Padding="5,2"/>
+            </StackPanel>
+
+            <!-- PV Range -->
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="PV Range:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="5,2">
+                <TextBox Width="80"
+                         Text="{Binding PVMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Margin="5,2" Padding="5,2"/>
+                <TextBlock Text="to" VerticalAlignment="Center" Margin="5,2"/>
+                <TextBox Width="80"
+                         Text="{Binding PVMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Margin="5,2" Padding="5,2"/>
+            </StackPanel>
+
+            <!-- Integral Limit -->
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Integral Limit:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBox Grid.Row="7" Grid.Column="1"
+                     Text="{Binding IntegralLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Margin="5,2" Padding="5,2"/>
+
+            <!-- Auto Mode -->
+            <TextBlock Grid.Row="8" Grid.Column="0" Text="Auto Mode:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <CheckBox Grid.Row="8" Grid.Column="1"
+                      IsChecked="{Binding Auto, Mode=TwoWay}"
+                      Margin="5,2"/>
+
+            <!-- Reset on Mode Change -->
+            <TextBlock Grid.Row="9" Grid.Column="0" Text="Reset on Mode Change:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <CheckBox Grid.Row="9" Grid.Column="1"
+                      IsChecked="{Binding ResetOnModeChange, Mode=TwoWay}" 
+                      Content="Yes" Margin="5,2"/>
+            <!-- Auto Mode -->
+            <TextBlock Grid.Row="10" Grid.Column="0" Text="Enabled:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <CheckBox Grid.Row="10" Grid.Column="1"
+                      IsChecked="{Binding Enabled, Mode=TwoWay}"
+                      Margin="5,2"/>
+
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="12" Grid.ColumnSpan="2" Orientation="Horizontal"
+                        HorizontalAlignment="Center" Margin="5,10,5,0">
+                <Button Content="OK" Width="80" Margin="5,2" Padding="5,2" IsDefault="True" Click="Ok_Click"/>
+                <Button Content="Cancel" Width="80" Margin="5,2" Padding="5,2" IsCancel="True"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

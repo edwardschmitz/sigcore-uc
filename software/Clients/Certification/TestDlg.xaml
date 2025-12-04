@@ -1,0 +1,55 @@
+﻿<Window x:Class="Certification.TestDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Certification"
+        mc:Ignorable="d"
+        Title="TestDlg" Height="450" Width="500"
+        WindowStartupLocation="CenterScreen"
+        >
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0"
+                    Grid.RowSpan="3">
+            <Button x:Name="CloseBtn" Content="Close" 
+                    Padding="10,2" Margin="5,2"
+                    IsCancel="True"
+                    />
+            <Button x:Name="Run" Content="{Binding Path=ModeStr}" 
+                    d:Content="Run Test"
+                    Padding="10,2" Margin="5,2"
+                    Command="{Binding Path=RunCmd}"
+                    />
+        </StackPanel>
+
+        <TextBlock Text="{Binding Path=Name}" Grid.Row="0" Grid.Column="1"
+                   d:Text="Test Name"
+                   Padding="5,2" Margin="5,2"
+                   FontSize="16"
+                   />
+        <TextBlock Text="{Binding Path=Instructions}" Grid.Row="1" Grid.Column="1"
+                   d:Text="Hookup the analog outputs to the analog inputs. 
+                   &#10;AOut1 >>> AIn1 &#10;AOut2 >>> AIn2 &#10;AOut3 >>> AIn3 
+                   &#10;AOut4 >>> AIn4 "
+                   Padding="5,2" Margin="5,2"
+                   TextWrapping="Wrap"
+                   />
+        <TextBlock Text="{Binding Path=Progress}" Grid.Row="2" Grid.Column="1"
+                   d:Text="AOut1 >>> AIn1 | COMPLETE &#10;AOut2 >>> AIn2 | COMPLETE&#10;AOut3 >>> AIn3 | 75%&#10;AOut4 >>> AIn4 | PENDING"
+                   Padding="5,2" Margin="5,2"
+                   FontSize="16"
+                   TextWrapping="Wrap"
+                   />
+
+    </Grid>
+</Window>

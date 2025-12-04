@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigCore Press Kit</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+    <main class="main-content">
+        <div class="section-title">
+            <p class="large-text" style="margin-left: 15px;">Press Kit</p>
+        </div>
+
+        <!-- Press Availability Section -->
+        <div class="specs-container">
+            <div class="spec-card">
+                <h1>Press Availability</h1>
+                <p>
+                    Evaluation units of the SigCore UC are available for members of the press.
+                    I am also generally available for interviews or to provide additional details about the product.
+                </p>
+                <p>
+                    Please feel free to <a href="contacts.html">contact me</a> to request a unit or set up a time to talk.
+                </p>
+            </div>
+        </div>
+
+        <!-- Press Sheet Section -->
+        <div class="specs-container">
+            <div class="spec-card">
+                <h1>Press Sheet</h1>
+                <p>Download the official SigCore UC press sheet below.</p>
+                <p style="text-align:center;">
+                    <a href="downloads/press-sheet.pdf" target="_blank">
+                        <img src="images/press-sheet-preview.png"
+                             alt="Product Image – Press Sheet Preview"
+                             style="max-width:50%; height:auto; border:1px solid #ccc; margin-bottom:10px; display:block; margin-left:auto; margin-right:auto;">
+                    </a>
+                </p>
+                <p>
+                    <a class="download-link" href="downloads/press-sheet.pdf" target="_blank">
+                        Download Press Sheet (PDF)
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Press Photos Section -->
+        <div class="specs-container">
+            <div class="spec-card">
+                <h1>Press Photos</h1>
+                <p>High-resolution product and lifestyle images are available for download. Click any image to open the full version.</p>
+                <div class="press-photo-grid">
+                    <a href="images/angle-view.jpg" target="_blank" download>
+                        <div class="photo-frame">
+                            <img src="images/angle-view.jpg" alt="Product Image 1">
+                        </div>
+                    </a>
+                    <a href="images/front-angle.jpg" target="_blank" download>
+                        <div class="photo-frame">
+                            <img src="images/front-angle.jpg" alt="Product Image 2">
+                        </div>
+                    </a>
+                    <a href="images/front.jpg" target="_blank" download>
+                        <div class="photo-frame">
+                            <img src="images/front.jpg" alt="Product Image 3">
+                        </div>
+                    </a>
+                    <a href="images/top-view.jpg" target="_blank" download>
+                        <div class="photo-frame">
+                            <img src="images/top-view.jpg" alt="Product Image 4">
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+
+</body>
+</html>

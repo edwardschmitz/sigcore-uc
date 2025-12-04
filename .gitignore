@@ -1,0 +1,35 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build folders
+**/bin/
+**/obj/
+**/publish/
+build/
+
+# Build outputs
+*.exe
+*.dll
+*.so
+*.pdb
+*.deps.json
+*.runtimeconfig.json
+
+# NuGet + temp
+packages/
+*.cache
+*.tmp
+*.log
+*.db
+*.db-wal
+*.db-shm
+
+# Update builder artifacts
+*.scu
+*.sig
+*.manifest
+
+# Website build output
+software/web/localwebsite/root/

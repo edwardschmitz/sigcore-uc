@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D88A42 User's Guide</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+    <main class="main-content">
+        <div class="section-title">
+            <span class="large-text">D88A42 User's Guide</span>
+        </div>
+        <div class="tagline">Installation, configuration, and operation guide for hardware and software</div>
+
+        <div class="docs-container">
+            <div class="doc-card" id="introduction">
+                <h1>Introduction</h1>
+                <div class="slideshow-container" style="width: 90%;">
+                    <div class="slide active" style="opacity: 100;">
+                        <img src="slideshow-images/angle-view.jpg" alt="angle view" />
+                    </div>
+                </div>
+                <p>
+                    This guide provides comprehensive information to help you install, configure, and operate both the hardware and software components of the D88A42.
+                    The device delivers reliable data acquisition and control solutions for industrial automation, process control, and laboratory measurement environments.
+                </p>
+
+                <h2>Who Should Use This Documentation?</h2>
+                <ul>
+                    <li><strong>System Integrators:</strong> Setting up hardware for field applications.</li>
+                    <li><strong>Engineers and Technicians:</strong> Installing and configuring the system.</li>
+                    <li><strong>Software Developers:</strong> Using the C# and Python libraries for custom solutions.</li>
+                    <li><strong>End Users:</strong> Operating the system through the provided software interface.</li>
+                </ul>
+
+                <h2>How This Documentation Is Organized</h2>
+                <p><strong>Hardware Documentation:</strong> Connections, relay usage, and safety considerations.</p>
+                <p><strong>Software Documentation:</strong> Using the control panel, device settings, and channel operations.</p>
+                <p><strong>Library Documentation:</strong> Programming with .NET and Python libraries, examples, and API references.</p>
+            </div>
+
+            <div class="doc-card" id="warnings">
+                <h1>Warnings and Safety Notice</h1>
+                <p>
+                    Read these warnings carefully before installing or operating the system. Failure to comply may result in injury, equipment damage, or voiding of warranties.
+                </p>
+                <h2>General Safety</h2>
+                <ul>
+                    <li>Only qualified personnel should perform installation and maintenance.</li>
+                    <li>Always disconnect power before servicing.</li>
+                    <li>Never touch exposed terminals when the system is powered.</li>
+                    <li>Ensure proper grounding for safe operation.</li>
+                </ul>
+                <h2>Electrical Safety</h2>
+                <ul>
+                    <li>Relays may carry up to 120VAC or 30VDC—use caution.</li>
+                    <li>Follow proper wiring practices with rated wires and connectors.</li>
+                    <li>Do not exceed relay contact ratings (120VAC @ 10A, 30VDC @ 2A).</li>
+                </ul>
+                <h2>Environment</h2>
+                <ul>
+                    <li>Indoor, dry environments only.</li>
+                    <li>Operating range: 0°C to 50°C.</li>
+                    <li>Avoid moisture, flammable atmospheres, and overheating.</li>
+                </ul>
+            </div>
+
+            <div class="doc-card" id="front-panel">
+                <h1>Front Panel</h1>
+                <div class="doc-image-container">
+                    <img src="images/LidDesign.png" alt="Front Panel">
+                </div>
+                <p>
+                    The front panel provides clear labeling and organized sections for easy access to I/O connections, power, and relays.
+                </p>
+                <h2>Sections</h2>
+                <ul>
+                    <li><strong>Relay Outputs (R1–R8):</strong> SPDT relays rated 120VAC/10A or 30VDC/2A.</li>
+                    <li><strong>Digital Inputs (DI1–DI8):</strong> 0–0.5V = OFF, 3–5V = ON.</li>
+                    <li><strong>Analog Inputs (AI1–AI4):</strong> 0–10V standard; jumper configurable for 0–40V.</li>
+                    <li><strong>Analog Outputs (AO1–AO2):</strong> 0–5V outputs with calibration scaling.</li>
+                    <li><strong>5V Supply:</strong> For sensors/logic-level devices (observe current limit).</li>
+                    <li><strong>Ground Terminal:</strong> Common reference for all I/O.</li>
+                </ul>
+            </div>
+
+            <div class="doc-card" id="relay-usage">
+                <h1>Relay Usage</h1>
+                <div class="doc-image-container">
+                    <img src="images/LidRelay.png" alt="Relay Panel">
+                </div>
+                <p>Each relay is SPDT, offering NO and NC contacts for flexible control of external loads.</p>
+
+                <h2>Relay Ratings</h2>
+                <ul>
+                    <li>120VAC @ 10A</li>
+                    <li>30VDC @ 2A</li>
+                    <li>~10ms switching time</li>
+                    <li>Isolated from internal circuitry</li>
+                </ul>
+
+                <h2>Example Connections</h2>
+                <div class="doc-image-container">
+                    <img src="images/Relay-5VDC.png" alt="5VDC Relay Connection">
+                </div>
+                <p style="text-align: center;">Using the internal 5VDC supply for relay activation.</p>
+            </div>
+
+            <div class="doc-card" id="digital-input">
+                <h1>Digital Input Usage</h1>
+                <div class="doc-image-container">
+                    <img src="images/LidDigitalIn.png" alt="Digital Inputs">
+                </div>
+                <p>DI1–DI8 accept external voltages to monitor switches, sensors, or relays.</p>
+                <ul>
+                    <li>OFF: 0–0.5V</li>
+                    <li>ON: 3–5V</li>
+                    <li>Inputs share a common reference</li>
+                </ul>
+            </div>
+
+            <div class="doc-card" id="analog-input">
+                <h1>Analog Input Usage</h1>
+                <div class="doc-image-container">
+                    <img src="images/LidAnalogIn.png" alt="Analog Inputs">
+                </div>
+                <ul>
+                    <li>0–10V standard input range</li>
+                    <li>0–40V extended range with jumper</li>
+                    <li>Software calibration and filtering included</li>
+                </ul>
+                <div class="doc-image-container">
+                    <img src="images/AI1-0-10V-01.png" alt="0-10V Example">
+                </div>
+                <p style="text-align: center;">Example: reading 0–10V signal on AI1.</p>
+            </div>
+
+            <div class="doc-card" id="analog-output">
+                <h1>Analog Output Usage</h1>
+                <div class="doc-image-container">
+                    <img src="images/LidAnalogOut.png" alt="Analog Outputs">
+                </div>
+                <p>AO1 and AO2 provide calibrated 0–5V outputs for control or simulation.</p>
+                <h2>Applications</h2>
+                <ul>
+                    <li>Control proportional valves or drives</li>
+                    <li>Provide setpoints to controllers</li>
+                    <li>Simulate sensor outputs</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>en Z em - Product Details</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+    <main class="main-content">
+        <div class="section-title">
+            <span class="small-text">en</span>
+            <span class="large-text">Z</span>
+            <span class="small-text">em</span>
+            <span class="large-text" style="margin-left: 15px;">Product Details</span>
+        </div>
+        <div class="tagline">Technical specifications and capabilities of our products</div>
+
+        <div class="docs-container">
+            <div class="doc-card">
+                <p style="font-size: 1.3rem;">
+                </p>
+                <div class="slideshow-container" style=" width: 90%;">
+                    <div class="slide active" style="opacity: 100;">
+                        <img src="images/top-view.jpg" alt="top view" />
+                    </div>
+                </div>
+                <p></p>
+                <p></p>
+                <h2>Key Features</h2>
+
+                <ul>
+                    <li><strong>PID CONTROL:</strong> Built-in industrial-grade PID loops for precise feedback control loops. Automate your process with reliable closed-loop control.</li>
+                    <li><strong>SIGNAL CONDITIONING:</strong> – All I/O signals are fully conditioned and ready for direct use. No external circuitry or adapters required.</li>
+                    <li><strong>RELAY OUTPUTS:</strong> 8 isolated relay channels rated for 120VAC / 10 Amps, each with both normally open (NO) and normally closed (NC) terminals for flexible switching control.</li>
+                    <li><strong>DIGITAL INPUTS:</strong> 8 digital input channels with clear logic thresholds: 2-24VDC = ON, 0–0.5VDC = OFF; ideal for sensors, switches, and external logic signals.</li>
+                    <li><strong>ANALOG INPUTS:</strong> 4 analog input channels configurable for 0–5VDC, 0–10VDC, 0-500mV, or 4–20mA; supports both voltage and current-based analog sensors.</li>
+                    <li><strong>ANALOG OUTPUTS:</strong> 4 analog output channels configurable for 0–5VDC or PWM; suitable for driving industrial devices and control systems.</li>
+                    <li><strong>MODBUS CONTROL SOFTWARE:</strong> Intuitive Ethernet or USB connected control panel with real-time monitoring, calibration tools, and channel-specific configuration for multiple SigCore units.</li>
+                    <li><strong>PROGRAMMING:</strong> Write your own Python or .NET application using the free libraries. They are easy and intuitive to use. Example code and documentation included.</li>
+                </ul>
+                <p></p>
+                <h2>Use Cases</h2>
+                <ul>
+                    <li><strong>Environmental Chambers:</strong> Maintain precise temperature and humidity conditions for thermal testing and aging analysis.</li>
+                    <li><strong>Process Automation:</strong> Regulate pressure, flow, or voltage in real-time across manufacturing, chemical, and lab environments.</li>
+                    <li><strong>Burn-In Racks:</strong> Monitor and control multiple units under test (UUTs) simultaneously for endurance and stress testing.</li>
+                    <li><strong>Lab Equipment Integration:</strong> Automate experimental setups and collect synchronized analog and digital measurements.</li>
+                    <li><strong>HVAC Control Systems:</strong> Manage setpoints, feedback, and output levels for heating, cooling, or mixed climate systems.</li>
+                    <li><strong>Custom Test Fixtures:</strong> Interface with sensors, relays, and actuators to automate repeatable test sequences and safety triggers.</li>
+                    <li><strong>Educational Labs:</strong> Provide students with real-time feedback and programmable control loops for learning automation principles.</li>
+                </ul>
+            </div>
+
+            <div class="doc-card">
+                <h3>Relay Specifications</h3>
+                <p><strong>Addressing:</strong>  R1 through R8</p>
+                <ul>
+                    <li><strong>AC:</strong> 120 VAC @ 10 Amps</li>
+                    <li><strong>DC:</strong> 30 VDC @ 2 Amps</li>
+                    <li><strong>Configuration:</strong> Single Pole Double Throw (SPDT), offering Normally Open (NO) and Normally Closed (NC) contacts.</li>
+                    <li><strong>Switching Time:</strong> ~10 milliseconds</li>
+                    <li>All relays are electrically isolated from each other and from the internal circuitry</li>
+                </ul>
+            </div>
+
+            <div class="doc-card">
+                <h3>Digital Input Specifications</h3>
+                <p><strong>Addressing:</strong> DI1 through DI8</p>
+                <ul>
+                    <li><strong>OFF:</strong> 0 to 0.5VDC</li>
+                    <li><strong>ON:</strong> 2 to 24VDC</li>
+                    <li>All inputs share a common ground</li>
+                </ul>
+            </div>
+
+            <div class="doc-card">
+                <h3>Analog Input Specifications</h3>
+                <p><strong>Addressing:</strong> AI1 through AI4</p>
+                <ul>
+                    <li><strong>Standard Range:</strong> 0 to 5VDC, 0 to 10VDC, 4 to 20mA current loops</li>
+                    <li>All inputs share a common ground</li>
+                </ul>
+                <p class="note">
+                    <em>Calibration & Filtering:</em> Software configurable to correct electrical offsets and scale to engineering units. Filtering stabilizes readings.
+                </p>
+            </div>
+
+            <div class="doc-card">
+                <h3>Analog Output Specifications</h3>
+                <p><strong>Addressing:</strong> AO1 through AO4</p>
+                <ul>
+                    <li><strong>Output Mode:</strong> Software selectable between 0–5 VDC and PWM current loop</li>
+                    <li>All outputs share a common ground</li>
+                </ul>
+                <p class="note">
+                    <em>Calibration:</em> Allows scaling to real-world units, ensuring accurate voltage outputs.
+                </p>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 50px;">Relay Connection Examples</div>
+
+        <div class="docs-container">
+            <div class="doc-card">
+                <h3>5VDC Start/Stop Control</h3>
+                <div class="doc-image-container">
+                    <img src="images/Relay-5VDC Start Stop.png" alt="5VDC Start/Stop Control Diagram">
+                </div>
+                <p style="text-align: center;">Uses the relay to manage start and stop commands using the device's internal 5VDC supply.</p>
+            </div>
+
+            <div class="doc-card">
+                <h3>Internal 5VDC Supply Connection</h3>
+                <div class="doc-image-container">
+                    <img src="images/Relay-5VDC.png" alt="Internal 5VDC Supply Diagram">
+                </div>
+                <p style="text-align: center;">Example of using the device’s internal 5VDC supply for relay activation.</p>
+            </div>
+
+            <div class="doc-card">
+                <h3>24VDC External Supply Connection</h3>
+                <div class="doc-image-container">
+                    <img src="images/Relay-24VDC.png" alt="24VDC External Supply Diagram">
+                </div>
+                <p style="text-align: center;">Controls a 24VDC device with an external power source.</p>
+            </div>
+
+            <div class="doc-card">
+                <h3>120VAC External Supply Connection</h3>
+                <div class="doc-image-container">
+                    <img src="images/Relay-120VAC.png" alt="120VAC External Supply Diagram">
+                </div>
+                <p style="text-align: center;">Switches 120VAC loads for industrial applications.</p>
+            </div>
+
+            <div class="doc-card">
+                <h3>Dry Contact Signal Connection</h3>
+                <div class="doc-image-container">
+                    <img src="images/Relay-Close Contact.png" alt="Dry Contact Connection Diagram">
+                </div>
+                <p style="text-align: center;">Demonstrates using the relay as a dry contact for low-current signals.</p>
+            </div>
+        </div>
+
+        <div class="section-title" style="margin-top: 50px;">Analog Input Connection Examples</div>
+        <div class="tagline">Illustrations demonstrating various relay connection configurations</div>
+
+        <div class="docs-container">
+            <div class="doc-card">
+                <h3>0 to 5 Volt Reading</h3>
+                <div class="doc-image-container">
+                    <img src="images/AI1-0-10V-01.png" alt="0 to 10V Diagram">
+                </div>
+                <p style="text-align: center;">Uses the Analog Input A1 to read a value between 0 and 5V.</p>
+            </div>
+
+            <div class="doc-card">
+                <h3>0 to 10 High Voltage Reading</h3>
+                <div class="doc-image-container">
+                    <img src="images/AI1-0-20V-01.png" alt="High Voltage Reading Diagram">
+                </div>
+                <p style="text-align: center;">Uses the Analog Input A1 to read a high voltage value between 0 and 10V.</p>
+            </div>
+
+            <div class="doc-card">
+                <h3>mAmp Reading</h3>
+                <div class="doc-image-container">
+                    <img src="images/AI1-mA-01.png" alt="mAmp Reading Diagram">
+                </div>
+                <p style="text-align: center;">Uses the Analog Input A1 to read a milliamp signal (0–20mA) typically used by industrial sensors.</p>
+            </div>
+
+        </div>
+
+
+
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+
+
+</body>
+</html>

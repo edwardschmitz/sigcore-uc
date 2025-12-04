@@ -1,0 +1,15 @@
+{
+  "hardware_rev": "revA",
+  "latest_version": "1.0.13",
+  "public_key_fingerprint": "597363aba00a2408366dc702c0171a56508854b0467ac8f5bf50e228d84fb735",
+  "versions": [
+    {
+      "version": "1.0.13",
+      "release_date": "2025-11-15",
+      "hash_sha256": "3b0005ca37336c845544ee41bd702c22642ef12541f083b512fc73a5051de40a",
+      "signature": "https://sigcoreuc.com/update/revA/update.scu.sig",
+      "url": "https://sigcoreuc.com/update/revA/update.scu",
+      "notes": ""
+    }
+  ]
+}
