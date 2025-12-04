@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Pi")(type "Legacy")(uri "${KIPRJMOD}/RASPBERRY_PI_4B_4GB.lib")(options "")(descr ""))
+)

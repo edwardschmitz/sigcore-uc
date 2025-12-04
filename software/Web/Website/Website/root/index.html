@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigCore UC</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <script src="scripts.js"></script>
+
+    <main class="main-content">
+        <div class="section-title">
+            <img src="images/sigcore-uc-logo.png" height="150" />
+        </div>
+        <div class="tagline">
+            A Universal Controller for Professionals
+        </div>
+
+        <div class="wrapper">
+            <div class="slideshow-container">
+                <div id="slideshow"></div>
+                <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+                <button class="next" onclick="changeSlide(1)">&#10095;</button>
+                <button class="pause-play" onclick="toggleSlideshow()">Pause</button>
+            </div>
+
+            <!-- Modal Popup -->
+            <div id="imageModal" class="modal" onclick="closeModal()">
+                <img id="modalImage">
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+        </div>
+
+        <div class="card-container">
+            <a href="product-details.html" class="card-link-wrapper">
+                <div class="card" id="product-details">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/abstract-circuit.png" alt="Product Spec's'">
+                        </div>
+                        <h2>Product Overview</h2>
+                        <p>Find product specifications, features, and capabilities.</p>
+                        <div class="view-article-button">Learn More</div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="support.html" class="card-link-wrapper">
+                <div class="card" id="user-support">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/circuit-board.png" alt="User Support">
+                        </div>
+                        <h2>Support</h2>
+                        <p>Access documentation and guides to help with hardware setup, software usage and library functions, and example code.</p>
+                        <div class="view-article-button">User's Guide</div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="software.html" class="card-link-wrapper">
+                <div class="card" id="software-download">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/software.png" alt="Software Tools">
+                        </div>
+                        <h2>Software</h2>
+                        <p>Download the latest software with the Control Panel, libraries, and other components.</p>
+                        <div class="view-article-button">Download</div>
+                    </div>
+                </div>
+            </a>
+            <a href="media.html" class="card-link-wrapper">
+                <div class="card" id="media">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/media2.jpg" alt="Media Appearances">
+                        </div>
+                        <h2>Media Appearances</h2>
+                        <p>See what the community is saying about SigCore UC</p>
+                        <div class="view-article-button">Media Appearances</div>
+                    </div>
+                </div>
+            </a>
+            <a href="press-sheet.html" class="card-link-wrapper">
+                <div class="card" id="press">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/press.jpg" alt="Press Kit">
+                        </div>
+                        <h2>Press Kit</h2>
+                        <p>Press material suitable for publication</p>
+                        <div class="view-article-button">Press Kit</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+</body>
+</html>

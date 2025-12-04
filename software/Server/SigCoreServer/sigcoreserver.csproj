@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configuration>Release</Configuration>
+		<TargetFramework>net8.0</TargetFramework>
+		<RuntimeIdentifier>linux-arm64</RuntimeIdentifier>
+		<SelfContained>true</SelfContained>
+		<PublishSingleFile>true</PublishSingleFile>
+		<PublishTrimmed>true</PublishTrimmed>
+		<PublishDir>bin\Release\net8.0\linux-arm64\publish\</PublishDir>
+		<OutputType>Exe</OutputType>
+		<BaseOutputPath>..\..\..\build\server</BaseOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Iot.Device.Bindings" Version="4.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="System.Device.Gpio" Version="4.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\libs\SigCoreCommon\SigCoreCommon.csproj" />
+	</ItemGroup>
+
+</Project>

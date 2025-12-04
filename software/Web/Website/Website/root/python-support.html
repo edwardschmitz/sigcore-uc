@@ -1,0 +1,140 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Python Library</title>
+    <link href="styles.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="header-container"></div>
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+    <main class="main-content">
+        <div class="section-title">
+            <p class="large-text" style="margin-left: 15px;">Python Library</p>
+        </div>
+        <div class="specs-container" id="specs">
+
+            <div class="spec-card">
+                <h1>D88A42 Python Library</h1>
+                <h2>Overview</h2>
+                <p>The <code>D88A42</code> class provides a high-level interface for controlling relays, reading inputs, and setting analog outputs on the D88A42 USB I/O module.</p>
+                <h2>Installation</h2>
+<pre><code>pip install https://en-z-em.edwardschmitzsoftware.com/Downloads/d88a42-1.0.0-py3-none-any.whl</code></pre>
+                <h2>Basic Usage</h2>
+<pre><code>from d88a42 import D88A42, Relays
+
+device = D88A42()
+if device.connect():
+    device.set_digital_output(Relays.R1, True)
+    device.disconnect()</code></pre>
+                <h2>Enums</h2>
+                <ul>
+                    <li><code>DigitalInputs</code>: DI1-DI8</li>
+                    <li><code>Relays</code>: R1-R8</li>
+                    <li><code>AnalogInputs</code>: AI1-AI4</li>
+                    <li><code>AnalogOutputs</code>: AO1, AO2</li>
+                </ul>
+                <h2>Digital I/O</h2>
+                <ul>
+                    <li><code>get_digital_input(channel)</code></li>
+                    <li><code>get_digital_output(relay)</code></li>
+                    <li><code>set_digital_output(relay, value)</code></li>
+                    <li><code>set_relay(channel, value)</code> (alias)</li>
+                </ul>
+                <h2>Analog I/O</h2>
+                <ul>
+                    <li><code>get_analog_input(channel)</code></li>
+                    <li><code>get_analog_output(channel)</code></li>
+                    <li><code>set_analog_output(channel, value)</code></li>
+                </ul>
+                <h2>Configuration &amp; Labels</h2>
+                <ul>
+                    <li><code>save_config()</code>, <code>load_config()</code></li>
+                    <li><code>set_user_id(channel, name)</code>, <code>get_user_id(channel)</code></li>
+                </ul>
+                <h2>Connection</h2>
+                <ul>
+                    <li><code>connect()</code>: Connect to the device.</li>
+                    <li><code>disconnect()</code>: Stop sampling and close the connection.</li>
+                    <li><code>start()</code>: Load config and begin polling.</li>
+                    <li><code>stop()</code>: Save config and stop polling.</li>
+                    <li><code>reset()</code>: Reset relays and analog outputs to default values.</li>
+                </ul>
+                <h2>Sampling</h2>
+                <ul>
+                    <li><code>start_sampling(interval_ms=250)</code>: Start input polling.</li>
+                    <li><code>stop_sampling()</code>: Stop polling.</li>
+                </ul>
+                <h2>Function Details</h2>
+                <h3>connect()</h3>
+                <p>Attempts to open a connection to the D88A42 device via USB. Returns <code>True</code> if successful.</p>
+                <h3>disconnect()</h3>
+                <p>Stops sampling and closes the connection to the device. Should be called before exiting your application.</p>
+                <h3>start()</h3>
+                <p>Loads configuration from disk, connects to the device, and begins polling input channels.</p>
+                <h3>stop()</h3>
+                <p>Stops polling, saves configuration to disk, and disconnects the device.</p>
+                <h3>reset()</h3>
+                <p>Turns all relays OFF and sets analog outputs to 0.0V.</p>
+                <h3>start_sampling(interval_ms=250)</h3>
+                <p>Begins polling digital and analog input values at a specified interval (milliseconds). Default is 250 ms.</p>
+                <h3>stop_sampling()</h3>
+                <p>Stops the sampling thread. This can reduce CPU usage when inputs do not need monitoring.</p>
+                <h3>get_digital_input(channel)</h3>
+                <p>Returns the boolean state of a digital input channel.</p>
+                <p><strong>Parameters:</strong> <code>channel</code> - one of <code>DigitalInputs</code> enum.</p>
+                <h3>get_digital_output(relay)</h3>
+                <p>Returns the last known state of a relay (True or False).</p>
+                <p><strong>Parameters:</strong> <code>relay</code> - one of <code>Relays</code> enum.</p>
+                <h3>set_digital_output(relay, value)</h3>
+                <p>Sets a relay (digital output) to True (ON) or False (OFF).</p>
+                <p><strong>Parameters:</strong> <code>relay</code> - relay to control. <code>value</code> - boolean.</p>
+                <h3>set_relay(channel, value)</h3>
+                <p>Alias for <code>set_digital_output()</code>.</p>
+                <h3>get_analog_input(channel)</h3>
+                <p>Returns the current calibrated analog input value as a float (typically in volts).</p>
+                <p><strong>Parameters:</strong> <code>channel</code> - one of <code>AnalogInputs</code> enum.</p>
+                <h3>get_analog_output(channel)</h3>
+                <p>Returns the last set analog output value.</p>
+                <p><strong>Parameters:</strong> <code>channel</code> - one of <code>AnalogOutputs</code> enum.</p>
+                <h3>set_analog_output(channel, value)</h3>
+                <p>Sets the analog output voltage (0.0-5.0V).</p>
+                <p><strong>Parameters:</strong> <code>channel</code> - analog output to control. <code>value</code> - voltage as float.</p>
+                <h3>save_config()</h3>
+                <p>Saves the current configuration, including user-defined labels, to disk.</p>
+                <h3>load_config()</h3>
+                <p>Loads previously saved configuration from disk and applies it to the instance.</p>
+                <h3>set_user_id(channel, name)</h3>
+                <p>Assigns a friendly name to any channel object (digital, analog, or relay).</p>
+                <p><strong>Parameters:</strong> <code>channel</code> - any channel object. <code>name</code> - string label.</p>
+                <h3>get_user_id(channel)</h3>
+                <p>Retrieves the user-defined name (label) for the specified channel.</p>
+            </div>
+        </div>
+    </main>
+    <div id="footer-container"></div>
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+
+</body>
+</html>

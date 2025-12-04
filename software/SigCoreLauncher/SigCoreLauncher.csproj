@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Added for single-file, embedded runtime build -->
+		<Configuration>Release</Configuration>
+		<RuntimeIdentifier>linux-arm64</RuntimeIdentifier>
+		<SelfContained>true</SelfContained>
+		<PublishSingleFile>true</PublishSingleFile>
+		<PublishTrimmed>false</PublishTrimmed>
+		<PublishDir>bin\Release\net8.0\linux-arm64\publish\</PublishDir>
+		<BaseOutputPath>..\..\build\launcher</BaseOutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\libs\SigCoreCommon\SigCoreCommon.csproj" />
+	</ItemGroup>
+
+</Project>

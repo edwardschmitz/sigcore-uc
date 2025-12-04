@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36327.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "sigcoreserver", "Server\SigCoreServer\sigcoreserver.csproj", "{F8D62C9D-0DA8-4FCD-9A5B-5F32219EDDEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigCoreCommon", "libs\SigCoreCommon\SigCoreCommon.csproj", "{D4F22DB5-81EE-7F48-F061-7827352181CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBridge", "Clients\WebBridge\WebBridge.csproj", "{E6F53647-72D7-430D-9185-06DDBFC82D3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlPanel", "ControlPanel\ControlPanel.csproj", "{402C73DD-F837-4776-898C-2C055BB7A48A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigCoreLauncher", "SigCoreLauncher\SigCoreLauncher.csproj", "{2F59B475-EDC4-47DB-B97A-08EDF108ABAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigCoreUpdateBuilder", "SigCoreUpdateBuilder\SigCoreUpdateBuilder.csproj", "{1774ED4E-72B5-47D8-85EC-343AF0F080C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FactorySettings", "FactorySettings\FactorySettings.csproj", "{D5652739-2168-40CC-A980-3072D97DD745}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F8D62C9D-0DA8-4FCD-9A5B-5F32219EDDEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8D62C9D-0DA8-4FCD-9A5B-5F32219EDDEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8D62C9D-0DA8-4FCD-9A5B-5F32219EDDEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8D62C9D-0DA8-4FCD-9A5B-5F32219EDDEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4F22DB5-81EE-7F48-F061-7827352181CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4F22DB5-81EE-7F48-F061-7827352181CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4F22DB5-81EE-7F48-F061-7827352181CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4F22DB5-81EE-7F48-F061-7827352181CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6F53647-72D7-430D-9185-06DDBFC82D3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6F53647-72D7-430D-9185-06DDBFC82D3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6F53647-72D7-430D-9185-06DDBFC82D3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6F53647-72D7-430D-9185-06DDBFC82D3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{402C73DD-F837-4776-898C-2C055BB7A48A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{402C73DD-F837-4776-898C-2C055BB7A48A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{402C73DD-F837-4776-898C-2C055BB7A48A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{402C73DD-F837-4776-898C-2C055BB7A48A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F59B475-EDC4-47DB-B97A-08EDF108ABAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F59B475-EDC4-47DB-B97A-08EDF108ABAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F59B475-EDC4-47DB-B97A-08EDF108ABAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F59B475-EDC4-47DB-B97A-08EDF108ABAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1774ED4E-72B5-47D8-85EC-343AF0F080C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1774ED4E-72B5-47D8-85EC-343AF0F080C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1774ED4E-72B5-47D8-85EC-343AF0F080C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1774ED4E-72B5-47D8-85EC-343AF0F080C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5652739-2168-40CC-A980-3072D97DD745}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5652739-2168-40CC-A980-3072D97DD745}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5652739-2168-40CC-A980-3072D97DD745}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5652739-2168-40CC-A980-3072D97DD745}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C490483E-A5FC-4E97-BD6E-430FB028DD50}
+	EndGlobalSection
+EndGlobal

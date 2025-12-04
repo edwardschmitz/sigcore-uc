@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edward Schmitz Software</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+    <main class="main-content">
+        <div class="section-title">
+            <span class="large-text">Support</span>
+        </div>
+
+        <div class="card-container">
+
+            <a href="ussers-guide.html" class="card-link-wrapper">
+                <div class="card" id="Hardware-Guide">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/angle-view.jpg" alt="SigCore User's Guide">
+                        </div>
+                        <h2>SigCore UC User's Guide</h2>
+                        <p>User's Guide for setup and operation of SigCore UC</p>
+                        <div class="view-article-button">SigCore UC User's Guide</div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="control-panel-guide.html" class="card-link-wrapper">
+                <div class="card" id="Control-Panel-Guide">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/software.png" alt="Control Panel Guide">
+                        </div>
+                        <h2>SigCore UC - Control Panel Software User's Guide</h2>
+                        <p>Guide to fully functional Software Control Panel for SigCore UC</p>
+                        <div class="view-article-button">Software User's Guide</div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="dotnet-software.html" class="card-link-wrapper">
+                <div class="card" id="dotnet-Guide">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/dotnet-software.jpg" alt=".NET Guide">
+                        </div>
+                        <h2>.NET Developer's Guide</h2>
+                        <p>.NET developer's guide to communication with the SigCore UC</p>
+                        <div class="view-article-button">.NET Library</div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="python-support.html" class="card-link-wrapper">
+                <div class="card" id="python-guide">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/python.png" alt="Python Guide">
+                        </div>
+                        <h2>Python Devoloper's Guide</h2>
+                        <p>Python developer's guide to communication with the SigCore UC</p>
+                        <div class="view-article-button">Python Library</div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="ask-ai.html" class="card-link-wrapper">
+                <div class="card" id="AI-Assistant">
+                    <div class="card-content">
+                        <div class="image-container">
+                            <img src="images/ai-assistant.jpg" alt="AI Assistant">
+                        </div>
+                        <h2>AI Assistant</h2>
+                        <p>Ask the AI Assistant about using the SigCore UC</p>
+                        <div class="view-article-button">Ask AI</div>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+
+</body>
+</html>

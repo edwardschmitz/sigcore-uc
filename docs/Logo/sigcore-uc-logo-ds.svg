@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 174 107">
+  <defs>
+    <style>
+      .cls-1 {
+        filter: url(#drop-shadow-1);
+        font-family: Montserrat-SemiBold, Montserrat;
+        font-size: 41.29px;
+        font-variation-settings: 'wght' 600;
+        font-weight: 600;
+      }
+
+      .cls-2 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-3 {
+        letter-spacing: 0em;
+      }
+
+      .cls-4 {
+        fill: gray;
+        font-family: MyriadPro-Regular, 'Myriad Pro';
+        font-size: 12px;
+      }
+
+      .cls-5 {
+        fill: #006837;
+        filter: url(#drop-shadow-2);
+        font-family: Montserrat-Bold, Montserrat;
+        font-size: 48.17px;
+        font-variation-settings: 'wght' 700;
+        font-weight: 700;
+      }
+
+      .cls-6 {
+        letter-spacing: .1em;
+      }
+
+      .cls-7 {
+        letter-spacing: .1em;
+      }
+
+      .cls-8 {
+        letter-spacing: .08em;
+      }
+
+      .cls-9 {
+        fill: none;
+        stroke: #999;
+        stroke-linecap: round;
+        stroke-miterlimit: 10;
+        stroke-width: 1.42px;
+      }
+
+      .cls-10 {
+        letter-spacing: .1em;
+      }
+
+      .cls-11 {
+        letter-spacing: -.03em;
+      }
+    </style>
+    <filter id="drop-shadow-1" filterUnits="userSpaceOnUse">
+      <feOffset dx="3" dy="3"/>
+      <feGaussianBlur result="blur" stdDeviation="1.5"/>
+      <feFlood flood-color="#000" flood-opacity=".3"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="drop-shadow-2" filterUnits="userSpaceOnUse">
+      <feOffset dx="3" dy="3"/>
+      <feGaussianBlur result="blur-2" stdDeviation="1.5"/>
+      <feFlood flood-color="#000" flood-opacity=".3"/>
+      <feComposite in2="blur-2" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <text class="cls-1" transform="translate(2.17 37.06)"><tspan x="0" y="0">Sig</tspan><tspan class="cls-11" x="66.59" y="0">C</tspan><tspan class="cls-3" x="95.2" y="0">o</tspan><tspan class="cls-2" x="121.83" y="0">r</tspan><tspan x="138.55" y="0">e</tspan></text>
+  <path class="cls-9" d="M5.5,60.65c1.35,0,15.23,.31,17.31-.06,10.46-1.87,9.6-15.87,14.76-15.88,4.56,0,5.85,31.76,11.62,31.76,6.31,0,8.84-26.13,13.13-26.04,3.49,.08,4.64,8.88,7.81,10.27,1.48,.65,2.4,.4,3.39,.36,6.23-.23,74.61-.38,89.61-.19"/>
+  <text class="cls-5" transform="translate(71.62 77.42)"><tspan x="0" y="0">UC</tspan></text>
+  <text class="cls-4" transform="translate(3.69 91.85) scale(1.08 1)"><tspan class="cls-6" x="0" y="0">UNIVERSAL </tspan><tspan class="cls-8" x="71.05" y="0">C</tspan><tspan class="cls-7" x="78.96" y="0">ONT</tspan><tspan class="cls-10" x="104.69" y="0">R</tspan><tspan class="cls-6" x="112.38" y="0">OLLER</tspan></text>
+</svg>

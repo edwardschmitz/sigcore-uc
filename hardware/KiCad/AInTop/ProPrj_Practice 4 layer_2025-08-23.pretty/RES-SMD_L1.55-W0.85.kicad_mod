@@ -1,0 +1,133 @@
+(footprint "RES-SMD_L1.55-W0.85"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0 0 0)
+		(layer "F.SilkS")
+		(uuid "ba00c7cb-9031-4837-9eac-9dc28a22df5e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "9045744b-ff70-4ab4-a32c-8a3f590829c9")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "40b535d5-7b66-41af-8e1a-3b517a120d57")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "64a37566-3ba8-4b2b-a657-7324fdb6e21e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "JLC_3DModel_Q" "6a3223693fa64e8d911c71f06a762a75"
+		(at 0 0 0)
+		(layer "Cmts.User")
+		(hide yes)
+		(uuid "7d564961-5810-44b1-a7b1-556f91db9331")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "JLC_3D_Size" "1.55 0.851"
+		(at 0 0 0)
+		(layer "Cmts.User")
+		(hide yes)
+		(uuid "8779ba84-f924-46cc-9d70-ed97cc8e1ff6")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_line
+		(start 0.269 -0.4)
+		(end -0.269 -0.4)
+		(stroke
+			(width 0.254)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "d2083b32-5bda-4b4e-a218-a2cff3481d66")
+	)
+	(fp_line
+		(start 0.269 0.4)
+		(end -0.269 0.4)
+		(stroke
+			(width 0.254)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "154e92e9-2a4f-493a-8469-1422291df9f3")
+	)
+	(fp_poly
+		(pts
+			(xy -0.741067 0.377039) (xy -0.773539 0.344567) (xy -0.819461 0.344567) (xy -0.851933 0.377039) (xy -0.851933 0.422961)
+			(xy -0.819461 0.455433) (xy -0.773539 0.455433) (xy -0.741067 0.422961)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill yes)
+		(layer "User.3")
+		(uuid "c5425da7-db1a-49f9-a701-eaa4a0f59aab")
+	)
+	(pad "1" smd rect
+		(at -0.75 0 90)
+		(size 0.9 0.5)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "fcd7b797-a467-40b6-bbfe-83f6e00056ca")
+	)
+	(pad "2" smd rect
+		(at 0.75 0 90)
+		(size 0.9 0.5)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "ee65c902-56e3-4f99-9679-5df8a4be440e")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/EASYEDA_MODELS/RES-SMD_L1.55-W0.85.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -0 -0 -0)
+		)
+	)
+)
