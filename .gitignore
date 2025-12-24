@@ -33,3 +33,8 @@ packages/
 
 # Website build output
 software/web/localwebsite/root/
+
+# Private business docs
+docs/Accounting/
+docs/Marketing/
+
