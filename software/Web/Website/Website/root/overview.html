@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigCore UC - Overview</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+    <main class="main-content">
+
+        <div class="section-title">
+            <img src="images/sigcore-uc-logo.png" height="100" />
+        </div>
+        <div class="tagline">
+            A Universal Controller for Professionals
+        </div>
+        <div class="section-title">
+            <p class="large-text" style="margin-left: 15px; margin-top: -50px;">Overview</p>
+        </div>
+
+        <div class="specs-container">
+            <div class="spec-card">
+
+                <h1>What It Is</h1>
+                <p>
+                    <b>SigCore UC</b> is a compact <b>Industrial Control Platform</b> that combines real-world
+                    hardware I/O with open firmware and software in a single, deployable unit.
+                </p>
+                <p>It is
+                    designed to replace ad-hoc combinations of software, discrete hardware components,
+                    and experimental development boards with one coherent system.
+                </p>
+
+                <h1>Why It Exists</h1>
+                <p>
+                    Control and automation projects often require assembling development boards,
+                    relay modules, signal conditioning hardware, and proprietary software stacks
+                    before meaningful work can begin. This increases complexity, reduces reliability,
+                    and makes systems difficult to maintain or reproduce.
+                </p>
+                <p>
+                    <b>SigCore UC</b> was created to remove this integration burden by providing conditioned
+                    I/O, deterministic control, and a usable software stack out of the box, without
+                    locking users into a closed ecosystem.
+                </p>
+
+                <h1>What It Does</h1>
+                <ul>
+                    <li>Digital and analog I/O suitable for real-world voltages and currents</li>
+                    <li>Built-in PID control loops</li>
+                    <li>On-device data logging</li>
+                    <li>Ethernet and USB connectivity</li>
+                    <li>Open APIs for external software integration</li>
+                </ul>
+                <p>
+                    SigCore UC is intended for laboratory automation, industrial control, test systems,
+                    education, and experimentation.
+                </p>
+
+                <h1>System Architecture</h1>
+                <p>
+                    Configuration, monitoring, PID tuning, and data logging are handled entirely in
+                    firmware on the device, with the remote Control Panel serving solely as the user
+                    interface.
+                </p>
+                <p>
+                    The system continues operating independently if the UI disconnects. Control logic
+                    does not depend on a host PC.
+                </p>
+
+                <h1>Current Status</h1>
+                <ul>
+                    <li>Hardware: production-ready revision</li>
+                    <li>Firmware and Control Panel: near-release, running continuously in real environments</li>
+                    <li>Evaluation units: available</li>
+                    <li>Manufacturing and fulfillment: preparing for Crowd Supply launch</li>
+                </ul>
+
+                <h1>Related Resources</h1>
+
+                <div style="margin-left:50pt; margin-right:50pt">
+                    <a class="resource-button" href="product-details.html">
+                        <div class="resource-block">
+                            <p style="font-size:16pt; margin:0; color:white; text-align:center">Product Details:</p>
+                            <p style="margin:0; color:white; text-align:center">Technical specifications and I/O capabilities</p>
+                        </div>
+                    </a>
+                </div>
+
+                <br />
+
+                <div style="margin-left:50pt; margin-right:50pt">
+                    <a class="resource-button" href="press-sheet.html">
+                        <div class="resource-block">
+                            <p style="font-size:16pt; margin:0; color:white; text-align:center">Press Kit:</p>
+                            <p style="margin:0; color:white; text-align:center">Images, specifications, and contact information</p>
+                        </div>
+                    </a>
+                </div>
+
+                <br />
+
+                <div style="margin-left:50pt; margin-right:50pt">
+                    <a class="resource-button" href="media.html">
+                        <div class="resource-block">
+                            <p style="font-size:16pt; margin:0; color:white; text-align:center">Media Coverage:</p>
+                            <p style="margin:0; color:white; text-align:center">Articles, videos, and third-party mentions</p>
+                        </div>
+                    </a>
+                </div>
+
+                <br />
+
+                <div style="margin-left:50pt; margin-right:50pt">
+                    <a class="resource-button"
+                       href="https://hackaday.io/project/203656-sigcore-uc-universal-controller"
+                       target="_blank">
+                        <div class="resource-block">
+                            <p style="font-size:16pt; margin:0; color:white; text-align:center">Hackaday Project:</p>
+                            <p style="margin:0; color:white; text-align:center">Development logs and technical history</p>
+                        </div>
+                    </a>
+                </div>
+
+                <br />
+
+                <div style="margin-left:50pt; margin-right:50pt">
+                    <a class="resource-button" href="software.html">
+                        <div class="resource-block">
+                            <p style="font-size:16pt; margin:0; color:white; text-align:center">Software Downloads:</p>
+                            <p style="margin:0; color:white; text-align:center">Control Panel and libraries</p>
+                        </div>
+                    </a>
+                </div>
+
+                <br />
+
+                <div style="margin-left:50pt; margin-right:50pt">
+                    <a class="resource-button" href="getting-started.html">
+                        <div class="resource-block">
+                            <p style="font-size:16pt; margin:0; color:white; text-align:center">Getting Started:</p>
+                            <p style="margin:0; color:white; text-align:center">Initial setup and first connection</p>
+                        </div>
+                    </a>
+                </div>
+
+                <h1>Contact</h1>
+                <p>
+                    For evaluation units, technical questions, or media inquiries, please use the
+                    contact information provided on the website.
+                </p>
+
+            </div>
+        </div>
+
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+
+</body>
+</html>

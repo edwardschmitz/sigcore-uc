@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigCore UC – Getting Started</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+    <main class="main-content">
+
+        <div class="section-title">
+            <p class="large-text" style="margin-left: 15px;">Getting Started</p>
+        </div>
+
+        <div class="specs-container">
+            <div class="spec-card">
+
+                <h1>Initial Setup</h1>
+
+                <h2>1. Power the Device</h2>
+                <p>
+                    Remove the SigCore UC from the box and apply power.
+                    The unit boots automatically and is ready for connection within a few seconds.
+                </p>
+
+                <h2>2. Install the Control Panel</h2>
+                <p>
+                    Download the latest release of the Control Panel application:
+                </p>
+                <p>
+                    <a class="download-link" href="downloads/ControlPanelSetup.exe">
+                        Download the Control Panel Setup
+                    </a>
+                </p>
+                <h3>Installer Security Prompt (Windows SmartScreen)</h3>
+                <p>
+                    When running the installer for the first time, Windows may display a SmartScreen
+                    warning. This occurs when software has not yet established a reputation with
+                    Microsoft’s trust service.
+                </p>
+
+                <div class="spec-image-container" style="text-align: center; margin: 20px 0;">
+                    <img src="images/smartscreen-warning.png"
+                         alt="Windows SmartScreen Warning"
+                         style="max-width: 600px; width: 90%; border: 1px solid #ccc; border-radius: 6px;">
+                </div>
+
+                <ul>
+                    <li>Click <strong>More info</strong>.</li>
+                    <li>Select <strong>Run anyway</strong>.</li>
+                </ul>
+
+                <p>The installer will then start normally.</p>
+                <h2>3. Launch the Application</h2>
+                <p>
+                    Open the Control Panel.
+                    The connection window will appear automatically and list any SigCore UC devices
+                    discovered on your active network interfaces.
+                </p>
+
+                <div class="spec-image-container" style="text-align: center; margin: 20px 0;">
+                    <img src="images/connection-screen.png"
+                         alt="SigCore UC Connection Screen"
+                         style="max-width: 600px; width: 90%; border: 1px solid #ccc; border-radius: 6px;">
+                </div>
+
+                <h2>4. Select a Connection</h2>
+                <p>
+                    If your PC has both Wi-Fi and Ethernet enabled, two discovery paths may appear.
+                    The device will show up on whichever network can reach it.
+                </p>
+                <p>
+                    When your device appears in the list, select it and click <strong>Connect</strong>.
+                </p>
+
+                <h2>5. If the Device Does Not Appear</h2>
+                <ul>
+                    <li>Click <strong>Scan Subnet</strong> to search your local network range.</li>
+                    <li>
+                        On corporate or restricted networks, automatic discovery may be blocked.
+                        In these cases, obtain a <strong>fixed IP address</strong> from your IT department.
+                    </li>
+                    <li>
+                        Provide the device's MAC Address (printed on the label) and have IT assign a permanent address.
+                    </li>
+                    <li>
+                        Enter the assigned IP manually in the <strong>Enter IP Address</strong> field.
+                    </li>
+                </ul>
+
+                <h2>6. Auto Connect</h2>
+                <p>
+                    Enable <strong>Auto Connect</strong> if you want the Control Panel to automatically
+                    reconnect to this device each time the application starts.
+                </p>
+
+                <h2>Next Steps</h2>
+                <p>
+                    After connecting, the Control Panel will display live system status and all I/O channels.
+                    You may then configure relays, read inputs, adjust analog outputs, and perform calibration tasks.
+                </p>
+
+            </div>
+        </div>
+
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+
+</body>
+</html>
