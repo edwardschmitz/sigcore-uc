@@ -305,18 +305,15 @@ namespace SigCoreServer {
             string revision = (string)payload["revision"];
             string version = (string)payload["version"];
             string hostname = (string)payload["hostname"];
+            string manifestURL = (string)payload["manifest_url"];
+            string manifestSigUrl = (string)payload["manifest_sig_url"];
+            string URL = (string)payload["url"];
+            string sigUrl = (string)payload["signature"];
 
-            Console.WriteLine("HandleFactoryReset >>>");
-            Console.WriteLine($"  serial     = {serial}");
-            Console.WriteLine($"  systemName = {systemName}");
-            Console.WriteLine($"  revision   = {revision}");
-            Console.WriteLine($"  version    = {version}");
-            Console.WriteLine($"  hostname   = {hostname}");
-
-            // 1. Hardware reset (writes FRAM config)
-            hardwareManager.FactoryReset(serial, systemName, version, revision, hostname);
-
-            // 2. OS hostname reset
+            Console.WriteLine("HandleFactoryReset");
+            LogFile log = new LogFile();
+            log.Info("HandleFactoryReset");
+            hardwareManager.FactoryReset(serial, systemName, version, revision, hostname, manifestURL, manifestSigUrl, URL, sigUrl);
             osManager.FactoryReset(hostname);
 
             return null;

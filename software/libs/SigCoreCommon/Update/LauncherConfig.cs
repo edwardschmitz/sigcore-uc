@@ -1,10 +1,13 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.IO;
 
 namespace SigCoreCommon.Update {
+
     public class LauncherConfig {
-        static private readonly string path = "/opt/sigcore/config.json";
+
+        private static readonly string path = "/opt/sigcore/config.json";
 
         [JsonProperty("executables")]
         public string[] Executables { get; set; }
@@ -18,27 +21,15 @@ namespace SigCoreCommon.Update {
         [JsonProperty("public")]
         public string Public { get; set; }
 
-        [JsonProperty("manifest_url")]
-        public string ManifestUrl { get; set; }
-
-        [JsonProperty("manifest_sig_url")]
-        public string ManifestSigUrl { get; set; }
-
         [JsonProperty("tmp_path")]
         public string TempPath { get; set; }
 
         // ---------------------------------------------------------
-        // LOAD: create default config, then overlay file values
+        // LOAD
         // ---------------------------------------------------------
         public static LauncherConfig Load(string filename = "") {
-            string pathname;
-            if (filename == "") {
-                pathname = path;
-            } else {
-                pathname = filename;
-            }
+            string pathname = string.IsNullOrEmpty(filename) ? path : filename;
 
-            // Always start with defaults
             LauncherConfig cfg = new LauncherConfig();
 
             try {
@@ -46,7 +37,6 @@ namespace SigCoreCommon.Update {
                     return cfg;
 
                 string json = File.ReadAllText(pathname);
-
                 if (string.IsNullOrWhiteSpace(json))
                     return cfg;
 
@@ -56,44 +46,35 @@ namespace SigCoreCommon.Update {
                 cfg.Version = (string?)obj["version"] ?? cfg.Version;
                 cfg.Revision = (string?)obj["revision"] ?? cfg.Revision;
                 cfg.Public = (string?)obj["public"] ?? cfg.Public;
-                cfg.ManifestUrl = (string?)obj["manifest_url"] ?? cfg.ManifestUrl;
-                cfg.ManifestSigUrl = (string?)obj["manifest_sig_url"] ?? cfg.ManifestSigUrl;
                 cfg.TempPath = (string?)obj["tmp_path"] ?? cfg.TempPath;
+
             } catch (Exception ex) {
                 Console.WriteLine($"LauncherConfig.Load: corrupted file, using defaults. Error: {ex.Message}");
-                // cfg already contains full defaults, so just return it
             }
 
             return cfg;
         }
 
         // ---------------------------------------------------------
-        // SAVE: just serialize the whole current object
+        // SAVE
         // ---------------------------------------------------------
-        public void Save(string filename="") {
-            string pathname;
-            if (filename == "") {
-                pathname = path;
-            } else {
-                pathname = filename;
-            }
+        public void Save(string filename = "") {
+            string pathname = string.IsNullOrEmpty(filename) ? path : filename;
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(pathname, json);
         }
 
         // ---------------------------------------------------------
-        // DEFAULTS: full, healthy config
+        // DEFAULTS
         // ---------------------------------------------------------
         public LauncherConfig() {
-            Executables = new string[] {
+            Executables = new[] {
                 "/opt/sigcore/sigcoreserver",
                 "/opt/sigcore/WebBridge"
             };
             Version = "1.0.0";
             Revision = "revA";
             Public = "/opt/sigcore/keys/sigcore_public.pem";
-            ManifestUrl = "https://sigcoreuc.com/update/revA/manifest.json";
-            ManifestSigUrl = "https://sigcoreuc.com/update/revA/manifest.sig";
             TempPath = "/tmp/sigcore";
         }
     }

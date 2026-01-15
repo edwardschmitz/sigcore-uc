@@ -2,6 +2,7 @@
 using SigCoreCommon.Update;
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -764,13 +765,21 @@ namespace SigCoreCommon {
             sections.Add(section);
         }
 
-        public void FactoryReset(string serialNo, string systemName, string ver, string rev, string host) {
+        public void FactoryReset(string serialNo, string systemName, string ver, string rev, string host,
+                                    string manifestURL, string manifestSigUrl, string url, string signature) {
             LauncherConfig lc = LauncherConfig.Load();
 
             lc.Revision = rev;
             lc.Version = ver;
 
             lc.Save();
+
+            DeviceConfig devConfig = new DeviceConfig();
+            devConfig.ManifestUrl = manifestURL;
+            devConfig.ManifestSigUrl = manifestSigUrl;
+            devConfig.Url = url;
+            devConfig.Signature = signature;
+            devConfig.Save();
 
             _config.SystemName = systemName;
 

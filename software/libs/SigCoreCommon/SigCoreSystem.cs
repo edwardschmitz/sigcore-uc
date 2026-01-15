@@ -678,8 +678,9 @@ namespace SigCoreCommon {
             SigCoreMessage msg = SigCoreMessage.CreateGetStatus();
             return await RequestAsync(msg);
         }
-        public async Task FactoryReset(string serialNo, string rev, string ver, string host, string sysName) {
-            SigCoreMessage msg = SigCoreMessage.CreateFactoryReset(serialNo, rev, ver, host, sysName);
+        public async Task FactoryReset(string serialNo, string rev, string ver, string host, string sysName,
+                                        string manifestURL, string sigUrl, string url, string signature) {
+            SigCoreMessage msg = SigCoreMessage.CreateFactoryReset(serialNo, rev, ver, host, sysName, manifestURL, sigUrl, url, signature);
             await SendCommandAsync(msg);
         }
 

@@ -432,13 +432,27 @@ namespace SigCoreCommon {
         }
 
 
-        public static SigCoreMessage CreateFactoryReset(string serialNo, string rev, string ver, string host, string systemName) {
+        public static SigCoreMessage CreateFactoryReset(
+            string serialNo,
+            string rev,
+            string ver,
+            string host,
+            string systemName,
+            string manifestURL,
+            string sigUrl,
+            string updateUrl,
+            string updateSigUrl
+        ) {
             JObject payload = new JObject {
                 ["serial"] = serialNo,
                 ["revision"] = rev,
                 ["version"] = ver,
                 ["hostname"] = host,
-                ["systemName"] = systemName
+                ["systemName"] = systemName,
+                ["manifest_url"] = manifestURL,
+                ["manifest_sig_url"] = sigUrl,
+                ["url"] = updateUrl,
+                ["signature"] = updateSigUrl
             };
 
             return CreateBase(MsgType.FactoryReset, payload);

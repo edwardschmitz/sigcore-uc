@@ -17,9 +17,43 @@ namespace SigCoreCommon.Update {
         // =====================================================================
         // VERIFY A FILE with signature
         // =====================================================================
-        public static bool VerifyFile(string publicKeyPemPath, string inputFile, string signatureFile) {
+        public static bool VerifyFile(
+            string publicKeyPemPath,
+            string inputFile,
+            string signatureFile) {
+            LogFile log = new LogFile();
+
+            log.Info("VerifyFile: starting");
+            log.Info($"  inputFile       = '{inputFile}'");
+            log.Info($"  signatureFile   = '{signatureFile}'");
+            log.Info($"  publicKeyPem    = '{publicKeyPemPath}'");
+
+            if (!File.Exists(inputFile)) {
+                log.Error("VerifyFile: input file does not exist");
+                return false;
+            }
+
+            if (!File.Exists(signatureFile)) {
+                log.Error("VerifyFile: signature file does not exist");
+                return false;
+            }
+
+            if (!File.Exists(publicKeyPemPath)) {
+                log.Error("VerifyFile: public key file does not exist");
+                return false;
+            }
+
             byte[] data = File.ReadAllBytes(inputFile);
             byte[] signature = File.ReadAllBytes(signatureFile);
+
+            log.Info($"VerifyFile: input size      = {data.Length} bytes");
+            log.Info($"VerifyFile: signature size  = {signature.Length} bytes");
+
+            string dataHash = Convert.ToHexString(
+                System.Security.Cryptography.SHA256.HashData(data));
+
+            log.Info($"VerifyFile: input SHA256    = {dataHash}");
+
             return VerifyData(data, signature, publicKeyPemPath);
         }
 
@@ -42,18 +76,44 @@ namespace SigCoreCommon.Update {
         // =====================================================================
         // VERIFICATION LOGIC
         // =====================================================================
-        public static bool VerifyData(byte[] data, byte[] signature, string publicKeyPemPath) {
+        public static bool VerifyData(
+            byte[] data,
+            byte[] signature,
+            string publicKeyPemPath) {
+            LogFile log = new LogFile();
+
+            log.Info("VerifyData: starting");
+
             string pem = File.ReadAllText(publicKeyPemPath);
-            RSA rsa = LoadPublicKeyFromPem(pem);
+            log.Info($"VerifyData: public key PEM length = {pem.Length} chars");
 
-            bool ok = rsa.VerifyData(
-                data,
-                signature,
-                HashAlgorithmName.SHA256,
-                RSASignaturePadding.Pkcs1);
+            RSA rsa = null;
 
-            rsa.Dispose();
-            return ok;
+            try {
+                rsa = LoadPublicKeyFromPem(pem);
+
+                int keySize = rsa.KeySize;
+                log.Info($"VerifyData: RSA key size = {keySize} bits");
+
+                bool ok = rsa.VerifyData(
+                    data,
+                    signature,
+                    HashAlgorithmName.SHA256,
+                    RSASignaturePadding.Pkcs1);
+
+                if (ok) {
+                    log.Info("VerifyData: signature verification PASSED");
+                } else {
+                    log.Error("VerifyData: signature verification FAILED");
+                }
+
+                return ok;
+            } catch (Exception ex) {
+                log.Error("VerifyData: exception during verification", ex);
+                return false;
+            } finally {
+                rsa?.Dispose();
+            }
         }
 
         // =====================================================================

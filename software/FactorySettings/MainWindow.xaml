@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="Factory Settings" Width="500" Height="400">
+        Title="Factory Settings"
+        Width="500"
+        Height="420">
 
     <Grid Margin="20">
 
@@ -27,7 +29,6 @@
                    FontWeight="Bold"
                    HorizontalAlignment="Center"
                    Margin="0,0,0,15" />
-
 
         <!-- MAIN CONTENT -->
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
@@ -70,7 +71,6 @@
                         Click="Cancel_Click" />
             </StackPanel>
 
-
             <!-- RIGHT FIELDS -->
             <Grid Grid.Column="1" Margin="20,0,0,0">
 
@@ -81,15 +81,20 @@
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <!-- Date -->
                     <RowDefinition Height="Auto"/>
+                    <!-- Serial -->
                     <RowDefinition Height="Auto"/>
+                    <!-- Revision -->
                     <RowDefinition Height="Auto"/>
+                    <!-- Version -->
                     <RowDefinition Height="Auto"/>
+                    <!-- Web Path -->
                     <RowDefinition Height="Auto"/>
+                    <!-- Hostname -->
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <!-- System Name -->
                 </Grid.RowDefinitions>
-
 
                 <!-- DATE -->
                 <TextBlock Grid.Row="0" Grid.Column="0"
@@ -103,7 +108,6 @@
                            Margin="5,2"
                            Padding="5,2"/>
 
-
                 <!-- SERIAL -->
                 <TextBlock Grid.Row="1" Grid.Column="0"
                            Text="Serial:"
@@ -115,7 +119,6 @@
                          Text="{Binding Serial}"
                          Margin="5,2"
                          Padding="5,2"/>
-
 
                 <!-- REVISION -->
                 <TextBlock Grid.Row="2" Grid.Column="0"
@@ -129,7 +132,6 @@
                          Margin="5,2"
                          Padding="5,2"/>
 
-
                 <!-- VERSION -->
                 <TextBlock Grid.Row="3" Grid.Column="0"
                            Text="Version:"
@@ -142,34 +144,43 @@
                          Margin="5,2"
                          Padding="5,2"/>
 
+                <!-- WEB PATH -->
+                <TextBlock Grid.Row="4" Grid.Column="0"
+                           Text="Web Path:"
+                           HorizontalAlignment="Right"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+                <TextBox Grid.Row="4" Grid.Column="1"
+                         Text="{Binding WebPath}"
+                         Margin="5,2"
+                         Padding="5,2"/>
 
                 <!-- HOSTNAME -->
-                <TextBlock Grid.Row="6" Grid.Column="0"
+                <TextBlock Grid.Row="5" Grid.Column="0"
                            Text="Hostname:"
                            HorizontalAlignment="Right"
                            Margin="5,2"
                            Padding="5,2"/>
 
-                <TextBox Grid.Row="6" Grid.Column="1"
+                <TextBox Grid.Row="5" Grid.Column="1"
                          Text="{Binding Hostname}"
                          Margin="5,2"
                          Padding="5,2"/>
 
-
                 <!-- SYSTEM NAME -->
-                <TextBlock Grid.Row="7" Grid.Column="0"
+                <TextBlock Grid.Row="6" Grid.Column="0"
                            Text="System Name:"
                            HorizontalAlignment="Right"
                            Margin="5,2"
                            Padding="5,2"/>
 
-                <TextBox Grid.Row="7" Grid.Column="1"
+                <TextBox Grid.Row="6" Grid.Column="1"
                          Text="{Binding SystemName}"
                          Margin="5,2"
                          Padding="5,2"/>
 
             </Grid>
         </Grid>
-
     </Grid>
 </Window>

@@ -31,12 +31,6 @@ namespace SigCoreCommon.Update {
             [JsonProperty("hash_sha256")]
             public string HashSha256 { get; set; }
 
-            [JsonProperty("signature")]
-            public string Signature { get; set; }
-
-            [JsonProperty("url")]
-            public string Url { get; set; }
-
             [JsonProperty("notes")]
             public string Notes { get; set; }
 

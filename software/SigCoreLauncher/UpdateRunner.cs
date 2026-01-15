@@ -64,12 +64,13 @@ namespace SigCoreLauncher {
                 return false;
 
             ManifestModel model = ManifestModel.Load(manifestDownloadPath);
+            DeviceConfig deviceConfig = DeviceConfig.Load();
             ManifestModel.VersionEntry latest = model.Versions[0];
 
             Console.WriteLine("Latest version: " + latest.Version);
 
-            string scuUrl = latest.Url;
-            string scuSigUrl = latest.Signature;
+            string scuUrl = deviceConfig.Url;
+            string scuSigUrl = deviceConfig.Signature;
 
             Console.WriteLine("UpdateRunner.RunAsync >>> Downloading SCU");
 

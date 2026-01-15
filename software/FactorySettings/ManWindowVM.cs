@@ -1,5 +1,4 @@
 ﻿using ControlPanel;
-using Newtonsoft.Json.Linq;
 using SigCoreCommon;
 using System;
 using System.Collections.Generic;
@@ -18,8 +17,10 @@ namespace FactorySettings {
         public MainWindowVM() {
 
             Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
             SystemName = "SigCore UC";
+
+            // Single source of truth
+            WebPath = "https://sigcoreuc.com/update/revA";
 
             ConnectionStatus = "Disconnected";
             IsConnected = false;
@@ -74,18 +75,6 @@ namespace FactorySettings {
             set { version = value; OnPropertyChanged(); }
         }
 
-        private string mac;
-        public string Mac {
-            get { return mac; }
-            set { mac = value; OnPropertyChanged(); }
-        }
-
-        private string piSerial;
-        public string PiSerial {
-            get { return piSerial; }
-            set { piSerial = value; OnPropertyChanged(); }
-        }
-
         private string hostname;
         public string Hostname {
             get { return hostname; }
@@ -96,6 +85,44 @@ namespace FactorySettings {
         public string SystemName {
             get { return systemName; }
             set { systemName = value; OnPropertyChanged(); }
+        }
+
+        // ---------------- WEB PATH ----------------
+
+        private string webPath;
+        public string WebPath {
+            get { return webPath; }
+            set {
+                webPath = value;
+                OnPropertyChanged();
+                UpdateDerivedUrls();
+            }
+        }
+
+        // --------- DERIVED (NOT EDITABLE) ---------
+
+        private string manifestUrl;
+        public string ManifestUrl {
+            get { return manifestUrl; }
+            private set { manifestUrl = value; OnPropertyChanged(); }
+        }
+
+        private string manifestSigUrl;
+        public string ManifestSigUrl {
+            get { return manifestSigUrl; }
+            private set { manifestSigUrl = value; OnPropertyChanged(); }
+        }
+
+        private string updateUrl;
+        public string UpdateUrl {
+            get { return updateUrl; }
+            private set { updateUrl = value; OnPropertyChanged(); }
+        }
+
+        private string updateSigUrl;
+        public string UpdateSigUrl {
+            get { return updateSigUrl; }
+            private set { updateSigUrl = value; OnPropertyChanged(); }
         }
 
         // --------------------------------------------------------
@@ -129,11 +156,9 @@ namespace FactorySettings {
                 IZeroconfHost dev = devices[0];
                 string ip = dev.IPAddress;
 
-                if (_system == null)
-                    _system = new SigCoreSystem();
+                _system ??= new SigCoreSystem();
 
                 bool ok = await _system.ConnectAsync(ip, 7020);
-
                 if (!ok) {
                     MessageBox.Show("Connection failed for: " + ip);
                     ConnectionStatus = "Disconnected";
@@ -152,10 +177,6 @@ namespace FactorySettings {
                 Hostname = cfg.Hostname ?? "";
                 SystemName = cfg.SystemName ?? "";
 
-                // These do not exist in GlobalConfig
-                Mac = "";
-                PiSerial = "";
-
             } catch (Exception ex) {
                 MessageBox.Show("Error during discovery or connection:\n" + ex.Message);
                 ConnectionStatus = "Disconnected";
@@ -170,7 +191,18 @@ namespace FactorySettings {
             }
 
             try {
-                await _system.FactoryReset(Serial, Revision, Version, Hostname, SystemName);
+                await _system.FactoryReset(
+                    Serial,
+                    Revision,
+                    Version,
+                    Hostname,
+                    SystemName,
+                    ManifestUrl,
+                    ManifestSigUrl,
+                    UpdateUrl,
+                    UpdateSigUrl
+                );
+
                 MessageBox.Show("Factory settings applied.");
             } catch (Exception ex) {
                 MessageBox.Show("Error applying factory settings:\n" + ex.Message);
@@ -185,10 +217,8 @@ namespace FactorySettings {
 
             Serial = $"SCUC-{nextSerialNum:000000}";
             Hostname = $"scuc-{nextSerialNum:000000}";
-
             Revision = appData.LastRev ?? "";
             Version = appData.LastVer ?? "";
-
             Date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             appData.Save();
@@ -203,9 +233,20 @@ namespace FactorySettings {
         // --------------------------------------------------------
 
         private void UpdateHostname() {
-            if (!string.IsNullOrWhiteSpace(Serial)) {
+            if (!string.IsNullOrWhiteSpace(Serial))
                 Hostname = $"scuc-{Serial}".ToLower();
-            }
+        }
+
+        private void UpdateDerivedUrls() {
+            if (string.IsNullOrWhiteSpace(WebPath))
+                return;
+
+            string basePath = WebPath.TrimEnd('/');
+
+            ManifestUrl = $"{basePath}/manifest.json";
+            ManifestSigUrl = $"{basePath}/manifest.sig";
+            UpdateUrl = $"{basePath}/update.scu";
+            UpdateSigUrl = $"{basePath}/update.scu.sig";
         }
     }
 }

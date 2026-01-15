@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SigCoreCommon.Update;
 using System.Diagnostics;
+using SigCoreCommon;
 
 namespace SigCoreLauncher {
     public class UpdateSupervisor {
@@ -23,8 +24,16 @@ namespace SigCoreLauncher {
             string publicKeyPath,
             string installedRevision,
             string installedVersion,
-            string tempPath
-            ) {
+            string tempPath) {
+            LogFile log = new LogFile();
+
+            log.Info("Initializing UpdateSupervisor");
+            log.Info($"manifestUrl        = '{manifestUrl}'");
+            log.Info($"manifestSigUrl     = '{manifestSigUrl}'");
+            log.Info($"publicKeyPath      = '{publicKeyPath}'");
+            log.Info($"installedRevision  = '{installedRevision}'");
+            log.Info($"installedVersion   = '{installedVersion}'");
+            log.Info($"tempPath           = '{tempPath}'");
 
             this.manifestUrl = manifestUrl;
             this.manifestSigUrl = manifestSigUrl;
@@ -37,10 +46,11 @@ namespace SigCoreLauncher {
 
         public async Task<bool> CheckAndApplyUpdatesAsync(CancellationToken token) {
 
-            Console.WriteLine("UpdateSupervisor: Checking installed version.");
-            Console.WriteLine("  Installed Revision: " + installedRevision);
-            Console.WriteLine("  Installed Version: " + installedVersion);
-            Console.WriteLine("  Temp Path: " + tempPath);
+            LogFile log = new LogFile();
+            log.Info("UpdateSupervisor: Checking installed version.");
+            log.Info("  Installed Revision: " + installedRevision);
+            log.Info("  Installed Version: " + installedVersion);
+            log.Info("  Temp Path: " + tempPath);
 
             if (!Directory.Exists(tempPath))
                 Directory.CreateDirectory(tempPath);
@@ -48,7 +58,12 @@ namespace SigCoreLauncher {
             string manifestLocal = Path.Combine(tempPath, "manifest.json");
             string manifestSigLocal = Path.Combine(tempPath, "manifest.sig");
 
-            Console.WriteLine("UpdateSupervisor: Downloading manifest.");
+            log.Info("UpdateSupervisor: Downloading manifest.");
+
+            log.Info($"   {manifestUrl}");
+            log.Info($"   {manifestSigUrl}");
+            log.Info($"   {manifestLocal}");
+            log.Info($"   {manifestSigLocal}");
 
             await ManifestDownloader.DownloadAsync(
                 manifestUrl,
@@ -58,7 +73,8 @@ namespace SigCoreLauncher {
                 token
             );
 
-            Console.WriteLine("UpdateSupervisor: Validating manifest.");
+            log.Info("UpdateSupervisor: Validating manifest.");
+            log.Info($"    manifestLocal: {manifestLocal}\n    manifestSigLocal: {manifestSigLocal}");
 
             bool manifestValid = ManifestValidator.Validate(
                 manifestLocal,
@@ -67,28 +83,28 @@ namespace SigCoreLauncher {
             );
 
             if (!manifestValid) {
-                Console.WriteLine("UpdateSupervisor: Manifest validation failed.");
+                log.Info("UpdateSupervisor: Manifest validation failed.");
                 return false;
             }
 
             ManifestModel manifest = ManifestModel.Load(manifestLocal);
 
-            Console.WriteLine("UpdateSupervisor: Deciding update.");
+            log.Info("UpdateSupervisor: Deciding update.");
 
             UpdateDecisionEngine.UpdateDecision decision =
                 UpdateDecisionEngine.Decide(installedRevision, installedVersion, manifest);
 
             if (decision == UpdateDecisionEngine.UpdateDecision.NoUpdate) {
-                Console.WriteLine("UpdateSupervisor: No update needed.");
+                log.Info("UpdateSupervisor: No update needed.");
                 return true;
             }
 
             if (decision == UpdateDecisionEngine.UpdateDecision.WrongHardwareRevision) {
-                Console.WriteLine("UpdateSupervisor: Hardware revision mismatch.");
+                log.Info("UpdateSupervisor: Hardware revision mismatch.");
                 return false;
             }
 
-            Console.WriteLine("UpdateSupervisor: Update available.");
+            log.Info("UpdateSupervisor: Update available.");
 
             Launcher.Instance.PauseForUpdate();
 
@@ -104,15 +120,15 @@ namespace SigCoreLauncher {
             Launcher.Instance.ResumeAfterUpdate();
 
             if (!ok) {
-                Console.WriteLine("UpdateSupervisor: Update failed.");
+                log.Info("UpdateSupervisor: Update failed.");
                 return false;
             }
 
-            Console.WriteLine("UpdateSupervisor: Update applied successfully.");
+            log.Info("UpdateSupervisor: Update applied successfully.");
 
             if (manifest.RequiresReboot) {
-                Console.WriteLine("UpdateSupervisor: Reboot required. Rebooting now...");
-                Process.Start("/sbin/reboot");
+                log.Info("UpdateSupervisor: Update applied. Exiting to allow launcher restart.");
+                Environment.Exit(0);
             }
 
             return true;

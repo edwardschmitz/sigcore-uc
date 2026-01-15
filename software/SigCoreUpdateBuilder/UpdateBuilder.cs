@@ -137,20 +137,21 @@ namespace SigCoreUpdateBuilder {
                 RequiresReboot = includeLauncher,
 
                 Versions = new List<ManifestModel.VersionEntry> {
-            new ManifestModel.VersionEntry {
-                Version = version,
-                ReleaseDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
-                HashSha256 = HashHelper.Sha256File(scuPath),
-                Url = $"https://sigcoreuc.com/update/{revision}/update.scu",
-                Signature = $"https://sigcoreuc.com/update/{revision}/update.scu.sig",
-                Notes = notes,
-                Executables = new List<string> {
-                    "/opt/sigcore/sigcoreserver",
-                    "/opt/sigcore/WebBridge",
-                    "/opt/SigCoreLauncher"
+                    new ManifestModel.VersionEntry {
+                        Version = version,
+                        ReleaseDate = DateTime.UtcNow.ToString("yyyy-MM-dd"),
+                        HashSha256 = HashHelper.Sha256File(scuPath),
+                        // Remove these two
+                        //Url = $"https://sigcoreuc.com/update/{revision}/update.scu",
+                        //Signature = $"https://sigcoreuc.com/update/{revision}/update.scu.sig",
+                        Notes = notes,
+                        Executables = new List<string> {
+                            "/opt/sigcore/sigcoreserver",
+                            "/opt/sigcore/WebBridge",
+                            "/opt/SigCoreLauncher"
+                        }
+                    }
                 }
-            }
-        }
             };
 
             string manifestPath = Path.Combine(stagingDir, "manifest.json");
