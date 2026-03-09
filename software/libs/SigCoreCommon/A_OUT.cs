@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Generic;
 using System.Device.I2c;
@@ -15,44 +16,57 @@ namespace SigCoreCommon {
         }
 
         public class AnalogOutChannelConfig {
+
             public string Name { get; set; } = string.Empty;
             public string Units { get; set; } = string.Empty;
-            public double VoltageScaleM { get; set; }
-            public double VoltageScaleB { get; set; }
-            public OutputMode Mode { get; set; }
+            public double VoltageScaleM { get; set; } = 1.0;
+            public double VoltageScaleB { get; set; } = 0.0;
+            public OutputMode Mode { get; set; } = OutputMode.Voltage;
             public bool IsAuto { get; set; }
-            public int Precision { get; set; }
-            public DisplayFormat Display { get; set; }
+            public int Precision { get; set; } = 3;
+            public DisplayFormat Display { get; set; } = DisplayFormat.FixedPoint;
 
-            public JObject ToPayload(uint chan) {
-                return new JObject {
-                    ["name"] = Name,
-                    ["units"] = Units,
-                    ["voltM"] = VoltageScaleM,
-                    ["voltB"] = VoltageScaleB,
-                    ["mode"] = Mode.ToString(),
-                    ["channel"] = chan,
-                    ["auto"] = IsAuto,
-                    ["precision"] = Precision,
-                    ["display"] = Display.ToString(),
-                };
+            // ─────────────────────────
+            // Payload conversion
+            // ─────────────────────────
+
+            public AOutConfigPayload ToPayload(uint channel) {
+
+                AOutConfigPayload payload = new AOutConfigPayload();
+
+                payload.Channel = channel;
+                payload.Name = Name;
+                payload.Units = Units;
+                payload.VoltageScaleM = VoltageScaleM;
+                payload.VoltageScaleB = VoltageScaleB;
+                payload.Mode = (int)Mode;
+                payload.IsAuto = IsAuto;
+                payload.Precision = Precision;
+                payload.Display = (int)Display;
+
+                return payload;
             }
 
-            public void FromPayload(JObject obj) {
-                Name = (string?)obj["name"] ?? "";
-                Units = (string?)obj["units"] ?? "";
-                VoltageScaleM = (double?)obj["voltM"] ?? 1.0;
-                VoltageScaleB = (double?)obj["voltB"] ?? 0.0;
-                Mode = Enum.TryParse((string?)obj["mode"], out OutputMode mode) ? mode : OutputMode.Voltage;
-                IsAuto = (bool?)obj["auto"] ?? false;
-                Precision = (int?)obj["precision"] ?? 0;
-                Display = Enum.TryParse((string?)obj["display"], out DisplayFormat d) ? d : DisplayFormat.FixedPoint;
+            public void FromPayload(AOutConfigPayload payload) {
+
+                Name = payload.Name;
+                Units = payload.Units;
+                VoltageScaleM = payload.VoltageScaleM;
+                VoltageScaleB = payload.VoltageScaleB;
+                Mode = (OutputMode)payload.Mode;
+                IsAuto = payload.IsAuto;
+                Precision = payload.Precision;
+                Display = (DisplayFormat)payload.Display;
             }
+
+            // ─────────────────────────
+            // Enum domains for UI
+            // ─────────────────────────
+
             public static OutputMode[] OutputModes {
                 get { return (OutputMode[])Enum.GetValues(typeof(OutputMode)); }
             }
         }
-
         public bool GetIsAuto(uint channel) { 
             return _channelConfigs[channel].IsAuto;
         }
@@ -78,6 +92,9 @@ namespace SigCoreCommon {
         public override void Initialize() {
             base.Initialize();
             configurator.Initialize();
+            for (uint i = 0; i < 4; i++) {
+                SetMode(i);
+            }
         }
 
         public void SetFromPID(uint channel, double val) {
@@ -134,26 +151,26 @@ namespace SigCoreCommon {
             double hwValue = currentValue[channel];
             return ((hwValue - config.VoltageScaleB) / config.VoltageScaleM, GetIsAuto(channel));
         }
-        public JObject GetConfig(uint channel) {
+        public AOutConfigPayload GetConfig(uint channel) {
             if (channel > 3)
                 throw new ArgumentOutOfRangeException(nameof(channel));
             return _channelConfigs[channel].ToPayload(channel);
         }
-        public void SetConfig(JObject payload) {
-            uint channel = (uint?)payload["channel"] ?? 4;
+        public void SetConfig(AOutConfigPayload payload) {
+            uint channel = payload.Channel;
 
             if (channel > 3) return;
             _channelConfigs[channel].FromPayload(payload);
             SetMode(channel);
         }
-        public JObject ToPayload(uint channel) {
+        public AOutConfigPayload ToPayload(uint channel) {
             if (channel > 3)
                 throw new ArgumentOutOfRangeException(nameof(channel));
             return _channelConfigs[channel].ToPayload(channel);
         }
 
-        public void FromPayload(JObject payload) {
-            uint channel = payload.Value<uint>("channel");
+        public void FromPayload(AOutConfigPayload payload) {
+            uint channel = payload.Channel;
 
             if (channel < 0 || channel > 3)
                 throw new ArgumentOutOfRangeException(nameof(channel));
@@ -192,7 +209,7 @@ namespace SigCoreCommon {
         public JArray GenerateAllPayload() {
             JArray arr = new JArray();
             for (uint i = 0; i < 4; i++)
-                arr.Add(ToPayload(i));
+                arr.Add(ToPayload(i).ToJson());
             return arr;
         }
 

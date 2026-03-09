@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using ControlPanel.Dialogs;
 using SigCoreCommon;
+using SigCoreCommon.Payloads;
 
 namespace ControlPanel.IOChannelHandlers {
     public class PidControllerChannel : IOChannel<double> {
@@ -268,14 +269,14 @@ namespace ControlPanel.IOChannelHandlers {
 
         private async Task EditConfig() {
             dimmer?.SetDim(true);
-            PID_LOOP.Config config = await system.GetPIDConfigAsync(Index);
+            PidConfigPayload config = await system.GetPIDConfigAsync(Index);
             PidConfigDlgVM vm = new PidConfigDlgVM(config);
             PidConfigDlg dlg = new PidConfigDlg { DataContext = vm };
             dlg.Owner = Application.Current.MainWindow;
 
             bool? result = dlg.ShowDialog();
             if (result == true) {
-                await system.SetPIDConfigAsync(Index, config);
+                await system.SetPIDConfigAsync(config);
                 ShowConfig(config);
             }
             dimmer?.SetDim(false);
@@ -287,13 +288,13 @@ namespace ControlPanel.IOChannelHandlers {
         }
 
         public async Task UpdateFromConfig() {
-            PID_LOOP.Config config = await system.GetPIDConfigAsync(Index);
+            PidConfigPayload config = await system.GetPIDConfigAsync(Index);
             ShowConfig(config);
         }
 
-        private void ShowConfig(PID_LOOP.Config config) {
+        private void ShowConfig(PidConfigPayload config) {
             UserID = config.Title;
-            IsEnabled = config.Enabled;
+            IsEnabled = config.IsEnabled;
             OutputMax = config.OutputMax;
             OutputMin = config.OutputMin;
             PVMax = config.PVMax;

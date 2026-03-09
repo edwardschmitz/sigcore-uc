@@ -1,5 +1,6 @@
 ﻿using ControlPanel;
 using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace FactorySettings {
             ConnectionStatus = "Disconnected";
             IsConnected = false;
 
-            ConnectCmd = new RelayCommand(Connect);
+            ConnectCmd = new RelayCommand(() => ConnectAsync());
             ApplyFactorySettingsCmd = new RelayCommand(ApplyFactorySettings);
             GenerateFactorySettingsCmd = new RelayCommand(GenerateFactorySettings);
             PrintLabelsCmd = new RelayCommand(PrintLabels);
@@ -138,7 +139,7 @@ namespace FactorySettings {
         // Command Methods
         // --------------------------------------------------------
 
-        private async void Connect() {
+        private async Task ConnectAsync() {
             try {
                 SigCoreDiscovery discovery = new SigCoreDiscovery();
                 discovery.Start();
@@ -158,8 +159,8 @@ namespace FactorySettings {
 
                 _system ??= new SigCoreSystem();
 
-                bool ok = await _system.ConnectAsync(ip, 7020);
-                if (!ok) {
+                ConnectStatus connect = await _system.ConnectAsync(ip, 7020);
+                if (connect != ConnectStatus.Connected) {
                     MessageBox.Show("Connection failed for: " + ip);
                     ConnectionStatus = "Disconnected";
                     IsConnected = false;
@@ -169,12 +170,13 @@ namespace FactorySettings {
                 ConnectionStatus = ip;
                 IsConnected = true;
 
-                HardwareManager.Config cfg = await _system.GetGlobalConfigAsync();
+                SystemConfigPayload cfg = await _system.GetGlobalConfigAsync();
+                NetworkSettingsPayload netSet = await _system.GetNetworkConfigAsync();
 
                 Serial = cfg.SystemSerialNumber ?? "";
                 Revision = cfg.HardwareVersion ?? "";
                 Version = cfg.SoftwareVersion ?? "";
-                Hostname = cfg.Hostname ?? "";
+                Hostname = netSet.Hostname ?? "";
                 SystemName = cfg.SystemName ?? "";
 
             } catch (Exception ex) {

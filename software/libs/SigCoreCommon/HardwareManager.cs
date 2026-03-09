@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SigCoreCommon.Payloads;
 using SigCoreCommon.Update;
 using System;
 using System.Diagnostics;
@@ -17,6 +18,8 @@ namespace SigCoreCommon {
         private Fm24cl64bDriver FRAM { get; }
         public PID_LOOP PIDs { get; }
         private MYSQL_LOGGER Logger { get; }
+        public NetworkManager Network { get; }
+
 
         private CancellationTokenSource _cts;
         private CancellationTokenSource _ctsDIn;
@@ -37,6 +40,9 @@ namespace SigCoreCommon {
             PIDs = new PID_LOOP(this);
             FRAM = new Fm24cl64bDriver();
             Logger = new MYSQL_LOGGER(this);
+            Network = new NetworkManager();
+
+
             _cts = new CancellationTokenSource();
             _ctsDIn = new CancellationTokenSource();
             _ctsPID = new CancellationTokenSource();
@@ -104,11 +110,9 @@ namespace SigCoreCommon {
             }
         }
         public void Initialize() {
-            Console.WriteLine("HardwareManager.Initialize ---1---");
 
             // Initialize FRAM
             FRAM.Initialize();
-            Console.WriteLine("HardwareManager.Initialize ---2--- FRAM Initialized");
 
             // Read config blob from FRAM
             JObject storedConfig = ReadConfigFromFram();
@@ -116,25 +120,19 @@ namespace SigCoreCommon {
                 Console.WriteLine("Error: Failed to read config from FRAM.");
                 return;
             }
-            Console.WriteLine("HardwareManager.Initialize ---3--- Config loaded from FRAM");
 
             // Global config
             JObject global = storedConfig["global"] as JObject;
-            if (global != null) {
-                _config.FromPayload(global);
-                Console.WriteLine("HardwareManager.Initialize ---4--- Global config loaded");
-            } else {
-                Console.WriteLine("Error: Missing global config.");
-                throw new Exception("Error Reading Global Config");
-            }
+            SystemConfigPayload gPayload = new SystemConfigPayload(global);
+            _config.FromPayload(gPayload);
 
             // Relay configs
             JArray relays = storedConfig["relays"] as JArray;
             if (relays != null) {
                 foreach (JObject relayObj in relays) {
-                    RelayOut.FromPayload(relayObj);
+                    RelayConfigPayload payload = new RelayConfigPayload(relayObj);
+                    RelayOut.FromPayload(payload);
                 }
-                Console.WriteLine("HardwareManager.Initialize ---5--- Relay config loaded");
             } else {
                 Console.WriteLine("Error: Missing relay config.");
                 throw new Exception("Error Reading Relay Config");
@@ -144,9 +142,9 @@ namespace SigCoreCommon {
             JArray analogIns = storedConfig["analogInputs"] as JArray;
             if (analogIns != null) {
                 foreach (JObject ainObj in analogIns) {
-                    AnalogIn.FromPayload(ainObj);
+                    AInConfigPayload payload = new AInConfigPayload(ainObj);
+                    AnalogIn.FromPayload(payload);
                 }
-                Console.WriteLine("HardwareManager.Initialize ---6--- Analog inputs config loaded");
             } else {
                 Console.WriteLine("Error: Missing analog inputs config.");
                 throw new Exception("Error Reading Analog In Config");
@@ -156,10 +154,9 @@ namespace SigCoreCommon {
             JArray analogOuts = storedConfig["analogOutputs"] as JArray;
             if (analogOuts != null) {
                 foreach (JObject aoutObj in analogOuts) {
-                    uint channel = (uint)aoutObj.Value<int>("channel");
-                    AnalogOut.FromPayload(aoutObj);
+                    AOutConfigPayload payload = new AOutConfigPayload(aoutObj);
+                    AnalogOut.FromPayload(payload);
                 }
-                Console.WriteLine("HardwareManager.Initialize ---7--- Analog outputs config loaded");
             } else {
                 Console.WriteLine("Error: Missing analog outputs config.");
                 throw new Exception("Error Reading Analog Out Config");
@@ -169,9 +166,9 @@ namespace SigCoreCommon {
             JArray digitalIns = storedConfig["digitalInputs"] as JArray;
             if (digitalIns != null) {
                 foreach (JObject dinObj in digitalIns) {
-                    DigitalIn.FromPayload(dinObj);
+                    DInConfigPayload payload = new DInConfigPayload(dinObj);
+                    DigitalIn.FromPayload(payload);
                 }
-                Console.WriteLine("HardwareManager.Initialize ---8--- Digital inputs config loaded");
             } else {
                 Console.WriteLine("Error: Missing digital inputs config.");
                 throw new Exception("Error Reading Digital In Config");
@@ -183,7 +180,6 @@ namespace SigCoreCommon {
                 foreach (JObject obj in pids) {
                     PIDs.UnpackConfig(obj);
                 }
-                Console.WriteLine("HardwareManager.Initialize ---9--- PID config loaded");
             } else {
                 Console.WriteLine("Error: Missing PID config.");
                 throw new Exception("Error Reading PID Config");
@@ -192,7 +188,10 @@ namespace SigCoreCommon {
             // Logger config
             JObject logger = storedConfig["logger"] as JObject;
             Logger.SetConfig(logger);
-            Console.WriteLine("HardwareManager.Initialize ---10--- Logger config loaded");
+
+            JObject network = storedConfig["network"] as JObject;
+            Network.FromFram(network);
+
 
             // Initialize hardware with restored settings
             RelayOut.Initialize();
@@ -200,31 +199,22 @@ namespace SigCoreCommon {
             AnalogOut.Initialize();
             DigitalIn.Initialize();
             PIDs.Initialize();
-            Console.WriteLine("HardwareManager.Initialize ---11--- Hardware components initialized");
 
             for (uint i = 0; i < 4; i++) {
-                Console.WriteLine("HardwareManager.Initialize ---11.1--- Hardware components initialized");
                 (double v, bool a) val = GetAOutValue(i);
-                Console.WriteLine("HardwareManager.Initialize ---11.2--- Hardware components initialized");
 
                 JObject pidVal = GetPIDCurVal(i, true);
-                Console.WriteLine($"pidVal: {pidVal.ToString()}");
-                Console.WriteLine($"{Dispatcher.ToString()}");
                 _ = Dispatcher.NotifyPIDChanged(i, pidVal);
-                Console.WriteLine("HardwareManager.Initialize ---11.3--- Hardware components initialized");
                 _ = Dispatcher.NotifyAOutChanged(i, val.v, val.a);
             }
-            Console.WriteLine("HardwareManager.Initialize ---12--- Notified PID and AOut changes");
 
             SetupSnapshot();
-            Console.WriteLine("HardwareManager.Initialize ---13--- Snapshot setup completed");
 
             // Start background sampling
             StartAnalogLoop();
             StartDInLoop();
             StartPIDLoop();
             StartLoggerLoop();
-            Console.WriteLine("HardwareManager.Initialize ---14--- Background loops started");
         }
 
         public void StartLoggerLoop() {
@@ -376,13 +366,13 @@ namespace SigCoreCommon {
                 AnalogIn.ApplyInputRange(chan);
             }
             switch (_config.AnalogSamplingRate) { 
-                case Config.SamplesPerSecond.Low:
+                case SamplesPerSecond.Low:
                     AnalogIn.SetDataRate(Ads1115Driver.Ads1115DataRate.SPS8);
                     break;
-                case Config.SamplesPerSecond.Medium:
+                case SamplesPerSecond.Medium:
                     AnalogIn.SetDataRate(Ads1115Driver.Ads1115DataRate.SPS32);
                     break;
-                case Config.SamplesPerSecond.High:
+                case SamplesPerSecond.High:
                     AnalogIn.SetDataRate(Ads1115Driver.Ads1115DataRate.SPS475);
                     break;
                 default:
@@ -419,10 +409,10 @@ namespace SigCoreCommon {
             uint index = uint.Parse(channel.Substring(3));
             return AnalogIn.CurrentReading(index);
         }
-        public JObject GetAnalogInConfig(uint channel) {
+        public AInConfigPayload GetAnalogInConfig(uint channel) {
             return AnalogIn.ToPayload(channel);
         }
-        public void SetAInConfig(uint chan, JObject payload) {
+        public void SetAInConfig(AInConfigPayload payload) {
             AnalogIn.FromPayload(payload);
             SaveConfigToFram();
             RestartSamplingLoop();
@@ -477,99 +467,22 @@ namespace SigCoreCommon {
             bool result = AnalogOut.GetIsAuto(channel);
             return result;
         }
-        public JObject GetAOutConfig(uint channel) {
+        public AOutConfigPayload GetAOutConfig(uint channel) {
             if (channel > 3)
                 throw new ArgumentOutOfRangeException(nameof(channel));
             return AnalogOut.GetConfig(channel);
         }
-        public void SetAOutConfig(JObject payload) {
+        public void SetAOutConfig(AOutConfigPayload payload) {
                 AnalogOut.SetConfig(payload);
                 SaveConfigToFram();
         }
-        private string RunShell(string cmd) {
-            try {
-                ProcessStartInfo psi = new ProcessStartInfo {
-                    FileName = "/bin/bash",
-                    Arguments = "-c \"" + cmd + "\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
 
-                using (Process p = Process.Start(psi)) {
-                    string output = p.StandardOutput.ReadToEnd();
-                    p.WaitForExit();
-                    return output;
-                }
-            } catch (Exception ex) {
-                Console.WriteLine("RunShell error: " + ex.Message);
-                return "";
-            }
-        }
-
-
-        private void LoadCurrentNetworkInfo() {
-            try {
-                // Pull IPv4 info from NetworkManager
-                string cmd =
-                    "nmcli -g IP4.ADDRESS,IP4.GATEWAY,IP4.DNS device show eth0";
-
-                string output = RunShell(cmd);
-
-                string ip = "";
-                string mask = "";
-                string gateway = "";
-                string dns = "";
-
-                string[] lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (string line in lines) {
-                    if (line.StartsWith("IP4.ADDRESS")) {
-                        // Example: "IP4.ADDRESS[1]: 192.168.0.128/24"
-                        string[] parts = line.Split(':');
-                        string cidr = parts[1].Trim();
-
-                        // Split "192.168.0.128/24"
-                        string[] ipParts = cidr.Split('/');
-                        ip = ipParts[0];
-                        int prefix = int.Parse(ipParts[1]);
-                        mask = PrefixToMask(prefix);
-                    } else if (line.StartsWith("IP4.GATEWAY")) {
-                        gateway = line.Split(':')[1].Trim();
-                    } else if (line.StartsWith("IP4.DNS")) {
-                        dns = line.Split(':')[1].Trim();
-                    }
-                }
-
-                if (!string.IsNullOrWhiteSpace(ip)) _config.IpAddress = ip;
-                if (!string.IsNullOrWhiteSpace(mask)) _config.SubnetMask = mask;
-                if (!string.IsNullOrWhiteSpace(gateway)) _config.Gateway = gateway;
-                if (!string.IsNullOrWhiteSpace(dns)) _config.Dns = dns;
-            } catch (Exception ex) {
-                Console.WriteLine("LoadCurrentNetworkInfo error: " + ex.Message);
-            }
-        }
-
-        private string PrefixToMask(int prefix) {
-            uint mask = prefix == 0 ? 0 : 0xffffffff << (32 - prefix);
-            return string.Join(".",
-                BitConverter.GetBytes(mask).Reverse());
-        }
-
-        // --- Global Config Access ---
-        public JObject GetGlobalConfig() {
-            Console.WriteLine("LoadSystemIdentity");
+        public SystemConfigPayload GetGlobalConfig() {
             LoadSystemIdentity();
-
-            LoadCurrentNetworkInfo();
-
-            Console.WriteLine($"GlobalConfig >>> {_config.HardwareVersion}, {_config.SoftwareVersion}");
-            Console.WriteLine($"serial number: {_config.SystemSerialNumber}");
-
-            return _config.ToPayload(); 
+            SystemConfigPayload payload = _config.ToPayload();
+            return payload; 
         }
-        public void ApplyGlobalConfig(JObject payload) {
+        public void ApplyGlobalConfig(SystemConfigPayload payload) {
             _config.FromPayload(payload);
             RestartSamplingLoop();
             AnalogOut.SetFrequency(_config.PWMFrequency);
@@ -580,20 +493,20 @@ namespace SigCoreCommon {
             StartAnalogLoop();
         }
 
-        public JObject GetRelayConfig(uint channel) {
+        public RelayConfigPayload GetRelayConfig(uint channel) {
             return RelayOut.ToPayload(channel);
         }
 
-        public void SetRelayConfig(uint chan, JObject payload) {
+        public void SetRelayConfig(RelayConfigPayload payload) {
             RelayOut.FromPayload(payload);
             SaveConfigToFram();
         }
 
-        public JObject GetDInConfig(uint channel) {
+        public DInConfigPayload GetDInConfig(uint channel) {
             return DigitalIn.ToPayload(channel);
         }
 
-        public void SetDInConfig(uint chan, JObject payload) {
+        public void SetDInConfig(DInConfigPayload payload) {
             DigitalIn.FromPayload(payload);
             SaveConfigToFram();
         }
@@ -607,9 +520,9 @@ namespace SigCoreCommon {
         }
         public void SaveConfigToFram() {
             try {
-
                 JObject config = new JObject {
                     ["global"] = _config.ToFram(),
+                    ["network"] = Network.ToFram(),
                     ["relays"] = RelayOut.GenerateAllPayload(),
                     ["analogInputs"] = AnalogIn.GenerateAllPayload(),
                     ["analogOutputs"] = AnalogOut.GenerateAllPayload(),
@@ -650,13 +563,10 @@ namespace SigCoreCommon {
         }
 
         public JObject GetPIDCurVal(uint channel, bool all = false) {
-            Console.WriteLine("HardwareManager.GetPIDCurVal ---1---");
             if (all) {
-                Console.WriteLine("HardwareManager.GetPIDCurVal ---2---");
                 // Force full transmission for THIS SPECIFIC CHANNEL
                 PID_LOOP.Config cfg = PIDs.Configs[channel];
 
-                Console.WriteLine("HardwareManager.GetPIDCurVal ---3---");
                 JObject obj = new JObject {
                     ["sp"] = cfg.SP,
                     ["pv"] = cfg.PV,
@@ -665,12 +575,10 @@ namespace SigCoreCommon {
                     ["dev"] = cfg.Dev,
                     ["tol"] = cfg.Tol
                 };
-                Console.WriteLine("HardwareManager.GetPIDCurVal ---4---");
 
                 return obj;
             }
 
-            Console.WriteLine("HardwareManager.GetPIDCurVal ---5---");
             // Normal behavior: only changed fields
             return PIDs.PackCurVal(channel);
         }
@@ -718,19 +626,13 @@ namespace SigCoreCommon {
         }
         public Config GlobalConfig() {
             LoadSystemIdentity();
-            LoadCurrentNetworkInfo();
-
-            Console.WriteLine($"GlobalConfig >>> {_config.HardwareVersion}, {_config.SoftwareVersion}");
-
             return _config;
         }
 
         private void LoadSystemIdentity() {
             try {
-                Console.WriteLine("LoadSystemIdentity");
                 LauncherConfig lc = LauncherConfig.Load();
 
-                Console.WriteLine($"LoadSystemIdentity >>> {lc.Revision}, {lc.Version}");
                 _config.SoftwareVersion = lc.Version;
                 _config.HardwareVersion = lc.Revision;
             } catch (Exception ex) {
@@ -740,7 +642,34 @@ namespace SigCoreCommon {
             }
         }
 
+        public void GetWiFiStatus(JObject status) {
+
+            if (status["sections"] == null)
+                status["sections"] = new JArray();
+
+            JArray sections = (JArray)status["sections"];
+
+            NetworkSettingsPayload netSettings = GetNetworkConfig();
+            JArray list = new JArray();
+
+            list.Add(new JObject {
+                ["label"] = "SSID",
+                ["data"] = netSettings.WifiSsid ?? ""
+            });
+
+            list.Add(new JObject {
+                ["label"] = "PSK",
+                ["data"] = netSettings.WifiPsk ?? "",
+            });
+
+            sections.Add(new JObject {
+                ["section"] = "WiFi",
+                ["items"] = list
+            });
+        }
+
         public void GetSystemStatus(JObject status) {
+
             // ensure sections exists
             if (status["sections"] == null)
                 status["sections"] = new JArray();
@@ -748,8 +677,6 @@ namespace SigCoreCommon {
             JArray sections = (JArray)status["sections"];
 
             Config cfg = GlobalConfig();
-
-            JObject items = new JObject();
             JArray list = new JArray();
 
             list.Add(new JObject { ["label"] = "Name", ["data"] = cfg.SystemName });
@@ -757,16 +684,15 @@ namespace SigCoreCommon {
             list.Add(new JObject { ["label"] = "Revision", ["data"] = cfg.HardwareVersion });
             list.Add(new JObject { ["label"] = "Serial Number", ["data"] = cfg.SystemSerialNumber });
 
-            JObject section = new JObject {
+            sections.Add(new JObject {
                 ["section"] = "SigCore",
                 ["items"] = list
-            };
-
-            sections.Add(section);
+            });
         }
 
-        public void FactoryReset(string serialNo, string systemName, string ver, string rev, string host,
-                                    string manifestURL, string manifestSigUrl, string url, string signature) {
+        public void FactoryReset(string serialNo, string systemName, string ver, string rev, 
+                                    string manifestURL, string manifestSigUrl, string url, string signature,
+                                    string hostname ) {
             LauncherConfig lc = LauncherConfig.Load();
 
             lc.Revision = rev;
@@ -783,10 +709,12 @@ namespace SigCoreCommon {
 
             _config.SystemName = systemName;
 
-            Console.WriteLine($"FactoryReset >>> serial number:{_config.SystemSerialNumber}");
+            NetworkSettingsPayload payload = Network.GetConfig();
+            payload.Hostname = hostname;
+            Network.SetConfig(payload);
+
             _config.SystemSerialNumber = serialNo;
 
-            _config.Hostname = host;
             SaveConfigToFram();
 
             FactoryResetAIn();
@@ -860,13 +788,9 @@ namespace SigCoreCommon {
             Console.WriteLine("FactoryResetDIn");
 
             for (uint ch = 0; ch < 8; ch++) {
-                var cfg = new D_IN.DInConfig {
-                    Name = $"",
-                    DebounceMs = 50,
-                    Inverted = false
-                };
+                DInConfigPayload cfg = new DInConfigPayload();
 
-                DigitalIn.FromPayload(cfg.ToPayload(ch));
+                DigitalIn.FromPayload(cfg);
             }
 
             DigitalIn.ClearAllLastValues();
@@ -879,7 +803,7 @@ namespace SigCoreCommon {
             Console.WriteLine("FactoryResetRelays");
 
             for (uint ch = 0; ch < 8; ch++) {
-                var cfg = new RELAY_OUT.RelayConfig {
+                RELAY_OUT.RelayConfig cfg = new RELAY_OUT.RelayConfig {
                     Name = $"",
                     DefaultState = false,
                     FailSafeState = false
@@ -958,101 +882,183 @@ namespace SigCoreCommon {
             Logger.SetConfig(cfg.ToPayload());
         }
 
+        // ─────────────────────────────────────────────
+        // NETWORK CONFIG
+        // ─────────────────────────────────────────────
+
+        public NetworkSettingsPayload GetNetworkConfig() {
+            return Network.GetConfig();
+        }
+
+        public void SetNetworkConfig(NetworkSettingsPayload payload) {
+            if (payload == null)
+                return;
+
+            Network.SetConfig(payload);
+            SaveConfigToFram();
+        }
 
 
+        public enum SamplesPerSecond {
+            Low,
+            Medium,
+            High
+        }
 
+
+        //public class Config {
+        //    public string SystemName { get; set; } = "SigCore UC";
+        //    public string SystemSerialNumber { get; set; } = "SCU123456";
+        //    public string HardwareVersion { get; set; } = "1.0";
+        //    public string SoftwareVersion { get; set; } = "0.9.0";
+
+        //    public bool UseLastKnownValuesAtStartup { get; set; } = true;
+
+        //    public SamplesPerSecond AnalogSamplingRate { get; set; } = SamplesPerSecond.Medium;
+        //    public int PWMFrequency { get; set; } = 250;
+
+        //    public bool IsPIDOpen { get; set; } = true;
+
+        //    // Security
+        //    public string SystemPassword { get; set; } = "admin";
+
+        //    // Convert from JSON payload
+        //    public void FromPayload(JObject payload) {
+        //        if (payload == null) return;
+
+        //        SystemName = (string)payload["systemName"] ?? SystemName;
+        //        SystemSerialNumber = (string)payload["systemSerialNumber"] ?? SystemSerialNumber;
+        //        UseLastKnownValuesAtStartup = (bool?)payload["useLastKnownValues"] ?? UseLastKnownValuesAtStartup;
+
+        //        string sps = (string)payload["analogSamplingRate"];
+        //        if (!string.IsNullOrEmpty(sps) &&
+        //            Enum.TryParse(sps, true, out SamplesPerSecond rate)) {
+        //            AnalogSamplingRate = rate;
+        //        }
+
+        //        JToken pwmToken = payload["pwm_frequency"];
+        //        if (pwmToken != null && pwmToken.Type != JTokenType.Null)
+        //            PWMFrequency = pwmToken.Value<int>();
+
+        //        IsPIDOpen = (bool?)payload["isPIDOpen"] ?? IsPIDOpen;
+
+        //        HardwareVersion = (string)payload["hardwareVersion"] ?? HardwareVersion;
+        //        SoftwareVersion = (string)payload["softwareVersion"] ?? SoftwareVersion;
+
+        //        if (payload.ContainsKey("systemPassword"))
+        //            SystemPassword = (string)payload["systemPassword"] ?? SystemPassword;
+        //    }
+
+        //    // Convert to JSON payload
+        //    public JObject ToPayload() {
+        //        JObject payload = new JObject();
+        //        serialize(payload);
+        //        return payload;
+        //    }
+
+        //    private void serializeToFram(JObject payload) {
+        //        payload["systemName"] = SystemName;
+        //        payload["systemSerialNumber"] = SystemSerialNumber;
+        //        payload["useLastKnownValues"] = UseLastKnownValuesAtStartup;
+        //        payload["analogSamplingRate"] = AnalogSamplingRate.ToString();
+        //        payload["pwm_frequency"] = PWMFrequency.ToString();
+        //    }
+
+        //    private void serialize(JObject payload) {
+        //        serializeToFram(payload);
+
+        //        payload["isPIDOpen"] = IsPIDOpen;
+        //        payload["systemPassword"] = SystemPassword;
+        //        payload["hardwareVersion"] = HardwareVersion;
+        //        payload["softwareVersion"] = SoftwareVersion;
+        //    }
+
+        //    internal JObject ToFram() {
+        //        JObject payload = new JObject();
+        //        serializeToFram(payload);
+        //        return payload;
+        //    }
+        //}
 
         public class Config {
+
             public string SystemName { get; set; } = "SigCore UC";
-            public string SystemSerialNumber { get; set; } = "SCU123456"; 
-            public string HardwareVersion { get; set; } = "1.0";          
-            public string SoftwareVersion { get; set; } = "0.9.0";        
+            public string SystemSerialNumber { get; set; } = "SCU123456";
+            public string HardwareVersion { get; set; } = "1.0";
+            public string SoftwareVersion { get; set; } = "0.9.0";
 
             public bool UseLastKnownValuesAtStartup { get; set; } = true;
 
-            public enum SamplesPerSecond {
-                Low,
-                Medium,
-                High
-            }
             public SamplesPerSecond AnalogSamplingRate { get; set; } = SamplesPerSecond.Medium;
             public int PWMFrequency { get; set; } = 250;
 
-            // Networking
-            public string Hostname { get; set; } = "sigcore-uc";
-            public bool DhcpEnabled { get; set; } = true;
-            public string IpAddress { get; set; } = "";
-            public string SubnetMask { get; set; } = "";
-            public string Gateway { get; set; } = "";
-            public string Dns { get; set; } = "";
             public bool IsPIDOpen { get; set; } = true;
+
             // Security
             public string SystemPassword { get; set; } = "admin";
 
+            // ─────────────────────────
+            // Convert FROM payload
+            // ─────────────────────────
 
-            // Convert from JSON payload
-            public void FromPayload(JObject payload) {
-                if (payload == null) return;
+            public void FromPayload(SystemConfigPayload payload) {
+                if (payload == null)
+                    return;
 
-                SystemName = (string)payload["systemName"] ?? SystemName;
-                SystemSerialNumber = (string)payload["systemSerialNumber"] ?? SystemSerialNumber;
-                UseLastKnownValuesAtStartup = (bool?)payload["useLastKnownValues"] ?? UseLastKnownValuesAtStartup;
+                SystemName = payload.SystemName;
+                SystemSerialNumber = payload.SystemSerialNumber;
+                UseLastKnownValuesAtStartup = payload.UseLastKnownValuesAtStartup;
 
-                string sps = (string)payload["analogSamplingRate"];
-                if (!string.IsNullOrEmpty(sps) && Enum.TryParse(sps, true, out SamplesPerSecond rate)) {
-                    AnalogSamplingRate = rate;
-                }
-                JToken pwmToken = payload["pwm_frequency"];
-                if (pwmToken != null && pwmToken.Type != JTokenType.Null)
-                    PWMFrequency = pwmToken.Value<int>();
+                AnalogSamplingRate = (SamplesPerSecond)payload.AnalogSamplingRate;
+                PWMFrequency = payload.PWMFrequency;
 
-                Hostname = (string)payload["hostname"] ?? Hostname;
-                SoftwareVersion = (string)payload["softwareVersion"] ?? SoftwareVersion;
-                HardwareVersion = (string)payload["hardwareVersion"] ?? HardwareVersion;
-                DhcpEnabled = (bool?)payload["dhcpEnabled"] ?? DhcpEnabled;
-                IpAddress = (string)payload["ipAddress"] ?? IpAddress;
-                SubnetMask = (string)payload["subnetMask"] ?? SubnetMask;
-                Gateway = (string)payload["gateway"] ?? Gateway;
-                Dns = (string)payload["dns"] ?? Dns;
-                IsPIDOpen = (bool?)payload["isPIDOpen"] ?? IsPIDOpen;
+                IsPIDOpen = payload.IsPIDOpen;
 
-                if (payload.ContainsKey("systemPassword"))
-                    SystemPassword = (string)payload["systemPassword"] ?? SystemPassword;
+                HardwareVersion = payload.HardwareVersion;
+                SoftwareVersion = payload.SoftwareVersion;
+
+                SystemPassword = payload.SystemPassword;
             }
 
-            // Convert to JSON payload
-            public JObject ToPayload() {
-                JObject payload = new JObject();
-                serialize(payload);
-                payload["hardwareVersion"] = HardwareVersion;
-                payload["softwareVersion"] = SoftwareVersion;
+            // ─────────────────────────
+            // Convert TO full payload
+            // ─────────────────────────
 
-                return payload;
+            public SystemConfigPayload ToPayload() {
+                SystemConfigPayload cfg = BuildPayload();
+                return cfg;
             }
 
-            private void serialize(JObject payload) {
-                payload["systemName"] = SystemName;
-                payload["systemSerialNumber"] = SystemSerialNumber;
-                payload["useLastKnownValues"] = UseLastKnownValuesAtStartup;
-                payload["analogSamplingRate"] = AnalogSamplingRate.ToString();
-                payload["pwm_frequency"] = PWMFrequency.ToString();
+            // ─────────────────────────
+            // Convert TO FRAM payload
+            // ─────────────────────────
 
-                payload["hostname"] = Hostname;
-                payload["dhcpEnabled"] = DhcpEnabled;
-                payload["ipAddress"] = IpAddress;
-                payload["subnetMask"] = SubnetMask;
-                payload["gateway"] = Gateway;
-                payload["dns"] = Dns;
-                payload["isPIDOpen"] = IsPIDOpen;
-
-                payload["systemPassword"] = SystemPassword;
-            }
             internal JObject ToFram() {
-                JObject payload = new JObject();
-                serialize(payload);
-                return payload;
+                SystemConfigPayload cfg = BuildPayload();
+                return cfg.ToFramPayload();
+            }
+
+            // ─────────────────────────
+            // Internal mapping
+            // ─────────────────────────
+
+            private SystemConfigPayload BuildPayload() {
+                SystemConfigPayload cfg = new SystemConfigPayload();
+
+                cfg.SystemName = SystemName;
+                cfg.SystemSerialNumber = SystemSerialNumber;
+                cfg.UseLastKnownValuesAtStartup = UseLastKnownValuesAtStartup;
+
+                cfg.AnalogSamplingRate = (int)AnalogSamplingRate;
+                cfg.PWMFrequency = PWMFrequency;
+
+                cfg.IsPIDOpen = IsPIDOpen;
+                cfg.SystemPassword = SystemPassword;
+                cfg.HardwareVersion = HardwareVersion;
+                cfg.SoftwareVersion = SoftwareVersion;
+
+                return cfg;
             }
         }
-
     }
 }

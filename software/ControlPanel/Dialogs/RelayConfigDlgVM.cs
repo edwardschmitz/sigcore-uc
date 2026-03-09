@@ -1,12 +1,13 @@
 ﻿using SigCoreCommon; // assuming RelayConfig lives there
+using SigCoreCommon.Payloads;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace ControlPanel.Dialogs {
     public class RelayConfigDlgVM : ViewModelBase {
-        private readonly RELAY_OUT.RelayConfig _config;
+        private readonly RelayConfigPayload _config;
 
-        public RelayConfigDlgVM(RELAY_OUT.RelayConfig config) {
+        public RelayConfigDlgVM(RelayConfigPayload config) {
             _config = config;
         }
 
@@ -40,7 +41,7 @@ namespace ControlPanel.Dialogs {
             }
         }
 
-        public RELAY_OUT.RelayConfig Config { get { return _config; } }
+        public RelayConfigPayload Config { get { return _config; } }
 
     }
 }

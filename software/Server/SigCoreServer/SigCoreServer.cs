@@ -30,12 +30,10 @@ namespace SigCoreServer {
         public async Task StartAsync() {
             _listener = new TcpListener(IPAddress.Any, 7020);
             _listener.Start();
-            Console.WriteLine("SigCore Server started on port 7020");
 
             while (true) {
                 TcpClient client = await _listener.AcceptTcpClientAsync();
                 uint sessionId = _nextSessionId++;
-                Console.WriteLine($"--- Client Connected: Session {sessionId} ---");
 
                 ClientSession session = new ClientSession(client, sessionId, _dispatcher);
 

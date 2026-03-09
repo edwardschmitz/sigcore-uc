@@ -6,5 +6,6 @@ namespace SigCoreCommon {
         bool IsCommander { get; set; }
         bool IsConnected { get; }
         Task Send(SigCoreMessage msg);
+        Task SendOrDiscard(SigCoreMessage msg);
     }
 }

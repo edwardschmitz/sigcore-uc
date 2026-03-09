@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using static System.Collections.Specialized.BitVector32;
 
@@ -12,6 +13,7 @@ namespace SigCoreServer {
         // ---- Static list of active sessions ----
         private static readonly List<ClientSession> _sessions = new List<ClientSession>();
         private static readonly object _sessionsLock = new object();
+        private int _lossySendInProgress = 0;
 
         private readonly object _sendLock = new object();
         private readonly IDispatcher _dispatcher;
@@ -48,6 +50,10 @@ namespace SigCoreServer {
 
         public ClientSession(TcpClient client, uint sessionId, IDispatcher dispatcher) {
             Client = client;
+
+            Client.Client.SendBufferSize = 4 * 1024;   
+            Client.Client.NoDelay = true;              
+
             Stream = client.GetStream();
             SessionID = sessionId;
             _dispatcher = dispatcher;
@@ -73,9 +79,6 @@ namespace SigCoreServer {
 
         public async Task RunAsync() {
             try {
-                SigCoreMessage msg = SigCoreMessage.CreateConnect(SessionID, IsCommander);
-                Send(msg);
-
                 while (true) {
                     string? line = await _reader.ReadLineAsync();
                     if (line == null) break;
@@ -111,6 +114,24 @@ namespace SigCoreServer {
             }
         }
 
+        public async Task SendOrDiscard(SigCoreMessage msg) {
+            if (!IsConnected)
+                return;
+
+            string encoded = SigCoreProtocol.Encode(msg);
+            byte[] buffer = Encoding.UTF8.GetBytes(encoded);
+
+            using CancellationTokenSource cts = new CancellationTokenSource(1); // ~1ms "basically free" window
+
+            try {
+                await Stream.WriteAsync(buffer, 0, buffer.Length, cts.Token);
+            } catch (OperationCanceledException) {
+                // Expected: socket under pressure → drop message
+            } catch {
+                // Connection error or other failure → ignore for lossy traffic
+            }
+        }
+
         public void Close() {
             lock (_sessionsLock) {
                 _sessions.Remove(this);
@@ -118,23 +139,6 @@ namespace SigCoreServer {
             Client.Close();
             Console.WriteLine($"Session {SessionID} closed");
         }
-
-        //public static async Task BroadcastAsync(SigCoreMessage msg) {
-        //    if (msg.Command == SigCoreMessage.MsgType.RelayChangeAlert) {
-        //        Console.WriteLine($"Broadcasting: {msg.Command}");
-        //    }
-        //    List<ClientSession> copy;
-        //    lock (_sessionsLock) {
-        //        copy = new List<ClientSession>(_sessions);
-        //    }
-
-        //    foreach (ClientSession session in copy) {
-        //        if (msg.Command == SigCoreMessage.MsgType.RelayChangeAlert) {
-        //            Console.WriteLine($"Sending to: {session.SessionID}");
-        //        }
-        //        session.Send(msg);
-        //    }
-        //}
 
         public static async Task SendToAsync(uint sessionId, SigCoreMessage msg) {
             ClientSession? target = null;

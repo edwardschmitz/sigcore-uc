@@ -155,6 +155,29 @@ namespace SigCoreCommon {
             await SendAsync(message);
         }
 
+        public async Task SendOrDiscard(SigCoreMessage msg) {
+            throw new NotImplementedException();
+            if (_stream == null || !IsConnected)
+                return;
+
+            string encoded = SigCoreProtocol.Encode(msg);
+            byte[] buffer = Encoding.UTF8.GetBytes(encoded + "\n");
+
+            using CancellationTokenSource cts = new CancellationTokenSource(1);
+
+            try {
+                await _stream.WriteAsync(buffer, 0, buffer.Length, cts.Token);
+            } catch (OperationCanceledException) {
+                // Expected: socket under pressure → drop
+            } catch (ObjectDisposedException) {
+                // Stream closed → drop
+            } catch (IOException) {
+                // Transport failure → drop
+            } catch {
+                // Lossy by design
+            }
+        }
+
         // -------------------------------------------------------------
         // CLOSE  (manual or after failure)
         // -------------------------------------------------------------

@@ -1,5 +1,6 @@
 ﻿using ControlPanel.Dialogs;
 using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,7 +22,7 @@ namespace ControlPanel.IOChannelHandlers {
             set {
                 editValue = value;
                 OnPropertyChanged();
-                system.SetAOutValue(Index, value);
+                _ = system.SetAOutValueAsync(Index, value);
             }
         }
 
@@ -98,7 +99,7 @@ namespace ControlPanel.IOChannelHandlers {
             SetValueFromServer(formatted);
 
             // push to hardware
-            system.SetAOutValue(Index, formatted);
+            _ = system.SetAOutValueAsync(Index, formatted);
         }
 
         // ------------------------------------------------------------
@@ -126,17 +127,17 @@ namespace ControlPanel.IOChannelHandlers {
         private async Task EditConfig() {
             dimmer?.SetDim(true);
 
-            var config = await system.GetAOutConfigAsync(Index);
+            AOutConfigPayload config = await system.GetAOutConfigAsync(Index);
 
-            var vm = new AOutConfigDlgVM(config);
-            var dlg = new AOutConfigDlg { DataContext = vm };
+            AOutConfigDlgVM vm = new AOutConfigDlgVM(config);
+            AOutConfigDlg dlg = new AOutConfigDlg { DataContext = vm };
             dlg.Owner = Application.Current.MainWindow;
 
             bool? result = dlg.ShowDialog();
 
             if (result == true) {
-                await system.SetAOutConfigAsync(Index, vm.Config);
-                ShowConfig(vm.Config);
+                await system.SetAOutConfigAsync(config);
+                ShowConfig(config);
             }
 
             dimmer?.SetDim(false);
@@ -155,18 +156,20 @@ namespace ControlPanel.IOChannelHandlers {
             SetValueFromServer(val);
         }
 
-        private void ShowConfig(A_OUT.AnalogOutChannelConfig config) {
+        private void ShowConfig(AOutConfigPayload config) {
             UserID = config.Name;
             Units = config.Units;
 
             Precision = config.Precision;
-            Display = (int)config.Display;
+            Display = config.Display;
 
-            if (config.Mode == A_OUT.OutputMode.Voltage) {
-                MinValue = config.VoltageScaleB;
+            bool isVoltage = config.Mode == AOutConfigPayload.VoltageModeValue;
+
+            MinValue = config.VoltageScaleB;
+
+            if (isVoltage) {
                 MaxValue = config.VoltageScaleM * 5 + config.VoltageScaleB;
             } else {
-                MinValue = config.VoltageScaleB;
                 MaxValue = config.VoltageScaleM * 100 + config.VoltageScaleB;
             }
         }

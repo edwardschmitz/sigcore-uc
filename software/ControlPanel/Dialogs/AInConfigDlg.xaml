@@ -14,9 +14,6 @@
         FontFamily="Segoe UI"
         FontSize="14">
 
-    <Window.Resources>
-        <local:CalTypeToVisibilityConverter x:Key="CalTypeVisibility"/>
-    </Window.Resources>
 
     <Border CornerRadius="8" BorderBrush="#888" BorderThickness="1" Padding="10" Background="White" Margin="10">
         <Border.Effect>
@@ -90,24 +87,29 @@
                        Margin="5,2" Padding="5,2"/>
             <ComboBox Grid.Row="5" Grid.Column="1"
                       Margin="5,2" Padding="5,2"
-                      ItemsSource="{x:Static local:AInConfigDlg.DisplayFormats}"
-                      SelectedItem="{Binding Display, Mode=TwoWay}"/>
+                      ItemsSource="{x:Static local:AInConfigDlgVM.DisplayFormats}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="Value"
+                      SelectedValue="{Binding Display, Mode=TwoWay}" />
 
-            <!-- Input Range -->
             <ComboBox Grid.Row="6" Grid.Column="1"
                       Margin="5,2" Padding="5,2"
-                      ItemsSource="{x:Static local:AInConfigDlg.Ranges}"
-                      SelectedItem="{Binding InputRange, Mode=TwoWay}"/>
+                      ItemsSource="{x:Static local:AInConfigDlgVM.Ranges}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="Value"
+                      SelectedValue="{Binding InputRange, Mode=TwoWay}" />
 
-            <!-- Calibration Type -->
             <ComboBox Grid.Row="7" Grid.Column="1"
                       Margin="5,2" Padding="5,2"
-                      ItemsSource="{x:Static local:AInConfigDlg.CalTypes}"
-                      SelectedItem="{Binding CalibrationType, Mode=TwoWay}"/>
+                      ItemsSource="{x:Static local:AInConfigDlgVM.CalTypes}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="Value"
+                      SelectedValue="{Binding CalibrationType, Mode=TwoWay}" />
 
             <!-- mX+b -->
             <StackPanel Grid.Row="8" Grid.ColumnSpan="2" Orientation="Vertical" 
-                        Visibility="{Binding CalibrationType, Converter={StaticResource CalTypeVisibility}, ConverterParameter=mXplusB}">
+                        x:Name="MxBPanel"
+                        >
                 <TextBlock Text="y = m·x + b" FontWeight="Bold" Margin="5,5,5,0"/>
                 <StackPanel Orientation="Horizontal" Margin="5,2">
                     <TextBlock Text="m:" VerticalAlignment="Center" Margin="5,2" Padding="5,2"/>
@@ -119,7 +121,8 @@
 
             <!-- Polynomial -->
             <StackPanel Grid.Row="9" Grid.ColumnSpan="2" Orientation="Vertical"
-                        Visibility="{Binding CalibrationType, Converter={StaticResource CalTypeVisibility}, ConverterParameter=Polynomial}">
+                        x:Name="PolynomialPanel"
+                        >
                 <TextBlock Text="Polynomial Coefficients:" FontWeight="Bold" Margin="5,5,5,0"/>
                 <TextBox Text="{Binding PolynomialCoefficientsString, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
                 <TextBlock Text="Enter the coefficients in a comma delimited list" 
@@ -130,7 +133,8 @@
 
             <!-- MultiPoint -->
             <StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Vertical"
-                        Visibility="{Binding CalibrationType, Converter={StaticResource CalTypeVisibility}, ConverterParameter=MultiPoint}">
+                        x:Name="MultiPointPanel"
+                        >
                 <TextBlock Text="Multi-Point Calibration:" FontWeight="Bold" Margin="5,5,5,0"/>
                 <TextBox Text="{Binding PiecewisePairsString, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
                 <TextBlock Text="Enter point pairs as 'x1:y1, x2:y2, x3:y3'" 

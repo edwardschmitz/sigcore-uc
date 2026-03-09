@@ -107,8 +107,10 @@
                       Grid.Column="1"
                       Margin="5,2"
                       Padding="5,2"
-                      ItemsSource="{x:Static local:AOutConfigDlg.DisplayFormats}"
-                      SelectedItem="{Binding Display, Mode=TwoWay}"/>
+                      ItemsSource="{x:Static local:AOutConfigDlgVM.DisplayFormats}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="Value"
+                      SelectedValue="{Binding Display, Mode=TwoWay}" />
 
             <!-- Voltage Scale M -->
             <TextBlock Text="Voltage Scale (m):"
@@ -155,8 +157,10 @@
                       Grid.Column="1"
                       Margin="5,2"
                       Padding="5,2"
-                      ItemsSource="{x:Static local:AOutConfigDlg.Modes}"
-                      SelectedItem="{Binding Mode, Mode=TwoWay}"/>
+                      ItemsSource="{x:Static local:AOutConfigDlgVM.Modes}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="Value"
+                      SelectedValue="{Binding Mode, Mode=TwoWay}" />
 
             <!-- Auto -->
             <TextBlock Text="Automatic Mode:"

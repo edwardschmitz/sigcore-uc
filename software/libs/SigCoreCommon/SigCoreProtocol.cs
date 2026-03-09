@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SigCoreCommon.Payloads;
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -10,6 +11,7 @@ namespace SigCoreCommon {
     public class SigCoreMessage {
 
         // Adding a new message: 
+        //     Change the ProtocolVersion
         //     Add enum value. 
         //     Add handler to IDispatcher and its implementation(s). 
         //     Add switch case in Dispatch.
@@ -74,9 +76,13 @@ namespace SigCoreCommon {
             Shutdown = 54,
             GetStatus = 55,
             FactoryReset = 56,
+            NetworkConfig = 57,
+            SetNetworkConfig = 58,
+            GetNetworkConfig = 59,
+            ConnectResult = 60,
+
         }
 
-        private const string Version = "2";
 
         public ulong MsgId { get; set; }
         public MsgType Command { get; set; } = MsgType.None;
@@ -96,7 +102,7 @@ namespace SigCoreCommon {
                 case MsgType.Relay: return dispatcher.HandleRelay(Payload, MsgId, session);
                 case MsgType.Status: return dispatcher.HandleStatus(Payload, MsgId, session);
                 case MsgType.Error: return dispatcher.HandleError(Payload, MsgId, session);
-                case MsgType.Connect: return dispatcher.HandleConnect(Payload, MsgId, session, Version);
+                case MsgType.Connect: return dispatcher.HandleConnect(Payload, MsgId, session);
                 case MsgType.GetAnalogIn: return dispatcher.HandleGetAnalogIn(Payload, MsgId, session);
                 case MsgType.AnalogInValue: return dispatcher.HandleAnalogInValue(Payload, MsgId, session);
                 case MsgType.AInConfig: return dispatcher.HandleAInConfig(Payload, MsgId, session);
@@ -143,6 +149,10 @@ namespace SigCoreCommon {
                 case MsgType.Shutdown: return dispatcher.HandleShutdown(Payload, MsgId, session);
                 case MsgType.GetStatus: return dispatcher.HandleGetStatus(Payload, MsgId, session);
                 case MsgType.FactoryReset: return dispatcher.HandleFactoryReset(Payload, MsgId, session);
+                case MsgType.GetNetworkConfig: return dispatcher.HandleGetNetworkConfig(Payload, MsgId, session);
+                case MsgType.SetNetworkConfig: return dispatcher.HandleSetNetworkConfig(Payload, MsgId, session);
+                case MsgType.NetworkConfig: return dispatcher.HandleNetworkConfig(Payload, MsgId, session);
+                case MsgType.ConnectResult: return dispatcher.HandleConnectResult(Payload, MsgId, session);
                 default: return null;
             }
         }
@@ -173,14 +183,18 @@ namespace SigCoreCommon {
             };
         }
 
-        public static SigCoreMessage CreateConnect(uint sessionID, bool isCommander) {
-            Console.WriteLine($"SessionID: {sessionID}, IsCommander: {isCommander}, Ver: {Version.ToString()}");
+        private const int ProtocolVersion = 12;
+        public static SigCoreMessage CreateConnect() {
             JObject payload = new JObject { 
-                ["sessionID"] = sessionID, 
-                ["isCommander"] = isCommander,
-                ["version"] = Version.ToString(),
+                ["version"] = ProtocolVersion, 
             };
             return CreateBase(MsgType.Connect, payload);
+        }
+        public static SigCoreMessage CreateConnectResult(ulong msgID, int receivedVersion) {
+            JObject payload = new JObject {
+                ["accepted"] = receivedVersion == ProtocolVersion
+            };
+            return CreateBase(msgID, MsgType.ConnectResult, payload);
         }
 
         public static SigCoreMessage CreatePing() => CreateBase(MsgType.Ping);
@@ -221,8 +235,8 @@ namespace SigCoreCommon {
             JObject payload = new JObject { ["channel"] = chan };
             return CreateBase(MsgType.GetAInConfig, payload);
         }
-        public static SigCoreMessage CreateAInConfig(ulong msgId, JObject payload) {
-            return new SigCoreMessage { Command = MsgType.AInConfig, Payload = payload, MsgId = msgId };
+        public static SigCoreMessage CreateAInConfig(ulong msgId, AInConfigPayload payload) {
+            return new SigCoreMessage { Command = MsgType.AInConfig, Payload = payload.ToJson(), MsgId = msgId };
         }
 
         public static SigCoreMessage CreateGetAOut(uint chan) {
@@ -246,8 +260,11 @@ namespace SigCoreCommon {
             JObject payload = new JObject { ["channel"] = chan };
             return CreateBase(MsgType.GetRelayConfig, payload);
         }
-        public static SigCoreMessage CreateRelayConfig(ulong msgId, JObject payload) {
-            return new SigCoreMessage { Command = MsgType.RelayConfig, Payload = payload, MsgId = msgId };
+        public static SigCoreMessage CreateRelayConfig(ulong msgId, RelayConfigPayload payload) {
+            return new SigCoreMessage { 
+                Command = MsgType.RelayConfig, 
+                Payload = payload.ToJson(), 
+                MsgId = msgId };
         }
 
         public static SigCoreMessage CreateGetGlobalConfig() => CreateBase(MsgType.GetGlobalConfig);
@@ -268,8 +285,8 @@ namespace SigCoreCommon {
             JObject payload = new JObject { ["channel"] = chan };
             return CreateBase(MsgType.GetDInConfig, payload);
         }
-        public static SigCoreMessage CreateDInConfig(ulong msgId, JObject payload) {
-            return new SigCoreMessage { Command = MsgType.DInConfig, Payload = payload, MsgId = msgId };
+        public static SigCoreMessage CreateDInConfig(ulong msgId, DInConfigPayload payload) {
+            return new SigCoreMessage { Command = MsgType.DInConfig, Payload = payload.ToJson(), MsgId = msgId };
         }
 
 
@@ -287,9 +304,8 @@ namespace SigCoreCommon {
             return CreateBase(msgId, MsgType.PIDConfig, payload);
         }
 
-        public static SigCoreMessage CreateSetPIDConfig(uint channel, JObject payload) {
-            payload["channel"] = channel;
-            return CreateBase(MsgType.SetPIDConfig, payload);
+        public static SigCoreMessage CreateSetPIDConfig(PidConfigPayload payload) {
+            return CreateBase(MsgType.SetPIDConfig, payload.ToJson());
         }
 
 
@@ -393,19 +409,16 @@ namespace SigCoreCommon {
             JObject payload = new JObject { ["channel"] = chan, ["value"] = val };
             return CreateBase(MsgType.SetAOut, payload);
         }
-        public static SigCoreMessage CreateSetAInConfig(uint channel, JObject payload) {
-            payload["channel"] = channel;
-            return CreateBase(MsgType.SetAInConfig, payload);
+        public static SigCoreMessage CreateSetAInConfig(AInConfigPayload payload) {
+            return CreateBase(MsgType.SetAInConfig, payload.ToJson());
         }
 
-        public static SigCoreMessage CreateSetAOutConfig(uint channel, JObject payload) {
-            payload["channel"] = channel;
+        public static SigCoreMessage CreateSetAOutConfig(JObject payload) {
             return CreateBase(MsgType.SetAOutConfig, payload);
         }
 
-        public static SigCoreMessage CreateSetRelayConfig(uint channel, JObject payload) {
-            payload["channel"] = channel;
-            return CreateBase(MsgType.SetRelayConfig, payload);
+        public static SigCoreMessage CreateSetRelayConfig(RelayConfigPayload payload) {
+            return CreateBase(MsgType.SetRelayConfig, payload.ToJson());
         }
 
         public static SigCoreMessage CreateSetGlobalConfig(JObject payload) {
@@ -413,9 +426,8 @@ namespace SigCoreCommon {
             return CreateBase(MsgType.SetGlobalConfig, payload);
         }
 
-        public static SigCoreMessage CreateSetDInConfig(uint channel, JObject payload) {
-            payload["channel"] = channel;
-            return CreateBase(MsgType.SetDInConfig, payload);
+        public static SigCoreMessage CreateSetDInConfig(DInConfigPayload payload) {
+            return CreateBase(MsgType.SetDInConfig, payload.ToJson());
         }
         public static SigCoreMessage CreateGetFRAM() {
             return CreateBase(MsgType.GetFRAM);
@@ -430,6 +442,21 @@ namespace SigCoreCommon {
         public static SigCoreMessage CreateStatus(JObject payload, ulong msgId) {
             return CreateBase(msgId, MsgType.Status, payload);
         }
+
+        public static SigCoreMessage CreateNetworkConfig(ulong msgId, JObject payload) {
+            return new SigCoreMessage {
+                Command = MsgType.NetworkConfig,
+                Payload = payload,
+                MsgId = msgId
+            };
+        }
+
+        public static SigCoreMessage CreateSetNetworkConfig(JObject payload) {
+            return CreateBase(MsgType.SetNetworkConfig, payload);
+        }
+
+        public static SigCoreMessage CreateGetNetworkConfig() =>
+            CreateBase(MsgType.GetNetworkConfig);
 
 
         public static SigCoreMessage CreateFactoryReset(

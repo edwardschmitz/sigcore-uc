@@ -1,13 +1,14 @@
 ﻿using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using static SigCoreCommon.D_IN;
 
 namespace ControlPanel.Dialogs {
     public class DInConfigDlgVM : ViewModelBase {
-        private readonly DInConfig _config;
+        private readonly DInConfigPayload _config;
 
-        public DInConfigDlgVM(DInConfig config) {
+        public DInConfigDlgVM(DInConfigPayload config) {
             _config = config;
         }
 
@@ -41,7 +42,7 @@ namespace ControlPanel.Dialogs {
             }
         }
 
-        public DInConfig Config {
+        public DInConfigPayload Config {
             get { return _config; }
         }
     }

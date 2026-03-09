@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,23 +10,29 @@ using static SigCoreCommon.RELAY_OUT;
 namespace SigCoreCommon {
     public class D_IN : Mcp23008Driver {
         public class DInConfig {
+
             public string Name { get; set; } = string.Empty;
-            public int DebounceMs { get; set; } = 50; // default debounce
+            public int DebounceMs { get; set; } = 50;
             public bool Inverted { get; set; } = false;
 
-            public JObject ToPayload(uint channel) {
-                return new JObject {
-                    ["channel"] = channel,
-                    ["name"] = Name,
-                    ["debounce"] = DebounceMs,
-                    ["inverted"] = Inverted
-                };
+            public DInConfigPayload ToPayload(uint channel) {
+                DInConfigPayload payload = new DInConfigPayload();
+
+                payload.Channel = channel;
+                payload.Name = Name;
+                payload.DebounceMs = DebounceMs;
+                payload.Inverted = Inverted;
+
+                return payload;
             }
 
-            public void FromPayload(JObject payload) {
-                Name = payload.Value<string>("name") ?? string.Empty;
-                DebounceMs = payload.Value<int?>("debounce") ?? 50;
-                Inverted = payload.Value<bool?>("inverted") ?? false;
+            public void FromPayload(DInConfigPayload payload) {
+                if (payload == null)
+                    return;
+
+                Name = payload.Name;
+                DebounceMs = payload.DebounceMs;
+                Inverted = payload.Inverted;
             }
         }
 
@@ -70,15 +77,15 @@ namespace SigCoreCommon {
         public bool GetInput(uint input) {
             return CurrentStates[input];
         }
-        public void FromPayload(JObject payload) {
-            uint channel = payload.Value<uint>("channel");
+        public void FromPayload(DInConfigPayload payload) {
+            uint channel = payload.Channel;
             if (channel > 7)
                 throw new ArgumentOutOfRangeException(nameof(channel));
 
             _config[channel].FromPayload(payload);
         }
 
-        public JObject ToPayload(uint channel) {
+        public DInConfigPayload ToPayload(uint channel) {
             if (channel > 7)
                 throw new ArgumentOutOfRangeException(nameof(channel));
 
@@ -87,7 +94,7 @@ namespace SigCoreCommon {
         public JArray GenerateAllPayload() {
             JArray arr = new JArray();
             for (uint i = 0; i < 8; i++) {
-                arr.Add(ToPayload(i));
+                arr.Add(ToPayload(i).ToJson());
             }
             return arr;
         }

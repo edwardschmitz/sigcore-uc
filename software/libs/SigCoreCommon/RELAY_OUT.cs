@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,19 +14,18 @@ namespace SigCoreCommon {
             public bool DefaultState { get; set; } = false;
             public bool FailSafeState { get; set; } = false;
 
-            public JObject ToPayload(uint channel) {
-                return new JObject {
-                    ["channel"] = channel,
-                    ["name"] = Name,
-                    ["defaultState"] = DefaultState,
-                    ["failSafeState"] = FailSafeState
-                };
+            public RelayConfigPayload ToPayload(uint channel) {
+                RelayConfigPayload payload = new RelayConfigPayload();
+                payload.Channel = channel;
+                payload.Name = Name;
+                payload.DefaultState = DefaultState;
+                payload.FailSafeState = FailSafeState;
+                return payload;
             }
-
-            public void FromPayload(JObject payload) {
-                Name = payload.Value<string>("name") ?? string.Empty;
-                DefaultState = payload.Value<bool?>("defaultState") ?? false;
-                FailSafeState = payload.Value<bool?>("failSafeState") ?? false;
+            public void FromPayload(RelayConfigPayload payload) {
+                Name = payload.Name;
+                DefaultState = payload.DefaultState;
+                FailSafeState = payload.FailSafeState;
             }
         }
 
@@ -51,15 +51,15 @@ namespace SigCoreCommon {
             }
             return result;
         }
-        public void FromPayload(JObject payload) {
-            uint channel = payload.Value<uint>("channel");
+        public void FromPayload(RelayConfigPayload payload) {
+            uint channel = payload.Channel;
             if (channel > 7)
                 throw new ArgumentOutOfRangeException(nameof(channel));
 
             _config[channel].FromPayload(payload);
         }
 
-        public JObject ToPayload(uint channel) {
+        public RelayConfigPayload ToPayload(uint channel) {
             if (channel > 7)
                 throw new ArgumentOutOfRangeException(nameof(channel));
 
@@ -68,7 +68,7 @@ namespace SigCoreCommon {
         public JArray GenerateAllPayload() {
             JArray arr = new JArray();
             for (uint i = 0; i < 8; i++) {
-                arr.Add(ToPayload(i));
+                arr.Add(ToPayload(i).ToJson());
             }
             return arr;
         }

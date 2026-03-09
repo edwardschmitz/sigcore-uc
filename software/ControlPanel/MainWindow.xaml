@@ -193,13 +193,22 @@
                                             Command="{Binding Path=ResetCmd}"
                                             Margin="5,2"
                                             />
-                                    <Button Content="Settings" 
+                                    <Button Content="System" 
                                             BorderBrush="DimGray"
                                             Padding="20,5"
                                             Width="120"
                                             HorizontalAlignment="Center" VerticalAlignment="Top" 
                                             FontSize="16" FontWeight="Bold"
                                             Command="{Binding Path=SettingsCmd}"
+                                            Margin="2"
+                                            />
+                                    <Button Content="Network" 
+                                            BorderBrush="DimGray"
+                                            Padding="20,5"
+                                            Width="120"
+                                            HorizontalAlignment="Center" VerticalAlignment="Top" 
+                                            FontSize="16" FontWeight="Bold"
+                                            Command="{Binding Path=NetworkSettingsCmd}"
                                             Margin="2"
                                             />
                                 </StackPanel>

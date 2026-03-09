@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
@@ -26,8 +27,9 @@ namespace SigCoreServer {
             return null;
         }
 
-        public SigCoreMessage HandleConnect(JObject payload, ulong msgId, ISession session, string ver) {
-            throw new NotImplementedException();
+        public SigCoreMessage HandleConnect(JObject payload, ulong msgId, ISession session) {
+            int version = payload.Value<int>("version");
+            return SigCoreMessage.CreateConnectResult(msgId, version);
         }
 
         public SigCoreMessage HandleError(JObject payload, ulong msgId, ISession session) {
@@ -45,7 +47,6 @@ namespace SigCoreServer {
 
             uint channel = payload.Value<uint>("channel");
             bool state = payload.Value<bool>("state");
-            Console.WriteLine($"Command Dispatcher.HandleSetRelay: channel:{channel}, state: {state}");
 
             hardwareManager.SetRelay(channel, state);
             return null;
@@ -65,7 +66,7 @@ namespace SigCoreServer {
 
         public SigCoreMessage HandleGetAInConfig(JObject payload, ulong msgID, ISession session) {
             uint channel = payload.Value<uint>("channel");
-            JObject configPayload = hardwareManager.GetAnalogInConfig(channel);
+            AInConfigPayload configPayload = hardwareManager.GetAnalogInConfig(channel);
 
             return SigCoreMessage.CreateAInConfig(msgID, configPayload);
         }
@@ -94,65 +95,74 @@ namespace SigCoreServer {
         }
         public SigCoreMessage HandleGetAOutConfig(JObject payload, ulong msgID, ISession session) {
             uint channel = payload.Value<uint>("channel");
-            JObject config = hardwareManager.GetAOutConfig(channel);
-            return SigCoreMessage.CreateAOutConfig(msgID, config);
+            AOutConfigPayload config = hardwareManager.GetAOutConfig(channel);
+            return SigCoreMessage.CreateAOutConfig(msgID, config.ToJson());
         }
 
         public SigCoreMessage HandleSetAOutConfig(JObject payload, ulong msgID, ISession session) {
-            hardwareManager.SetAOutConfig(payload);
+            AOutConfigPayload config = new AOutConfigPayload(payload);
+            hardwareManager.SetAOutConfig(config);
             return null;
         }
 
         public SigCoreMessage HandleSetAInConfig(JObject payload, ulong msgId, ISession session) {
-            uint chan = payload.Value<uint>("channel");
-
-            hardwareManager.SetAInConfig(chan, payload); // how does this become null???
+            AInConfigPayload Payload = new AInConfigPayload(payload);
+            hardwareManager.SetAInConfig(Payload); 
             return null;
         }
 
         public SigCoreMessage HandleGetGlobalConfig(JObject payload, ulong msgId, ISession session) {
-            JObject p = hardwareManager.GetGlobalConfig();
-
-            Console.WriteLine($"Command Dispatcher >>> {p}");
-
-
-            SigCoreMessage msg = SigCoreMessage.CreateGlobalConfig(msgId, p);
+            SystemConfigPayload p = hardwareManager.GetGlobalConfig();
+            SigCoreMessage msg = SigCoreMessage.CreateGlobalConfig(msgId, p.ToJson());
             return msg;
         }
 
         public SigCoreMessage HandleSetGlobalConfig(JObject payload, ulong msgId, ISession session) {
-            hardwareManager.ApplyGlobalConfig(payload);
+            SystemConfigPayload config = new SystemConfigPayload(payload);
 
-            HardwareManager.Config config = hardwareManager.GlobalConfig();
-            osManager.ApplyNetworkConfig(config.DhcpEnabled, config.IpAddress, config.SubnetMask,
-                config.Gateway, config.Dns);
+            hardwareManager.ApplyGlobalConfig(config);
             return null;
         }
+
+
+        public SigCoreMessage HandleSetNetworkConfig(JObject payload, ulong msgId, ISession session) {
+            NetworkSettingsPayload p = new NetworkSettingsPayload(payload);
+
+                // Persist the network settings
+            hardwareManager.SetNetworkConfig(p);
+
+                // Apply the settings to the OS
+            osManager.ApplyNetworkConfig(p);
+            return null;
+        }
+        public SigCoreMessage HandleGetNetworkConfig(JObject payload, ulong msgId, ISession session) {
+            NetworkSettingsPayload settings = hardwareManager.GetNetworkConfig();
+            SigCoreMessage msg = SigCoreMessage.CreateNetworkConfig(msgId, settings.ToJson());
+            return msg;
+        }
+
+
         public SigCoreMessage HandleGetRelayConfig(JObject payload, ulong msgId, ISession session) {
             uint channel = payload.Value<uint>("channel");
-            JObject configPayload = hardwareManager.GetRelayConfig(channel);
+            RelayConfigPayload configPayload = hardwareManager.GetRelayConfig(channel);
             return SigCoreMessage.CreateRelayConfig(msgId, configPayload);
 
         }
-
         public SigCoreMessage HandleSetRelayConfig(JObject payload, ulong msgId, ISession session) {
-            uint chan = payload.Value<uint>("channel");
-
-            hardwareManager.SetRelayConfig(chan, payload); // how does this become null???
+            RelayConfigPayload config = new RelayConfigPayload(payload);
+            hardwareManager.SetRelayConfig(config); // how does this become null???
             return null;
         }
 
         public SigCoreMessage HandleGetDInConfig(JObject payload, ulong msgId, ISession session) {
             uint channel = payload.Value<uint>("channel");
-            JObject configPayload = hardwareManager.GetDInConfig(channel);
+            DInConfigPayload configPayload = hardwareManager.GetDInConfig(channel);
             return SigCoreMessage.CreateDInConfig(msgId, configPayload);
         }
 
         public SigCoreMessage HandleSetDInConfig(JObject payload, ulong msgId, ISession session) {
-            Console.WriteLine("HandleSetDInConfig");
-            uint chan = payload.Value<uint>("channel");
-
-            hardwareManager.SetDInConfig(chan, payload); // how does this become null???
+            DInConfigPayload dInConfigPayload = new DInConfigPayload(payload);
+            hardwareManager.SetDInConfig(dInConfigPayload); // how does this become null???
             return null;
         }
 
@@ -181,14 +191,12 @@ namespace SigCoreServer {
         }
 
         public SigCoreMessage HandleSetPIDCurVal(JObject payload, ulong msgId, ISession session) {
-            Console.WriteLine($"{payload}");
             hardwareManager.SetPIDCurVal(payload);
             return null;
         }
 
 
         public SigCoreMessage HandleSubscribe(JObject payload, ulong msgId, ISession session) {
-            Console.WriteLine($"session: {session.SessionID} is subscribed");
             _subscribers.TryAdd(session, true);
             return null; 
         }
@@ -219,13 +227,14 @@ namespace SigCoreServer {
             osManager.ShutdownDevice();
             return null;
         }
-        public SigCoreMessage HandleGetStatus(object payload, ulong msgId, ISession session) {
+        public SigCoreMessage HandleGetStatus(JObject payload, ulong msgId, ISession session) {
             JObject status = new JObject();
 
             status["sections"] = new JArray();
 
             hardwareManager.GetSystemStatus(status);
             osManager.GetSystemStatus(status);
+            hardwareManager.GetWiFiStatus(status);
             return SigCoreMessage.CreateStatus(status, msgId);
         }
 
@@ -250,6 +259,8 @@ namespace SigCoreServer {
         public SigCoreMessage HandlePIDCurValChangeAlert(JObject payload, ulong msgId, ISession session) => null;
         public SigCoreMessage HandleFRAM(JObject payload, ulong msgId, ISession session) => null;
         public SigCoreMessage HandleLoggingConfig(JObject payload, ulong msgId, ISession session) => null;
+        public SigCoreMessage HandleNetworkConfig(JObject payload, ulong msgId, ISession session) => null;
+        public SigCoreMessage HandleConnectResult(JObject payload, ulong msgId, ISession session) => null;
 
 
         public async Task NotifyDInChanged(bool[] vals) {
@@ -289,13 +300,13 @@ namespace SigCoreServer {
 
         public async Task Broadcast(SigCoreMessage msg) {
             foreach (var kvp in _subscribers) {
-                var session = kvp.Key;
+                ISession session = kvp.Key;
                 if (session.IsConnected)
-                    await session.Send(msg);
+                    await session.SendOrDiscard(msg);
             }
         }
 
-        public SigCoreMessage HandleFactoryReset(object payloadObj, ulong msgId, ISession session) {
+        public SigCoreMessage HandleFactoryReset(JObject payloadObj, ulong msgId, ISession session) {
             JObject payload = payloadObj as JObject;
             if (payload == null)
                 return null;
@@ -310,13 +321,13 @@ namespace SigCoreServer {
             string URL = (string)payload["url"];
             string sigUrl = (string)payload["signature"];
 
-            Console.WriteLine("HandleFactoryReset");
             LogFile log = new LogFile();
             log.Info("HandleFactoryReset");
-            hardwareManager.FactoryReset(serial, systemName, version, revision, hostname, manifestURL, manifestSigUrl, URL, sigUrl);
+            hardwareManager.FactoryReset(serial, systemName, version, revision, manifestURL, manifestSigUrl, URL, sigUrl, hostname);
             osManager.FactoryReset(hostname);
 
             return null;
         }
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MySqlConnector;
 using Newtonsoft.Json.Linq;
+using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace SigCoreCommon {
             }
 
             JObject configJson = new JObject {
-                ["global"] = owner.GetGlobalConfig(),
+                ["global"] = owner.GetGlobalConfig().ToJson(),
                 ["relays"] = owner.RelayOut.GenerateAllPayload(),
                 ["analogInputs"] = owner.AnalogIn.GenerateAllPayload(),
                 ["analogOutputs"] = owner.AnalogOut.GenerateAllPayload(),
@@ -167,38 +168,42 @@ namespace SigCoreCommon {
             public string Status { get; set; } = "Idle";
 
             public JObject ToPayload() {
-                JObject payload = new JObject {
-                    ["enabled"] = Enabled,
-                    ["intervalSec"] = IntervalSec,
-                    ["server"] = Server,
-                    ["port"] = Port,
-                    ["database"] = Database,
-                    ["user"] = User,
-                    ["password"] = Password,
-                    ["tableName"] = TableName,
-                    ["schemaVersion"] = SchemaVersion,
-                    ["connectionTimeoutSec"] = ConnectionTimeoutSec,
-                    ["commandTimeoutSec"] = CommandTimeoutSec,
-                    ["status"] = Status
-                };
-                return payload;
+                LoggerConfigPayload payload = new LoggerConfigPayload();
+
+                payload.Enabled = Enabled;
+                payload.IntervalSec = IntervalSec;
+                payload.Server = Server;
+                payload.Port = Port;
+                payload.Database = Database;
+                payload.User = User;
+                payload.Password = Password;
+                payload.TableName = TableName;
+                payload.SchemaVersion = SchemaVersion;
+                payload.ConnectionTimeoutSec = ConnectionTimeoutSec;
+                payload.CommandTimeoutSec = CommandTimeoutSec;
+                payload.Status = Status;
+
+                return payload.ToJson();
             }
 
-            public void FromPayload(JObject payload) {
-                if (payload == null) return;
+            public void FromPayload(JObject obj) {
+                if (obj == null)
+                    return;
 
-                Enabled = (bool?)payload["enabled"] ?? Enabled;
-                IntervalSec = (double?)payload["intervalSec"] ?? IntervalSec;
-                Server = (string?)payload["server"] ?? Server;
-                Port = (int?)payload["port"] ?? Port;
-                Database = (string?)payload["database"] ?? Database;
-                User = (string?)payload["user"] ?? User;
-                Password = (string?)payload["password"] ?? Password;
-                TableName = (string?)payload["tableName"] ?? TableName;
-                SchemaVersion = (string?)payload["schemaVersion"] ?? SchemaVersion;
-                ConnectionTimeoutSec = (int?)payload["connectionTimeoutSec"] ?? ConnectionTimeoutSec;
-                CommandTimeoutSec = (int?)payload["commandTimeoutSec"] ?? CommandTimeoutSec;
-                Status = (string?)payload["status"] ?? Status;
+                LoggerConfigPayload payload = new LoggerConfigPayload(obj);
+
+                Enabled = payload.Enabled;
+                IntervalSec = payload.IntervalSec;
+                Server = payload.Server;
+                Port = payload.Port;
+                Database = payload.Database;
+                User = payload.User;
+                Password = payload.Password;
+                TableName = payload.TableName;
+                SchemaVersion = payload.SchemaVersion;
+                ConnectionTimeoutSec = payload.ConnectionTimeoutSec;
+                CommandTimeoutSec = payload.CommandTimeoutSec;
+                Status = payload.Status;
             }
         }
     }

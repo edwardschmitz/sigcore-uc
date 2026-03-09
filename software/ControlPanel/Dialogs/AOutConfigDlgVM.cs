@@ -1,13 +1,40 @@
 ﻿using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace ControlPanel.Dialogs {
     public class AOutConfigDlgVM : ViewModelBase {
-        private readonly A_OUT.AnalogOutChannelConfig _config;
+        private readonly AOutConfigPayload _config;
 
-        public AOutConfigDlgVM(A_OUT.AnalogOutChannelConfig config) {
+        public AOutConfigDlgVM(AOutConfigPayload config) {
             _config = config;
+        }
+
+        public static NameValueItem[] DisplayFormats {
+            get {
+                (string Name, int Value)[] src = AOutConfigPayload.DisplayFormats;
+                NameValueItem[] result = new NameValueItem[src.Length];
+
+                for (int i = 0; i < src.Length; i++) {
+                    result[i] = new NameValueItem(src[i].Name, src[i].Value);
+                }
+
+                return result;
+            }
+        }
+
+        public static NameValueItem[] Modes {
+            get {
+                (string Name, int Value)[] src = AOutConfigPayload.OutputModes;
+                NameValueItem[] result = new NameValueItem[src.Length];
+
+                for (int i = 0; i < src.Length; i++) {
+                    result[i] = new NameValueItem(src[i].Name, src[i].Value);
+                }
+
+                return result;
+            }
         }
 
         public string Name {
@@ -50,7 +77,7 @@ namespace ControlPanel.Dialogs {
             }
         }
 
-        public A_OUT.OutputMode Mode {
+        public int Mode {
             get { return _config.Mode; }
             set {
                 if (_config.Mode != value) {
@@ -79,7 +106,7 @@ namespace ControlPanel.Dialogs {
             }
         }
 
-        public A_OUT.DisplayFormat Display {
+        public int Display {
             get { return _config.Display; }
             set {
                 if (_config.Display != value) {
@@ -89,7 +116,7 @@ namespace ControlPanel.Dialogs {
             }
         }
 
-        public A_OUT.AnalogOutChannelConfig Config {
+        public AOutConfigPayload Config {
             get { return _config; }
         }
 

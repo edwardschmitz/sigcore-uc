@@ -1,5 +1,6 @@
 ﻿using ControlPanel.Dialogs;
 using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System.Windows;
 
 namespace ControlPanel.IOChannelHandlers {
@@ -34,18 +35,16 @@ namespace ControlPanel.IOChannelHandlers {
         }
         private async Task EditConfig() {
             dimmer?.SetDim(true);
-            A_IN.AInConfig config;
+            AInConfigPayload config;
 
             config = await system.GetAInConfigAsync(Index);
 
-            AInConfigDlgVM vm = new AInConfigDlgVM(config);
-            AInConfigDlg dlg = new AInConfigDlg();
-            dlg.DataContext = vm;
+            AInConfigDlg dlg = new AInConfigDlg(config);
 
             dlg.Owner = Application.Current.MainWindow;
             bool? result = dlg.ShowDialog();
             if (result == true) {
-                await system.SetAInConfigAsync(Index, vm.Config);
+                await system.SetAInConfigAsync(config);
                 ShowConfig(config);
             }
             dimmer?.SetDim(false);
@@ -55,11 +54,11 @@ namespace ControlPanel.IOChannelHandlers {
             _ = UpdateFromConfig();
         }
         public async Task UpdateFromConfig() {
-            A_IN.AInConfig config = await system.GetAInConfigAsync(Index);
+            AInConfigPayload config = await system.GetAInConfigAsync(Index);
             ShowConfig(config);
         }
 
-        private void ShowConfig(A_IN.AInConfig config) {
+        private void ShowConfig(AInConfigPayload config) {
             UserID = config.Name;
             Units = config.Units;
             Precision = config.Precision;

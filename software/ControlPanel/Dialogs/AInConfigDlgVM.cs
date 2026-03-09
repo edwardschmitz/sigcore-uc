@@ -1,12 +1,62 @@
 ﻿using SigCoreCommon;
+using SigCoreCommon.Payloads;
+using System;
 
 namespace ControlPanel.Dialogs {
-    public class AInConfigDlgVM : ViewModelBase {
-        private readonly A_IN.AInConfig _config;
 
-        public AInConfigDlgVM(A_IN.AInConfig config) {
+    public class AInConfigDlgVM : ViewModelBase {
+        private readonly AInConfigPayload _config;
+
+        public AInConfigDlgVM(AInConfigPayload config) {
             _config = config;
         }
+
+        // ─────────────────────────
+        // UI domain lists (built from payload)
+        // ─────────────────────────
+
+        public static NameValueItem[] CalTypes {
+            get {
+                (string Name, int Value)[] src = AInConfigPayload.CalTypes;
+                NameValueItem[] result = new NameValueItem[src.Length];
+
+                for (int i = 0; i < src.Length; i++) {
+                    result[i] = new NameValueItem(src[i].Name, src[i].Value);
+                }
+
+                return result;
+            }
+        }
+
+        public static NameValueItem[] Ranges {
+            get {
+                (string Name, int Value)[] src = AInConfigPayload.Ranges;
+                NameValueItem[] result = new NameValueItem[src.Length];
+
+                for (int i = 0; i < src.Length; i++) {
+                    result[i] = new NameValueItem(src[i].Name, src[i].Value);
+                }
+
+                return result;
+            }
+        }
+
+        public static NameValueItem[] DisplayFormats {
+            get {
+                (string Name, int Value)[] src = AInConfigPayload.DisplayFormats;
+                NameValueItem[] result = new NameValueItem[src.Length];
+
+                for (int i = 0; i < src.Length; i++) {
+                    result[i] = new NameValueItem(src[i].Name, src[i].Value);
+                }
+
+                return result;
+            }
+        }
+
+        // ─────────────────────────
+        // Bound properties
+        // ─────────────────────────
 
         public string Name {
             get => _config.Name;
@@ -23,12 +73,12 @@ namespace ControlPanel.Dialogs {
             set { if (_config.AveragingSamples != value) { _config.AveragingSamples = value; OnPropertyChanged(); } }
         }
 
-        public A_IN.Range InputRange {
+        public int InputRange {
             get => _config.InputRange;
             set { if (_config.InputRange != value) { _config.InputRange = value; OnPropertyChanged(); } }
         }
 
-        public A_IN.CalType CalibrationType {
+        public int CalibrationType {
             get => _config.CalibrationType;
             set { if (_config.CalibrationType != value) { _config.CalibrationType = value; OnPropertyChanged(); } }
         }
@@ -45,12 +95,22 @@ namespace ControlPanel.Dialogs {
 
         public string PolynomialCoefficientsString {
             get => _config.PolynomialCoefficientsString;
-            set { if (_config.PolynomialCoefficientsString != value) { _config.PolynomialCoefficientsString = value; OnPropertyChanged(); } }
+            set {
+                if (_config.PolynomialCoefficientsString != value) {
+                    _config.PolynomialCoefficientsString = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
         public string PiecewisePairsString {
             get => _config.PiecewisePairsString;
-            set { if (_config.PiecewisePairsString != value) { _config.PiecewisePairsString = value; OnPropertyChanged(); } }
+            set {
+                if (_config.PiecewisePairsString != value) {
+                    _config.PiecewisePairsString = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
         public int Precision {
@@ -58,14 +118,25 @@ namespace ControlPanel.Dialogs {
             set { if (_config.Precision != value) { _config.Precision = value; OnPropertyChanged(); } }
         }
 
-        public A_IN.DisplayFormat Display {
+        public int Display {
             get => _config.Display;
             set { if (_config.Display != value) { _config.Display = value; OnPropertyChanged(); } }
         }
 
-        public A_IN.AInConfig Config => _config;
+        public AInConfigPayload Config => _config;
+    }
 
-        public static A_IN.CalType[] CalTypes => (A_IN.CalType[])System.Enum.GetValues(typeof(A_IN.CalType));
-        public static A_IN.Range[] Ranges => (A_IN.Range[])System.Enum.GetValues(typeof(A_IN.Range));
+    // ─────────────────────────
+    // UI helper (binding-friendly)
+    // ─────────────────────────
+
+    public sealed class NameValueItem {
+        public string Name { get; }
+        public int Value { get; }
+
+        public NameValueItem(string name, int value) {
+            Name = name;
+            Value = value;
+        }
     }
 }

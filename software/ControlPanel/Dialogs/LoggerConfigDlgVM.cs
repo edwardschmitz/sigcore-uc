@@ -1,12 +1,13 @@
 ﻿using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace ControlPanel.Dialogs {
     public class LoggerConfigDlgVM : ViewModelBase {
-        private readonly MYSQL_LOGGER.DataLoggerConfig _config;
+        private readonly LoggerConfigPayload _config;
 
-        public LoggerConfigDlgVM(MYSQL_LOGGER.DataLoggerConfig config) {
+        public LoggerConfigDlgVM(LoggerConfigPayload config) {
             _config = config;
         }
 
@@ -120,6 +121,6 @@ namespace ControlPanel.Dialogs {
             }
         }
 
-        public MYSQL_LOGGER.DataLoggerConfig Config => _config;
+        public LoggerConfigPayload Config => _config;
     }
 }

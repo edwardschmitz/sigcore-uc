@@ -1,5 +1,6 @@
 ﻿using ControlPanel.Dialogs;
 using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +21,11 @@ namespace ControlPanel.IOChannelHandlers {
             _ = EditConfig();
         }
         protected override void OnUIValueChanged(bool newValue) {
-            system.SetRelay(Index, newValue); // break point
+            _ = system.SetRelayAsync(Index, newValue); 
         }
         private async Task EditConfig() {
             dimmer?.SetDim(true);
-            RELAY_OUT.RelayConfig config;
+            RelayConfigPayload config;
 
             config = await system.GetRelayConfigAsync(Index);
 
@@ -45,13 +46,13 @@ namespace ControlPanel.IOChannelHandlers {
             _ = UpdateFromConfig();
         }
         public async Task UpdateFromConfig() {
-            RELAY_OUT.RelayConfig config = await system.GetRelayConfigAsync(Index);
+            RelayConfigPayload config = await system.GetRelayConfigAsync(Index);
             bool val = await system.GetRelayAsync(Index);
             Value = val;
             ShowConfig(config);
         }
 
-        private void ShowConfig(RELAY_OUT.RelayConfig config) {
+        private void ShowConfig(RelayConfigPayload config) {
             UserID = config.Name;
         }
     }

@@ -52,7 +52,7 @@
                        VerticalAlignment="Center" TextAlignment="Right"
                        Margin="5,2" Padding="5,2"/>
             <TextBox Grid.Row="1" Grid.Column="1" 
-                     Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Text="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                      Margin="5,2" Padding="5,2"/>
 
             <!-- Kp -->
@@ -60,7 +60,7 @@
                        VerticalAlignment="Center" TextAlignment="Right"
                        Margin="5,2" Padding="5,2"/>
             <TextBox Grid.Row="2" Grid.Column="1"
-                     Text="{Binding Kp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Text="{Binding Kp, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                      Margin="5,2" Padding="5,2"/>
 
             <!-- Ki -->
@@ -68,7 +68,7 @@
                        VerticalAlignment="Center" TextAlignment="Right"
                        Margin="5,2" Padding="5,2"/>
             <TextBox Grid.Row="3" Grid.Column="1"
-                     Text="{Binding Ki, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Text="{Binding Ki, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                      Margin="5,2" Padding="5,2"/>
 
             <!-- Kd -->
@@ -76,7 +76,7 @@
                        VerticalAlignment="Center" TextAlignment="Right"
                        Margin="5,2" Padding="5,2"/>
             <TextBox Grid.Row="4" Grid.Column="1"
-                     Text="{Binding Kd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Text="{Binding Kd, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                      Margin="5,2" Padding="5,2"/>
 
             <!-- Output Range -->
@@ -85,11 +85,11 @@
                        Margin="5,2" Padding="5,2"/>
             <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal" Margin="5,2">
                 <TextBox Width="80"
-                         Text="{Binding OutputMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Text="{Binding OutputMin, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                          Margin="5,2" Padding="5,2"/>
                 <TextBlock Text="to" VerticalAlignment="Center" Margin="5,2"/>
                 <TextBox Width="80"
-                         Text="{Binding OutputMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Text="{Binding OutputMax, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                          Margin="5,2" Padding="5,2"/>
             </StackPanel>
 
@@ -99,11 +99,11 @@
                        Margin="5,2" Padding="5,2"/>
             <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="5,2">
                 <TextBox Width="80"
-                         Text="{Binding PVMin, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Text="{Binding PVMin, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                          Margin="5,2" Padding="5,2"/>
                 <TextBlock Text="to" VerticalAlignment="Center" Margin="5,2"/>
                 <TextBox Width="80"
-                         Text="{Binding PVMax, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Text="{Binding PVMax, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                          Margin="5,2" Padding="5,2"/>
             </StackPanel>
 
@@ -112,7 +112,7 @@
                        VerticalAlignment="Center" TextAlignment="Right"
                        Margin="5,2" Padding="5,2"/>
             <TextBox Grid.Row="7" Grid.Column="1"
-                     Text="{Binding IntegralLimit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Text="{Binding IntegralLimit, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" 
                      Margin="5,2" Padding="5,2"/>
 
             <!-- Auto Mode -->

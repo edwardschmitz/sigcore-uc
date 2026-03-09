@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SigCoreCommon.Payloads;
 using System;
 using System.Diagnostics;
 
@@ -137,48 +138,55 @@ namespace SigCoreCommon {
 
             // ---------- Configuration packing ----------
             public virtual JObject PackConfig(uint channel) {
-                JObject payload = new JObject {
-                    ["channel"] = channel,
-                    ["title"] = Title,
-                    ["isEnabled"] = Enabled,
-                    ["kp"] = Kp,
-                    ["ki"] = Ki,
-                    ["kd"] = Kd,
-                    ["outputMin"] = OutputMin,
-                    ["outputMax"] = OutputMax,
-                    ["pvMin"] = PVMin,
-                    ["pvMax"] = PVMax,
-                    ["autoMode"] = Auto,
-                    ["pvSource"] = PvSource,
-                    ["outputDestination"] = OutputDestination,
-                    ["integralLimit"] = IntegralLimit,
-                    ["resetOnModeChange"] = ResetOnModeChange
-                };
-                return payload;
+                PidConfigPayload payload = new PidConfigPayload();
+
+                payload.Channel = channel;
+                payload.Title = Title;
+                payload.IsEnabled = Enabled;
+                payload.AutoMode = Auto;
+
+                payload.Kp = Kp;
+                payload.Ki = Ki;
+                payload.Kd = Kd;
+
+                payload.OutputMin = OutputMin;
+                payload.OutputMax = OutputMax;
+                payload.PVMin = PVMin;
+                payload.PVMax = PVMax;
+
+                payload.PvSource = PvSource;
+                payload.OutputDestination = OutputDestination;
+
+                payload.IntegralLimit = IntegralLimit;
+                payload.ResetOnModeChange = ResetOnModeChange;
+
+                return payload.ToJson();
             }
 
             public virtual void UnpackConfig(JObject obj) {
                 if (obj == null)
                     throw new ArgumentNullException(nameof(obj));
 
-                Title = (string?)obj["title"] ?? string.Empty;
-                Enabled = (bool?)obj["isEnabled"] ?? false;
-                Auto = (bool?)obj["autoMode"] ?? true;
+                PidConfigPayload payload = new PidConfigPayload(obj);
 
-                OutputMin = (double?)obj["outputMin"] ?? 0.0;
-                OutputMax = (double?)obj["outputMax"] ?? 5.0;
-                PVMin = (double?)obj["pvMin"] ?? 0.0;
-                PVMax = (double?)obj["pvMax"] ?? 5.0;
+                Title = payload.Title;
+                Enabled = payload.IsEnabled;
+                Auto = payload.AutoMode;
 
-                Kp = (double?)obj["kp"] ?? 10.0;
-                Ki = (double?)obj["ki"] ?? 0.01;
-                Kd = (double?)obj["kd"] ?? 0.0;
+                Kp = payload.Kp;
+                Ki = payload.Ki;
+                Kd = payload.Kd;
 
-                PvSource = (uint?)obj["pvSource"] ?? 0;
-                OutputDestination = (uint?)obj["outputDestination"] ?? 0;
+                OutputMin = payload.OutputMin;
+                OutputMax = payload.OutputMax;
+                PVMin = payload.PVMin;
+                PVMax = payload.PVMax;
 
-                IntegralLimit = (double?)obj["integralLimit"] ?? 1000.0;
-                ResetOnModeChange = (bool?)obj["resetOnModeChange"] ?? false;
+                PvSource = payload.PvSource;
+                OutputDestination = payload.OutputDestination;
+
+                IntegralLimit = payload.IntegralLimit;
+                ResetOnModeChange = payload.ResetOnModeChange;
             }
 
             // ---------- Current-value packing ----------

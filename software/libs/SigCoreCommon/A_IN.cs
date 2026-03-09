@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using SigCoreCommon.Payloads;
+using System;
 using System.Collections.Generic;
 using System.Device.I2c;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 
 namespace SigCoreCommon {
     public class A_IN : Ads1115Driver {
@@ -89,76 +90,48 @@ namespace SigCoreCommon {
             }
 
             // --- Serialization to FRAM / network ---
-            public JObject ToPayload(uint channel) {
-                var payload = new JObject {
-                    ["channel"] = channel,
-                    ["name"] = Name,
-                    ["units"] = Units,
-                    ["avgSamples"] = AveragingSamples,
-                    ["calType"] = CalibrationType.ToString(),
-                    ["range"] = InputRange.ToString(),
-                    ["precision"] = Precision,
-                    ["display"] = Display.ToString(),
-                };
+            public AInConfigPayload ToPayload(uint channel) {
+                AInConfigPayload payload = new AInConfigPayload();
 
-                switch (CalibrationType) {
-                    case CalType.mXplusB:
-                        payload["m"] = M;
-                        payload["b"] = B;
-                        break;
+                payload.Channel = channel;
+                payload.Name = Name;
+                payload.Units = Units;
+                payload.AveragingSamples = AveragingSamples;
+                payload.Precision = Precision;
 
-                    case CalType.MultiPoint:
-                        var points = new JArray();
-                        for (int i = 0; i < InputPoints.Length; i++) {
-                            points.Add(new JObject {
-                                ["input"] = InputPoints[i],
-                                ["adjusted"] = AdjustedPoints[i]
-                            });
-                        }
-                        payload["points"] = points;
-                        break;
+                payload.CalibrationType = (int)CalibrationType;
+                payload.InputRange = (int)InputRange;
+                payload.Display = (int)Display;
 
-                    case CalType.Polynomial:
-                        payload["coefficients"] = new JArray(PolynomialCoefficients);
-                        break;
-                }
+                // Calibration-specific
+                payload.M = M;
+                payload.B = B;
+
+                payload.PolynomialCoefficientsString = PolynomialCoefficientsString;
+                payload.PiecewisePairsString = PiecewisePairsString;
 
                 return payload;
             }
 
-            public void FromPayload(JObject payload) {
-                Name = payload.Value<string>("name") ?? string.Empty;
-                Units = payload.Value<string>("units") ?? string.Empty;
-                AveragingSamples = payload.Value<int?>("avgSamples") ?? 1;
-                CalibrationType = Enum.TryParse(payload.Value<string>("calType"), out CalType ct) ? ct : CalType.mXplusB;
-                InputRange = Enum.TryParse(payload.Value<string>("range"), out Range r) ? r : Range.Voltage5V;
-                Display = Enum.TryParse(payload.Value<string>("display"), out DisplayFormat d) ? d : DisplayFormat.FixedPoint;
-                Precision = payload.Value<int?>("precision") ?? 3;
+            public void FromPayload(AInConfigPayload payload) {
+                if (payload == null)
+                    return;
 
-                switch (CalibrationType) {
-                    case CalType.mXplusB:
-                        M = payload.Value<double?>("m") ?? 1.0;
-                        B = payload.Value<double?>("b") ?? 0.0;
-                        break;
+                Name = payload.Name;
+                Units = payload.Units;
+                AveragingSamples = payload.AveragingSamples;
+                Precision = payload.Precision;
 
-                    case CalType.MultiPoint:
-                        JArray points = payload["points"] as JArray;
-                        if (points != null) {
-                            List<double> inList = new List<double>();
-                            List<double> adjList = new List<double>();
-                            foreach (var pt in points) {
-                                inList.Add(pt.Value<double>("input"));
-                                adjList.Add(pt.Value<double>("adjusted"));
-                            }
-                            InputPoints = inList.ToArray();
-                            AdjustedPoints = adjList.ToArray();
-                        }
-                        break;
+                CalibrationType = (CalType)payload.CalibrationType;
+                InputRange = (Range)payload.InputRange;
+                Display = (DisplayFormat)payload.Display;
 
-                    case CalType.Polynomial:
-                        PolynomialCoefficients = payload["coefficients"]?.ToObject<double[]>() ?? Array.Empty<double>();
-                        break;
-                }
+                // Calibration-specific
+                M = payload.M;
+                B = payload.B;
+
+                PolynomialCoefficientsString = payload.PolynomialCoefficientsString;
+                PiecewisePairsString = payload.PiecewisePairsString;
             }
         }
 
@@ -190,8 +163,8 @@ namespace SigCoreCommon {
             _muxController.SendRegisters();
         }
 
-        public void FromPayload(JObject payload) {
-            uint channel = payload.Value<uint>("channel");
+        public void FromPayload(AInConfigPayload payload) {
+            uint channel = payload.Channel;
             if (channel > 3)
                 throw new ArgumentOutOfRangeException(nameof(channel));
 
@@ -200,7 +173,7 @@ namespace SigCoreCommon {
             ApplyMux(channel);
         }
 
-        public JObject ToPayload(uint channel) {
+        public AInConfigPayload ToPayload(uint channel) {
             if (channel > 3)
                 throw new ArgumentOutOfRangeException(nameof(channel));
             return _configs[channel].ToPayload(channel);
@@ -322,7 +295,7 @@ namespace SigCoreCommon {
         public JArray GenerateAllPayload() {
             JArray arr = new JArray();
             for (uint i = 0; i < 4; i++)
-                arr.Add(ToPayload(i));
+                arr.Add(ToPayload(i).ToJson());
             return arr;
         }
 

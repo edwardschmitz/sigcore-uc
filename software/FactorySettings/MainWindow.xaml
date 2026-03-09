@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Factory Settings"
-        Width="500"
+        Width="600"
         Height="420">
 
     <Grid Margin="20">

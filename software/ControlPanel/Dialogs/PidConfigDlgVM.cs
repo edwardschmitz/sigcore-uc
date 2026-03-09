@@ -1,11 +1,12 @@
 ﻿using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System.ComponentModel;
 
 namespace ControlPanel.Dialogs {
     public class PidConfigDlgVM : INotifyPropertyChanged {
-        public PID_LOOP.Config Config { get; }
+        public PidConfigPayload Config { get; }
 
-        public PidConfigDlgVM(PID_LOOP.Config config) {
+        public PidConfigDlgVM(PidConfigPayload config) {
             Config = config;
         }
 
@@ -55,13 +56,13 @@ namespace ControlPanel.Dialogs {
         }
 
         public bool Auto {
-            get => Config.Auto;
-            set { Config.Auto = value; OnPropertyChanged(nameof(Auto)); }
+            get => Config.AutoMode;
+            set { Config.AutoMode = value; OnPropertyChanged(nameof(Auto)); }
         }
 
         public bool Enabled {
-            get => Config.Enabled;
-            set { Config.Enabled = value; OnPropertyChanged(nameof(Enabled)); }
+            get => Config.IsEnabled;
+            set { Config.IsEnabled = value; OnPropertyChanged(nameof(Enabled)); }
         }
 
         public bool ResetOnModeChange {

@@ -1,4 +1,5 @@
 ﻿using SigCoreCommon;
+using SigCoreCommon.Payloads;
 using System;
 using System.Globalization;
 using System.Windows;
@@ -10,24 +11,23 @@ namespace ControlPanel.Dialogs {
             InitializeComponent();
         }
 
-        private void Ok_Click(object sender, RoutedEventArgs e) {
-            DialogResult = true;
-            Close();
-        }
+        //private void Ok_Click(object sender, RoutedEventArgs e) {
+        //    DialogResult = true;
+        //    Close();
+        //}
 
-        public static Array SampleRates { get; } = Enum.GetValues(typeof(HardwareManager.Config.SamplesPerSecond));
+        //public static NameValueItem[] SampleRates {
+        //    get {
+        //        (string Name, int Value)[] src = SystemConfigPayload.SamplingRates;
+        //        NameValueItem[] result = new NameValueItem[src.Length];
+
+        //        for (int i = 0; i < src.Length; i++) {
+        //            result[i] = new NameValueItem(src[i].Name, src[i].Value);
+        //        }
+
+        //        return result;
+        //    }
+        //}
     }
 
-    public class BoolToCollapsedConverter : IValueConverter {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (value is bool b && b) {
-                return Visibility.Collapsed;
-            }
-            return Visibility.Visible;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            throw new NotImplementedException();
-        }
-    }
 }

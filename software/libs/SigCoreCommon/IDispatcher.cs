@@ -9,12 +9,12 @@ namespace SigCoreCommon {
         SigCoreMessage HandleRelay(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleStatus(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleError(JObject payload, ulong msgId, ISession session);
-        SigCoreMessage HandleConnect(JObject payload, ulong msgId, ISession session, string ver);
+        SigCoreMessage HandleConnect(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleGetAnalogIn(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleAnalogInValue(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleAInConfig(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleGetAInConfig(JObject payload, ulong msgId, ISession session);
-        SigCoreMessage HandleSetAInConfig(JObject payload, ulong msgId, ISession session); // 🔹 Added
+        SigCoreMessage HandleSetAInConfig(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleGetDIn(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleDIn(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleGetAOut(JObject payload, ulong msgId, ISession session);
@@ -54,8 +54,12 @@ namespace SigCoreCommon {
         SigCoreMessage HandleLoggingStatus(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleRestart(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleShutdown(JObject payload, ulong msgId, ISession session);
-        SigCoreMessage HandleGetStatus(Object payload, ulong msgId, ISession session);
-        SigCoreMessage HandleFactoryReset(Object payload, ulong msgId, ISession session);
+        SigCoreMessage HandleGetStatus(JObject payload, ulong msgId, ISession session);
+        SigCoreMessage HandleFactoryReset(JObject payload, ulong msgId, ISession session);
+        SigCoreMessage HandleGetNetworkConfig(JObject payload, ulong msgId, ISession session);
+        SigCoreMessage HandleSetNetworkConfig(JObject payload, ulong msgId, ISession session);
+        SigCoreMessage HandleNetworkConfig(JObject payload, ulong msgId, ISession session);
+        SigCoreMessage HandleConnectResult(JObject payload, ulong msgId, ISession session);
 
 
         Task NotifyDInChanged(bool[] vals);
