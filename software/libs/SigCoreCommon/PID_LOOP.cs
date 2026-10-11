@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using SigCoreCommon.Payloads;
 using System;
 using System.Diagnostics;
@@ -38,11 +38,27 @@ namespace SigCoreCommon {
             _lastTime = now;
             if (dt <= 0) return;
 
+            Exception firstError = null;
+
             for (int i = 0; i < loops.Length; i++) {
-                if (configs[i].Enabled)
+                if (!configs[i].Enabled)
+                    continue;
+
+                try {
                     loops[i].Compute(dt);
+                } catch (Exception ex) {
+                    // One bad PID must not prevent the remaining enabled loops
+                    // from getting their compute cycle.  The caller receives an
+                    // exception after all channels have had a chance to run.
+                    firstError ??= new InvalidOperationException(
+                        $"PID{i + 1} compute failed.", ex);
+                }
             }
+
             Thread.Sleep(10);
+
+            if (firstError != null)
+                throw firstError;
         }
 
         public void UnpackConfig(JObject payload) {

@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using SigCoreCommon.Payloads;
 using SigCoreCommon.Update;
 using System;
+using System.IO;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -11,7 +12,9 @@ using static SigCoreCommon.HardwareManager;
 
 namespace SigCoreCommon {
     public class HardwareManager {
-        public RELAY_OUT RelayOut { get; }
+        private static readonly Log EventLog = new Log();
+
+    public RELAY_OUT RelayOut { get; }
         public A_IN AnalogIn { get; }
         public A_OUT AnalogOut { get; }
         public D_IN DigitalIn { get; }
@@ -26,6 +29,14 @@ namespace SigCoreCommon {
         private CancellationTokenSource _ctsPID;
         private CancellationTokenSource _ctsLogger;
 
+        private Task _analogTask;
+        private Task _dInTask;
+        private Task _pidTask;
+
+        private readonly object _analogLoopLock = new object();
+        private readonly object _dInLoopLock = new object();
+        private readonly object _pidLoopLock = new object();
+
         private readonly Dictionary<string, double> snapshot;
 
 
@@ -38,14 +49,15 @@ namespace SigCoreCommon {
             AnalogOut = new A_OUT();
             DigitalIn = new D_IN();
             PIDs = new PID_LOOP(this);
-            FRAM = new Fm24cl64bDriver();
+            try {
+                FRAM = new Fm24cl64bDriver();
+            } catch {
+                // FRAM is not required on current hardware.
+                FRAM = null;
+            }
             Logger = new MYSQL_LOGGER(this);
             Network = new NetworkManager();
 
-
-            _cts = new CancellationTokenSource();
-            _ctsDIn = new CancellationTokenSource();
-            _ctsPID = new CancellationTokenSource();
 
             _config = new Config();
 
@@ -111,20 +123,7 @@ namespace SigCoreCommon {
         }
         public void Initialize() {
 
-            // Initialize FRAM
-            FRAM.Initialize();
-
-            // Read config blob from FRAM
-            JObject storedConfig = ReadConfigFromFram();
-            if (storedConfig == null) {
-                Console.WriteLine("Error: Failed to read config from FRAM.");
-                return;
-            }
-
-            // Global config
-            JObject global = storedConfig["global"] as JObject;
-            SystemConfigPayload gPayload = new SystemConfigPayload(global);
-            _config.FromPayload(gPayload);
+            JObject storedConfig = _config.Load(FRAM, CreateDefaultConfig);
 
             // Relay configs
             JArray relays = storedConfig["relays"] as JArray;
@@ -134,7 +133,7 @@ namespace SigCoreCommon {
                     RelayOut.FromPayload(payload);
                 }
             } else {
-                Console.WriteLine("Error: Missing relay config.");
+                EventLog.Error("Configuration", "MissingRelayConfig", "Relay configuration is missing.");
                 throw new Exception("Error Reading Relay Config");
             }
 
@@ -146,7 +145,7 @@ namespace SigCoreCommon {
                     AnalogIn.FromPayload(payload);
                 }
             } else {
-                Console.WriteLine("Error: Missing analog inputs config.");
+                EventLog.Error("Configuration", "MissingAnalogInputConfig", "Analog input configuration is missing.");
                 throw new Exception("Error Reading Analog In Config");
             }
 
@@ -158,7 +157,7 @@ namespace SigCoreCommon {
                     AnalogOut.FromPayload(payload);
                 }
             } else {
-                Console.WriteLine("Error: Missing analog outputs config.");
+                EventLog.Error("Configuration", "MissingAnalogOutputConfig", "Analog output configuration is missing.");
                 throw new Exception("Error Reading Analog Out Config");
             }
 
@@ -170,7 +169,7 @@ namespace SigCoreCommon {
                     DigitalIn.FromPayload(payload);
                 }
             } else {
-                Console.WriteLine("Error: Missing digital inputs config.");
+                EventLog.Error("Configuration", "MissingDigitalInputConfig", "Digital input configuration is missing.");
                 throw new Exception("Error Reading Digital In Config");
             }
 
@@ -181,7 +180,7 @@ namespace SigCoreCommon {
                     PIDs.UnpackConfig(obj);
                 }
             } else {
-                Console.WriteLine("Error: Missing PID config.");
+                EventLog.Error("Configuration", "MissingPidConfig", "PID configuration is missing.");
                 throw new Exception("Error Reading PID Config");
             }
 
@@ -286,86 +285,178 @@ namespace SigCoreCommon {
             _ctsLogger?.Cancel();
         }
         private void StartPIDLoop() {
-            _ctsPID = new CancellationTokenSource();
-            Task.Run(() => SamplePIDLoop(_ctsPID.Token));
+            lock (_pidLoopLock) {
+                if (_pidTask != null && !_pidTask.IsCompleted)
+                    return;
+
+                _ctsPID?.Dispose();
+                _ctsPID = new CancellationTokenSource();
+                CancellationToken token = _ctsPID.Token;
+                _pidTask = Task.Run(() => SamplePIDLoop(token));
+            }
         }
+
         private void StopPIDLoop() {
-            throw new NotImplementedException();
+            Task task;
+            CancellationTokenSource cts;
+
+            lock (_pidLoopLock) {
+                task = _pidTask;
+                cts = _ctsPID;
+                cts?.Cancel();
+            }
+
+            WaitForLoopToStop(task, "PID");
+
+            lock (_pidLoopLock) {
+                if (ReferenceEquals(task, _pidTask)) {
+                    _pidTask = null;
+                    _ctsPID = null;
+                    cts?.Dispose();
+                }
+            }
         }
+
         private void StartDInLoop() {
-            _ctsDIn = new CancellationTokenSource();
-            Task.Run(() => SampleDigitalInLoop(_ctsDIn.Token));
+            lock (_dInLoopLock) {
+                if (_dInTask != null && !_dInTask.IsCompleted)
+                    return;
+
+                _ctsDIn?.Dispose();
+                _ctsDIn = new CancellationTokenSource();
+                CancellationToken token = _ctsDIn.Token;
+                _dInTask = Task.Run(() => SampleDigitalInLoop(token));
+            }
         }
 
         private async Task SamplePIDLoop(CancellationToken token) {
             while (!token.IsCancellationRequested) {
-                await Task.Delay(100, token);
-                PIDs.ComputeAll();
-                for(uint chan =0; chan<4;  chan++) {
-                    if (PIDs.IsEnabled(chan)) {
-                        JObject payload = PIDs.PackCurVal(chan);
-                        _ = Dispatcher.NotifyPIDChanged(chan, payload);
+                try {
+                    await Task.Delay(100, token);
+
+                    PIDs.ComputeAll();
+                    for (uint chan = 0; chan < 4; chan++) {
+                        if (PIDs.IsEnabled(chan)) {
+                            JObject payload = PIDs.PackCurVal(chan);
+                            if (payload != null)
+                                _ = Dispatcher.NotifyPIDChanged(chan, payload);
+                        }
                     }
+                } catch (OperationCanceledException) when (token.IsCancellationRequested) {
+                    break;
+                } catch (Exception ex) {
+                    EventLog.Error("Sampling", "PidLoopFailure", "PID sampling loop failed.", ex);
+                    if (!await DelayAfterLoopError(token))
+                        break;
                 }
             }
         }
+
         private async Task SampleDigitalInLoop(CancellationToken token) {
             while (!token.IsCancellationRequested) {
-                await Task.Delay(1, token);
-                if (DigitalIn.SampleInputs()) {
-                    _ = Dispatcher.NotifyDInChanged(DigitalIn.States);
+                try {
+                    await Task.Delay(1, token);
+                    if (DigitalIn.SampleInputs())
+                        _ = Dispatcher.NotifyDInChanged(DigitalIn.States);
+                } catch (OperationCanceledException) when (token.IsCancellationRequested) {
+                    break;
+                } catch (Exception ex) {
+                    EventLog.Error("Sampling", "DigitalInputLoopFailure", "Digital input sampling loop failed.", ex);
+                    if (!await DelayAfterLoopError(token))
+                        break;
                 }
             }
         }
 
         public void StopDInLoop() {
-            _ctsDIn?.Cancel();
-        }
+            Task task;
+            CancellationTokenSource cts;
 
-        public JObject ReadConfigFromFram() {
-            try {
-                // Read 2-byte length prefix from start of FRAM
-                byte[] lenBytes = FRAM.ReadBytes(0x0000, 2);
-                int length = (lenBytes[0] << 8) | lenBytes[1];
+            lock (_dInLoopLock) {
+                task = _dInTask;
+                cts = _ctsDIn;
+                cts?.Cancel();
+            }
 
-                if (length <= 0 || length > 8190) {
-                    Console.WriteLine("Invalid FRAM length header");
-                    return null;
+            WaitForLoopToStop(task, "digital input");
+
+            lock (_dInLoopLock) {
+                if (ReferenceEquals(task, _dInTask)) {
+                    _dInTask = null;
+                    _ctsDIn = null;
+                    cts?.Dispose();
                 }
-
-                // Read JSON payload bytes
-                byte[] jsonBytes = FRAM.ReadBytes(0x0002, length);
-
-                // Decode to string
-                string json = System.Text.Encoding.UTF8.GetString(jsonBytes);
-
-                // Parse JSON to JObject
-                JObject payload = JObject.Parse(json);
-
-                _ = RestartLoggerAfterConfigChangeAsync();
-
-                return payload;
-            } catch (Exception ex) {
-                Console.WriteLine("Error reading config from FRAM: " + ex.Message);
-                return null;
             }
         }
 
         public void StartAnalogLoop() {
-            _cts = new CancellationTokenSource();
-            Task.Run(() => SampleAnalogInLoop(_cts.Token));
+            lock (_analogLoopLock) {
+                if (_analogTask != null && !_analogTask.IsCompleted)
+                    return;
+
+                _cts?.Dispose();
+                _cts = new CancellationTokenSource();
+                CancellationToken token = _cts.Token;
+                _analogTask = Task.Run(() => SampleAnalogInLoop(token));
+            }
         }
 
         public void StopAnalogLoop() {
-            _cts?.Cancel();
+            Task task;
+            CancellationTokenSource cts;
+
+            lock (_analogLoopLock) {
+                task = _analogTask;
+                cts = _cts;
+                cts?.Cancel();
+            }
+
+            WaitForLoopToStop(task, "analog input");
+
+            lock (_analogLoopLock) {
+                if (ReferenceEquals(task, _analogTask)) {
+                    _analogTask = null;
+                    _cts = null;
+                    cts?.Dispose();
+                }
+            }
         }
 
         private async Task SampleAnalogInLoop(CancellationToken token) {
+            try {
+                while (!token.IsCancellationRequested) {
+                    try {
+                        ConfigureAnalogSampling();
+
+                        while (!token.IsCancellationRequested) {
+                            await Task.Delay(1, token);
+                            if (AnalogIn.GetValue())
+                                _ = Dispatcher.NotifyAInChanged(AnalogIn.CurrentValues());
+                        }
+                    } catch (OperationCanceledException) when (token.IsCancellationRequested) {
+                        break;
+                    } catch (Exception ex) {
+                        EventLog.Error("Sampling", "AnalogInputLoopFailure", "Analog input sampling loop failed.", ex);
+                        try { AnalogIn.DisableAllMuxes(); } catch { }
+
+                        if (!await DelayAfterLoopError(token))
+                            break;
+                    }
+                }
+            } finally {
+                // Normal stop, config restart, and unexpected exit all leave the
+                // analog front end with no TMUX enabled.
+                try { AnalogIn.DisableAllMuxes(); } catch { }
+            }
+        }
+
+        private void ConfigureAnalogSampling() {
             for (uint chan = 0; chan < 4; chan++) {
                 AnalogIn.ApplyMux(chan);
                 AnalogIn.ApplyInputRange(chan);
             }
-            switch (_config.AnalogSamplingRate) { 
+
+            switch (_config.AnalogSamplingRate) {
                 case SamplesPerSecond.Low:
                     AnalogIn.SetDataRate(Ads1115Driver.Ads1115DataRate.SPS8);
                     break;
@@ -376,13 +467,29 @@ namespace SigCoreCommon {
                     AnalogIn.SetDataRate(Ads1115Driver.Ads1115DataRate.SPS475);
                     break;
                 default:
-                    throw new ArgumentException();
+                    throw new ArgumentOutOfRangeException(nameof(_config.AnalogSamplingRate));
             }
-            while (!token.IsCancellationRequested) {
-                await Task.Delay(1, token);
-                if (AnalogIn.GetValue()) {
-                    _ = Dispatcher.NotifyAInChanged(AnalogIn.CurrentValues());
-                }
+        }
+
+        private static async Task<bool> DelayAfterLoopError(CancellationToken token) {
+            try {
+                await Task.Delay(100, token);
+                return true;
+            } catch (OperationCanceledException) when (token.IsCancellationRequested) {
+                return false;
+            }
+        }
+
+        private static void WaitForLoopToStop(Task task, string loopName) {
+            if (task == null)
+                return;
+
+            try {
+                task.GetAwaiter().GetResult();
+            } catch (OperationCanceledException) {
+                // Expected when a loop is deliberately stopped.
+            } catch (Exception ex) {
+                EventLog.Warn("Sampling", "LoopStopFailure", $"{loopName} loop did not stop cleanly: {ex.Message}");
             }
         }
 
@@ -413,9 +520,13 @@ namespace SigCoreCommon {
             return AnalogIn.ToPayload(channel);
         }
         public void SetAInConfig(AInConfigPayload payload) {
-            AnalogIn.FromPayload(payload);
-            SaveConfigToFram();
-            RestartSamplingLoop();
+            StopAnalogLoop();
+            try {
+                AnalogIn.FromPayload(payload);
+                SaveConfig();
+            } finally {
+                StartAnalogLoop();
+            }
         }
 
 
@@ -473,20 +584,20 @@ namespace SigCoreCommon {
             return AnalogOut.GetConfig(channel);
         }
         public void SetAOutConfig(AOutConfigPayload payload) {
-                AnalogOut.SetConfig(payload);
-                SaveConfigToFram();
+            AnalogOut.SetConfig(payload);
+            SaveConfig();
         }
 
         public SystemConfigPayload GetGlobalConfig() {
             LoadSystemIdentity();
             SystemConfigPayload payload = _config.ToPayload();
-            return payload; 
+            return payload;
         }
         public void ApplyGlobalConfig(SystemConfigPayload payload) {
             _config.FromPayload(payload);
             RestartSamplingLoop();
             AnalogOut.SetFrequency(_config.PWMFrequency);
-            SaveConfigToFram();
+            SaveConfig();
         }
         private void RestartSamplingLoop() {
             StopAnalogLoop();
@@ -499,7 +610,7 @@ namespace SigCoreCommon {
 
         public void SetRelayConfig(RelayConfigPayload payload) {
             RelayOut.FromPayload(payload);
-            SaveConfigToFram();
+            SaveConfig();
         }
 
         public DInConfigPayload GetDInConfig(uint channel) {
@@ -507,8 +618,13 @@ namespace SigCoreCommon {
         }
 
         public void SetDInConfig(DInConfigPayload payload) {
-            DigitalIn.FromPayload(payload);
-            SaveConfigToFram();
+            StopDInLoop();
+            try {
+                DigitalIn.FromPayload(payload);
+                SaveConfig();
+            } finally {
+                StartDInLoop();
+            }
         }
 
         public void ClearAllLastValues() {
@@ -518,38 +634,32 @@ namespace SigCoreCommon {
             AnalogOut.ClearAllLastValues();
             PIDs.ClearAllLastValues();
         }
-        public void SaveConfigToFram() {
-            try {
-                JObject config = new JObject {
-                    ["global"] = _config.ToFram(),
-                    ["network"] = Network.ToFram(),
-                    ["relays"] = RelayOut.GenerateAllPayload(),
-                    ["analogInputs"] = AnalogIn.GenerateAllPayload(),
-                    ["analogOutputs"] = AnalogOut.GenerateAllPayload(),
-                    ["digitalInputs"] = DigitalIn.GenerateAllPayload(),
-                    ["pids"] = PIDs.GenerateAllPayload(),
-                    ["logger"] = Logger.GetConfig(),
-                };
+        public void SaveConfig() {
+            _config.Save(BuildConfigPayload());
+        }
 
-                string json = config.ToString(Newtonsoft.Json.Formatting.None);
-                byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
-                int length = jsonBytes.Length;
+        public JObject BuildConfigPayload() {
+            return new JObject {
+                ["global"] = _config.ToFram(),
+                ["network"] = Network.ToFram(),
+                ["relays"] = RelayOut.GenerateAllPayload(),
+                ["analogInputs"] = AnalogIn.GenerateAllPayload(),
+                ["analogOutputs"] = AnalogOut.GenerateAllPayload(),
+                ["digitalInputs"] = DigitalIn.GenerateAllPayload(),
+                ["pids"] = PIDs.GenerateAllPayload(),
+                ["logger"] = Logger.GetConfig()
+            };
+        }
 
-
-                if (length > 8190)
-                    throw new Exception("Config payload too large for FRAM");
-
-                // Write length header
-                byte[] lengthBytes = new byte[2];
-                lengthBytes[0] = (byte)((length >> 8) & 0xFF);
-                lengthBytes[1] = (byte)(length & 0xFF);
-                FRAM.WriteBytes(0x0000, lengthBytes);
-
-                // Write JSON payload
-                FRAM.WriteBytes(0x0002, jsonBytes);
-            } catch (Exception ex) {
-                Console.WriteLine("Error saving config to FRAM: " + ex.Message);
-            }
+        private JObject CreateDefaultConfig() {
+            _config.ResetToDefaults();
+            FactoryResetAIn();
+            FactoryResetAOut();
+            FactoryResetDIn();
+            FactoryResetRelays();
+            FactoryResetPIDs();
+            FactoryResetLogger();
+            return BuildConfigPayload();
         }
 
         public JObject GetPIDConfig(uint channel) {
@@ -558,8 +668,13 @@ namespace SigCoreCommon {
         }
 
         public void SetPIDConfig(JObject payload) {
-            PIDs.UnpackConfig(payload);
-            SaveConfigToFram();
+            StopPIDLoop();
+            try {
+                PIDs.UnpackConfig(payload);
+                SaveConfig();
+            } finally {
+                StartPIDLoop();
+            }
         }
 
         public JObject GetPIDCurVal(uint channel, bool all = false) {
@@ -614,7 +729,7 @@ namespace SigCoreCommon {
                 // No change to running state, but still update status
                 Logger.Config.Status = shouldRun ? "Logger running" : "Logger disabled";
             }
-            SaveConfigToFram();
+            SaveConfig();
         }
 
         public string GetLoggerStatus() {
@@ -631,12 +746,12 @@ namespace SigCoreCommon {
 
         private void LoadSystemIdentity() {
             try {
-                LauncherConfig lc = LauncherConfig.Load();
+                LauncherConfig lc = LauncherConfig.Load("/opt/sigcore/current/config.json");
 
                 _config.SoftwareVersion = lc.Version;
                 _config.HardwareVersion = lc.Revision;
             } catch (Exception ex) {
-                Console.WriteLine("Error loading system identity: " + ex.Message);
+                EventLog.Error("Configuration", "SystemIdentityLoadFailure", "System identity could not be loaded.", ex);
                 _config.SoftwareVersion = "unknown";
                 _config.HardwareVersion = "unknown";
             }
@@ -668,6 +783,17 @@ namespace SigCoreCommon {
             });
         }
 
+        public JObject GetUpdateConfig() {
+            DeviceConfig cfg = DeviceConfig.Load();
+
+            return new JObject {
+                ["manifest_url"] = cfg.ManifestUrl ?? "",
+                ["manifest_sig_url"] = cfg.ManifestSigUrl ?? "",
+                ["url"] = cfg.Url ?? "",
+                ["signature"] = cfg.Signature ?? ""
+            };
+        }
+
         public void GetSystemStatus(JObject status) {
 
             // ensure sections exists
@@ -690,16 +816,11 @@ namespace SigCoreCommon {
             });
         }
 
-        public void FactoryReset(string serialNo, string systemName, string ver, string rev, 
+        public void FactoryReset(string serialNo, string systemName, string ver, string rev,
                                     string manifestURL, string manifestSigUrl, string url, string signature,
-                                    string hostname ) {
-            LauncherConfig lc = LauncherConfig.Load();
-
-            lc.Revision = rev;
-            lc.Version = ver;
-
-            lc.Save();
-
+                                    string hostname) {
+            // Release identity is owned by the active version directory.
+            // Factory Settings must not create or modify /opt/sigcore/config.json.
             DeviceConfig devConfig = new DeviceConfig();
             devConfig.ManifestUrl = manifestURL;
             devConfig.ManifestSigUrl = manifestSigUrl;
@@ -715,21 +836,29 @@ namespace SigCoreCommon {
 
             _config.SystemSerialNumber = serialNo;
 
-            SaveConfigToFram();
+            StopAnalogLoop();
+            StopDInLoop();
+            StopPIDLoop();
+            try {
+                FactoryResetAIn();
+                FactoryResetAOut();
+                FactoryResetDIn();
+                FactoryResetRelays();
+                FactoryResetPIDs();
+                FactoryResetLogger();
 
-            FactoryResetAIn();
-            FactoryResetAOut();
-            FactoryResetDIn();
-            FactoryResetRelays();
-            FactoryResetPIDs();
-            FactoryResetLogger();
+                SaveConfig();
+            } finally {
+                StartAnalogLoop();
+                StartDInLoop();
+                StartPIDLoop();
+            }
         }
 
         // =============================================================
         // FACTORY RESET: ANALOG INPUTS
         // =============================================================
         private void FactoryResetAIn() {
-            Console.WriteLine("FactoryResetAIn");
 
             for (uint ch = 0; ch < 4; ch++) {
                 // Reset to default names/units/ranges/etc.
@@ -756,7 +885,6 @@ namespace SigCoreCommon {
         // FACTORY RESET: ANALOG OUTPUTS
         // =============================================================
         private void FactoryResetAOut() {
-            Console.WriteLine("FactoryResetAOut");
 
             for (uint ch = 0; ch < 4; ch++) {
                 var cfg = new A_OUT.AnalogOutChannelConfig {
@@ -770,8 +898,10 @@ namespace SigCoreCommon {
                     Display = A_OUT.DisplayFormat.FixedPoint
                 };
 
-                // Reset hardware to 0V / 0%
+                // Reset hardware to 0V / 0% and explicitly force manual mode.
+                // Do not rely solely on payload/config translation for the runtime auto flag.
                 AnalogOut.FromPayload(cfg.ToPayload(ch));
+                AnalogOut.SetIsAuto(ch, false);
                 AnalogOut.SetAnalogValue(ch, 0.0);
             }
 
@@ -785,10 +915,14 @@ namespace SigCoreCommon {
         // FACTORY RESET: DIGITAL INPUTS
         // =============================================================
         private void FactoryResetDIn() {
-            Console.WriteLine("FactoryResetDIn");
 
             for (uint ch = 0; ch < 8; ch++) {
-                DInConfigPayload cfg = new DInConfigPayload();
+                DInConfigPayload cfg = new DInConfigPayload {
+                    Channel = ch,
+                    Name = "",
+                    DebounceMs = 50,
+                    Inverted = false
+                };
 
                 DigitalIn.FromPayload(cfg);
             }
@@ -800,7 +934,6 @@ namespace SigCoreCommon {
         // FACTORY RESET: RELAYS
         // =============================================================
         private void FactoryResetRelays() {
-            Console.WriteLine("FactoryResetRelays");
 
             for (uint ch = 0; ch < 8; ch++) {
                 RELAY_OUT.RelayConfig cfg = new RELAY_OUT.RelayConfig {
@@ -822,13 +955,12 @@ namespace SigCoreCommon {
         // FACTORY RESET: PID CONFIG
         // =============================================================
         private void FactoryResetPIDs() {
-            Console.WriteLine("FactoryResetPIDs");
 
             for (uint ch = 0; ch < 4; ch++) {
                 var cfg = new PID_LOOP.Config {
                     Title = $"Disabled{ch}",
                     Enabled = false,
-                    Auto = true,
+                    Auto = false,
                     SP = 0.0,
                     PV = 0.0,
                     Output = 0.0,
@@ -862,7 +994,6 @@ namespace SigCoreCommon {
         // FACTORY RESET: LOGGER
         // =============================================================
         private void FactoryResetLogger() {
-            Console.WriteLine("FactoryResetLogger");
 
             var cfg = new MYSQL_LOGGER.DataLoggerConfig {
                 Enabled = false,
@@ -882,6 +1013,94 @@ namespace SigCoreCommon {
             Logger.SetConfig(cfg.ToPayload());
         }
 
+        public JObject VerifyFactoryReset(
+            string serialNo,
+            string systemName,
+            string ver,
+            string rev,
+            string manifestURL,
+            string manifestSigUrl,
+            string url,
+            string signature,
+            string hostname) {
+
+            JArray failures = new JArray();
+
+            void Require(bool condition, string text) {
+                if (!condition)
+                    failures.Add(text);
+            }
+
+            SystemConfigPayload global = GetGlobalConfig();
+            Require(global.SystemSerialNumber == serialNo, "Serial number did not persist.");
+            Require(global.SystemName == systemName, "System name did not persist.");
+            Require(global.SoftwareVersion == ver, "Software version did not persist.");
+            Require(global.HardwareVersion == rev, "Hardware revision did not persist.");
+
+            NetworkSettingsPayload network = GetNetworkConfig();
+            Require(network.Hostname == hostname, "Configured hostname did not persist.");
+
+            JObject update = GetUpdateConfig();
+            Require((string)update["manifest_url"] == manifestURL, "Manifest URL did not persist.");
+            Require((string)update["manifest_sig_url"] == manifestSigUrl, "Manifest signature URL did not persist.");
+            Require((string)update["url"] == url, "Update URL did not persist.");
+            Require((string)update["signature"] == signature, "Update signature URL did not persist.");
+
+            for (uint ch = 0; ch < 4; ch++) {
+                AInConfigPayload ai = GetAnalogInConfig(ch);
+                Require(ai.Channel == ch, $"AI{ch + 1} channel identity is wrong.");
+                Require(string.IsNullOrEmpty(ai.Name), $"AI{ch + 1} name was not cleared.");
+                Require(ai.Units == "V", $"AI{ch + 1} units were not reset.");
+                Require(ai.AveragingSamples == 1, $"AI{ch + 1} averaging was not reset.");
+                Require(ai.Precision == 3, $"AI{ch + 1} precision was not reset.");
+                Require(ai.CalibrationType == (int)A_IN.CalType.None, $"AI{ch + 1} calibration was not reset.");
+                Require(ai.InputRange == (int)A_IN.Range.Voltage5V, $"AI{ch + 1} range was not reset.");
+                Require(Math.Abs(ai.M - 1.0) < 0.0000001, $"AI{ch + 1} M was not reset.");
+                Require(Math.Abs(ai.B) < 0.0000001, $"AI{ch + 1} B was not reset.");
+
+                AOutConfigPayload ao = GetAOutConfig(ch);
+                Require(ao.Channel == ch, $"AO{ch + 1} channel identity is wrong.");
+                Require(string.IsNullOrEmpty(ao.Name), $"AO{ch + 1} name was not cleared.");
+                Require(ao.Units == "V", $"AO{ch + 1} units were not reset.");
+                Require(!ao.IsAuto, $"AO{ch + 1} was not reset to manual.");
+                Require(Math.Abs(ao.VoltageScaleM - 1.0) < 0.0000001, $"AO{ch + 1} scale M was not reset.");
+                Require(Math.Abs(ao.VoltageScaleB) < 0.0000001, $"AO{ch + 1} scale B was not reset.");
+
+                (double value, bool autoMode) = GetAOutValue(ch);
+                Require(Math.Abs(value) < 0.0000001, $"AO{ch + 1} output was not reset to zero.");
+                Require(!autoMode, $"AO{ch + 1} output mode was not reset to manual.");
+            }
+
+            for (uint ch = 0; ch < 8; ch++) {
+                DInConfigPayload di = GetDInConfig(ch);
+                Require(di.Channel == ch, $"DI{ch + 1} channel identity is wrong.");
+                Require(string.IsNullOrEmpty(di.Name), $"DI{ch + 1} name was not cleared.");
+                Require(di.DebounceMs == 50, $"DI{ch + 1} debounce was not reset.");
+                Require(!di.Inverted, $"DI{ch + 1} inversion was not reset.");
+
+                RelayConfigPayload relay = GetRelayConfig(ch);
+                Require(relay.Channel == ch, $"R{ch + 1} channel identity is wrong.");
+                Require(string.IsNullOrEmpty(relay.Name), $"R{ch + 1} name was not cleared.");
+                Require(!relay.DefaultState, $"R{ch + 1} default state was not reset.");
+                Require(!relay.FailSafeState, $"R{ch + 1} fail-safe state was not reset.");
+                Require(!relay.InvertedLogic, $"R{ch + 1} inverted logic was not reset.");
+                Require(!GetRelayOutput(ch), $"R{ch + 1} physical state was not reset to OFF.");
+            }
+
+            for (uint ch = 0; ch < 4; ch++) {
+                JObject pid = GetPIDConfig(ch);
+                Require(pid.Value<bool?>("isEnabled") == false, $"PID{ch + 1} was not disabled.");
+            }
+
+            JObject logger = GetLoggerConfig();
+            Require(logger.Value<bool?>("enabled") == false, "Data logger was not disabled.");
+
+            return new JObject {
+                ["success"] = failures.Count == 0,
+                ["failures"] = failures
+            };
+        }
+
         // ─────────────────────────────────────────────
         // NETWORK CONFIG
         // ─────────────────────────────────────────────
@@ -895,7 +1114,7 @@ namespace SigCoreCommon {
                 return;
 
             Network.SetConfig(payload);
-            SaveConfigToFram();
+            SaveConfig();
         }
 
 
@@ -906,83 +1125,16 @@ namespace SigCoreCommon {
         }
 
 
-        //public class Config {
-        //    public string SystemName { get; set; } = "SigCore UC";
-        //    public string SystemSerialNumber { get; set; } = "SCU123456";
-        //    public string HardwareVersion { get; set; } = "1.0";
-        //    public string SoftwareVersion { get; set; } = "0.9.0";
-
-        //    public bool UseLastKnownValuesAtStartup { get; set; } = true;
-
-        //    public SamplesPerSecond AnalogSamplingRate { get; set; } = SamplesPerSecond.Medium;
-        //    public int PWMFrequency { get; set; } = 250;
-
-        //    public bool IsPIDOpen { get; set; } = true;
-
-        //    // Security
-        //    public string SystemPassword { get; set; } = "admin";
-
-        //    // Convert from JSON payload
-        //    public void FromPayload(JObject payload) {
-        //        if (payload == null) return;
-
-        //        SystemName = (string)payload["systemName"] ?? SystemName;
-        //        SystemSerialNumber = (string)payload["systemSerialNumber"] ?? SystemSerialNumber;
-        //        UseLastKnownValuesAtStartup = (bool?)payload["useLastKnownValues"] ?? UseLastKnownValuesAtStartup;
-
-        //        string sps = (string)payload["analogSamplingRate"];
-        //        if (!string.IsNullOrEmpty(sps) &&
-        //            Enum.TryParse(sps, true, out SamplesPerSecond rate)) {
-        //            AnalogSamplingRate = rate;
-        //        }
-
-        //        JToken pwmToken = payload["pwm_frequency"];
-        //        if (pwmToken != null && pwmToken.Type != JTokenType.Null)
-        //            PWMFrequency = pwmToken.Value<int>();
-
-        //        IsPIDOpen = (bool?)payload["isPIDOpen"] ?? IsPIDOpen;
-
-        //        HardwareVersion = (string)payload["hardwareVersion"] ?? HardwareVersion;
-        //        SoftwareVersion = (string)payload["softwareVersion"] ?? SoftwareVersion;
-
-        //        if (payload.ContainsKey("systemPassword"))
-        //            SystemPassword = (string)payload["systemPassword"] ?? SystemPassword;
-        //    }
-
-        //    // Convert to JSON payload
-        //    public JObject ToPayload() {
-        //        JObject payload = new JObject();
-        //        serialize(payload);
-        //        return payload;
-        //    }
-
-        //    private void serializeToFram(JObject payload) {
-        //        payload["systemName"] = SystemName;
-        //        payload["systemSerialNumber"] = SystemSerialNumber;
-        //        payload["useLastKnownValues"] = UseLastKnownValuesAtStartup;
-        //        payload["analogSamplingRate"] = AnalogSamplingRate.ToString();
-        //        payload["pwm_frequency"] = PWMFrequency.ToString();
-        //    }
-
-        //    private void serialize(JObject payload) {
-        //        serializeToFram(payload);
-
-        //        payload["isPIDOpen"] = IsPIDOpen;
-        //        payload["systemPassword"] = SystemPassword;
-        //        payload["hardwareVersion"] = HardwareVersion;
-        //        payload["softwareVersion"] = SoftwareVersion;
-        //    }
-
-        //    internal JObject ToFram() {
-        //        JObject payload = new JObject();
-        //        serializeToFram(payload);
-        //        return payload;
-        //    }
-        //}
-
         public class Config {
 
-            public string SystemName { get; set; } = "SigCore UC";
+            private const int FramSize = 8192;
+            private const int FramHeaderSize = 2;
+            private const string ConfigFilePath = "/opt/sigcore/properties.json";
+            private readonly Log _log;
+
+            public string FilePath { get; }
+
+            public string SystemName { get; set; } = "";
             public string SystemSerialNumber { get; set; } = "SCU123456";
             public string HardwareVersion { get; set; } = "1.0";
             public string SoftwareVersion { get; set; } = "0.9.0";
@@ -996,6 +1148,190 @@ namespace SigCoreCommon {
 
             // Security
             public string SystemPassword { get; set; } = "admin";
+
+            public Config(string filePath = null) {
+                _log = new Log();
+
+                FilePath = string.IsNullOrWhiteSpace(filePath)
+                    ? ConfigFilePath
+                    : filePath;
+
+            }
+
+            public JObject Load(
+                Fm24cl64bDriver fram,
+                Func<JObject> createDefaultConfig) {
+
+                if (createDefaultConfig == null)
+                    throw new ArgumentNullException(nameof(createDefaultConfig));
+
+                if (File.Exists(FilePath)) {
+                    JObject fileConfig = ReadFromFile();
+
+                    if (IsValid(fileConfig)) {
+                        LoadGlobalSettings(fileConfig);
+                        return fileConfig;
+                    }
+
+                    _log.Warn(
+                        "Configuration",
+                        "InvalidPropertiesFile",
+                        "The hardware properties file is invalid; defaults will be used.");
+
+                    return CreateAndSaveDefault(createDefaultConfig);
+                }
+
+                JObject framConfig = ReadFromFram(fram);
+
+                if (IsValid(framConfig)) {
+                    LoadGlobalSettings(framConfig);
+                    Save(framConfig);
+                    return framConfig;
+                }
+
+                _log.Warn(
+                    "Configuration",
+                    "NoValidConfiguration",
+                    "No valid hardware configuration was found; defaults will be used.");
+
+                return CreateAndSaveDefault(createDefaultConfig);
+            }
+
+            public void Save(JObject config) {
+                if (!IsValid(config)) {
+                    _log.Error(
+                        "Configuration",
+                        "InvalidConfigurationSaveRejected",
+                        "Refusing to save an invalid hardware configuration.");
+                    throw new ArgumentException(
+                        "Cannot save an invalid configuration.",
+                        nameof(config));
+                }
+
+                try {
+                    string directory = Path.GetDirectoryName(FilePath);
+                    if (!string.IsNullOrWhiteSpace(directory))
+                        Directory.CreateDirectory(directory);
+
+                    string temporaryPath = FilePath + ".tmp";
+                    string json = config.ToString(Newtonsoft.Json.Formatting.Indented);
+
+                    File.WriteAllText(
+                        temporaryPath,
+                        json,
+                        new UTF8Encoding(false));
+
+                    File.Move(temporaryPath, FilePath, true);
+                } catch (Exception ex) {
+                    _log.Error(
+                        "Configuration",
+                        "PropertiesSaveFailure",
+                        "Hardware properties could not be saved.",
+                        ex);
+                    throw;
+                }
+            }
+
+            public void ResetToDefaults() {
+                SystemName = "SigCore UC";
+                SystemSerialNumber = "SCU123456";
+                HardwareVersion = "1.0";
+                SoftwareVersion = "0.9.0";
+                UseLastKnownValuesAtStartup = true;
+                AnalogSamplingRate = SamplesPerSecond.Medium;
+                PWMFrequency = 250;
+                IsPIDOpen = true;
+                SystemPassword = "admin";
+            }
+
+            private JObject CreateAndSaveDefault(
+                Func<JObject> createDefaultConfig) {
+
+                JObject defaultConfig = createDefaultConfig();
+
+                if (!IsValid(defaultConfig)) {
+                    _log.Error(
+                        "Configuration",
+                        "GeneratedDefaultInvalid",
+                        "The generated default hardware configuration is invalid.");
+                    throw new InvalidOperationException(
+                        "The default configuration is invalid.");
+                }
+
+                Save(defaultConfig);
+                LoadGlobalSettings(defaultConfig);
+                return defaultConfig;
+            }
+
+            private void LoadGlobalSettings(JObject config) {
+                JObject global = config["global"] as JObject;
+                FromPayload(new SystemConfigPayload(global));
+            }
+
+            private JObject ReadFromFile() {
+                try {
+                    string json = File.ReadAllText(FilePath, Encoding.UTF8);
+                    return JObject.Parse(json);
+                } catch (Exception ex) {
+                    _log.Error(
+                        "Configuration",
+                        "PropertiesReadFailure",
+                        "Hardware properties could not be read.",
+                        ex);
+                    return null;
+                }
+            }
+
+            private JObject ReadFromFram(Fm24cl64bDriver fram) {
+                if (fram == null) {
+                    // FRAM is optional and absent on current hardware.
+                    return null;
+                }
+
+                try {
+                    fram.Initialize();
+
+                    byte[] lengthBytes = fram.ReadBytes(0, FramHeaderSize);
+                    int length = (lengthBytes[0] << 8) | lengthBytes[1];
+
+                    if (length <= 0 || length > FramSize - FramHeaderSize) {
+                        _log.Warn(
+                            "Configuration",
+                            "InvalidFramConfiguration",
+                            "Legacy FRAM contains an invalid configuration length.");
+                        return null;
+                    }
+
+                    byte[] jsonBytes = fram.ReadBytes(FramHeaderSize, length);
+                    string json = Encoding.UTF8.GetString(jsonBytes);
+                    return JObject.Parse(json);
+                } catch (Exception ex) {
+                    _log.Error(
+                        "Configuration",
+                        "FramReadFailure",
+                        "Legacy FRAM configuration could not be read.",
+                        ex);
+                    return null;
+                }
+            }
+
+            private static bool IsValid(JObject config) {
+                if (config == null)
+                    return false;
+
+                return config["global"] is JObject &&
+                       config["network"] is JObject &&
+                       config["logger"] is JObject &&
+                       HasCount(config["relays"], 8) &&
+                       HasCount(config["analogInputs"], 4) &&
+                       HasCount(config["analogOutputs"], 4) &&
+                       HasCount(config["digitalInputs"], 8) &&
+                       HasCount(config["pids"], 4);
+            }
+
+            private static bool HasCount(JToken token, int expectedCount) {
+                return token is JArray array && array.Count == expectedCount;
+            }
 
             // ─────────────────────────
             // Convert FROM payload

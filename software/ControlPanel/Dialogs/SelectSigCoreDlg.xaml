@@ -22,19 +22,18 @@
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 Padding="{TemplateBinding Padding}"
-                                Margin="{TemplateBinding Margin}"
-                                >
+                                Margin="{TemplateBinding Margin}">
 
                             <Grid>
                                 <ScrollViewer x:Name="PART_ContentHost"/>
 
                                 <TextBlock x:Name="Watermark"
-                                   Text="{TemplateBinding Tag}"
-                                   Foreground="LightGray"
-                                   FontWeight="Bold"
-                                   IsHitTestVisible="False"
-                                   VerticalAlignment="Center"
-                                   Visibility="Collapsed"/>
+                                           Text="{TemplateBinding Tag}"
+                                           Foreground="LightGray"
+                                           FontWeight="Bold"
+                                           IsHitTestVisible="False"
+                                           VerticalAlignment="Center"
+                                           Visibility="Collapsed"/>
                             </Grid>
                         </Border>
 
@@ -44,8 +43,9 @@
                             </Trigger>
 
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" 
-                                Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                <Setter TargetName="Border"
+                                        Property="BorderBrush"
+                                        Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
                                 <Setter TargetName="Watermark" Property="Visibility" Value="Collapsed"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -53,10 +53,23 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="ReadyTextStyle" TargetType="TextBlock">
+            <Setter Property="Text" Value="Offline"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Device.Ready}" Value="True">
+                    <Setter Property="Text" Value="Ready"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
-    
-    <Border Margin="10" Padding="10" CornerRadius="8"
-            BorderBrush="#888" BorderThickness="1" Background="White">
+
+    <Border Margin="10"
+            Padding="10"
+            CornerRadius="8"
+            BorderBrush="#888"
+            BorderThickness="1"
+            Background="White">
 
         <StackPanel>
 
@@ -66,71 +79,106 @@
                        HorizontalAlignment="Center"
                        Margin="0,0,0,10"/>
 
-            <!-- MAIN LAYOUT: buttons left, list right -->
             <Grid>
-
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="10"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
+
                 <StackPanel Grid.Column="0"
                             Grid.Row="0"
                             Grid.RowSpan="3"
-                            VerticalAlignment="Top"
-                            Margin="0,0,0,0">
+                            VerticalAlignment="Top">
 
-                    <Button x:Name="OkButton" 
-                            Width="120" Margin="5,2"
+                    <Button x:Name="OkButton"
+                            Width="120"
+                            Margin="5,2"
                             IsEnabled="False"
                             IsDefault="True"
-                            Click="Ok_Click">Connect</Button>
-                    <Button Width="120" Margin="5,2"
-                            Click="ScanSubnet_Click">Scan Subnet</Button>
+                            Click="Ok_Click">
+                        Connect
+                    </Button>
 
-                    <Button Width="120" Margin="5,2"
+                    <Button Width="120"
+                            Margin="5,2"
+                            Click="ScanSubnet_Click">
+                        Scan Subnet
+                    </Button>
+
+                    <Button Width="120"
+                            Margin="5,2"
                             IsCancel="True"
-                            Click="Cancel_Click">Cancel</Button>
-                    <CheckBox Content="Auto Connect"
-                              Margin="5,8"
-                              x:Name="AutoConnect"
-                              />
+                            Click="Cancel_Click">
+                        Cancel
+                    </Button>
+
+                    <CheckBox x:Name="AutoConnect"
+                              Content="Auto Connect"
+                              Margin="5,8"/>
 
                 </StackPanel>
 
-                <Label Content="Enter IP Address:" 
-                       Grid.Row="0"
+                <Label Grid.Row="0"
                        Grid.Column="2"
-                        FontWeight="Bold"
-                       Margin="5,2"
-                       />
+                       Content="Enter IP Address:"
+                       FontWeight="Bold"
+                       Margin="5,2"/>
+
                 <TextBox x:Name="IPAddress"
                          Grid.Row="1"
                          Grid.Column="2"
-                        FontWeight="Bold"
+                         FontWeight="Bold"
                          Margin="5,2,5,5"
                          Padding="5,2"
                          Style="{StaticResource WatermarkTextBox}"
                          Tag="xxx.xxx.xxx.xxx"
-                         TextChanged="IPAddress_TextChanged"
-                         />
-                <ListBox x:Name="DeviceList"
-                        Grid.Column="2"
-                         Grid.Row="2"
-                         Margin="10,2"
-                        Width="400"
-                        Height="200"
-                         Padding="5,2"
-                        DisplayMemberPath="DisplayName"
-                        FontWeight="Bold"
-                        MouseDoubleClick="DeviceList_MouseDoubleClick"
-                        SelectionChanged="DeviceList_SelectionChanged"/>
+                         TextChanged="IPAddress_TextChanged"/>
+
+                <ListView x:Name="DeviceList"
+                          Grid.Column="2"
+                          Grid.Row="2"
+                          Margin="10,2"
+                          Width="600"
+                          Height="200"
+                          FontWeight="Bold"
+                          MouseDoubleClick="DeviceList_MouseDoubleClick"
+                          SelectionChanged="DeviceList_SelectionChanged">
+
+                    <ListView.View>
+                        <GridView>
+
+                            <GridViewColumn Header="Name"
+                                            Width="220"
+                                            DisplayMemberBinding="{Binding Device.Name}"/>
+
+                            <GridViewColumn Header="Address"
+                                            Width="140"
+                                            DisplayMemberBinding="{Binding Device.Address}"/>
+
+                            <GridViewColumn Header="Version"
+                                            Width="80"
+                                            DisplayMemberBinding="{Binding Device.Version}"/>
+
+                            <GridViewColumn Header="Status"
+                                            Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Style="{StaticResource ReadyTextStyle}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
             </Grid>
 
         </StackPanel>

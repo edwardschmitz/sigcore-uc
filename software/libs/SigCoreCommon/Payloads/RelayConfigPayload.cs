@@ -31,5 +31,9 @@ namespace SigCoreCommon.Payloads {
             get => Get<bool>("failSafeState", false);
             set => Set("failSafeState", value);
         }
+        public bool InvertedLogic {
+            get => Get<bool>("invertedLogic", false);
+            set => Set("invertedLogic", value);
+        }
     }
 }

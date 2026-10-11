@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Generic;
@@ -12,6 +12,7 @@ namespace SigCoreCommon {
             mXplusB,
             MultiPoint,
             Polynomial,
+            Log10,
         }
 
         public enum Range {
@@ -181,8 +182,14 @@ namespace SigCoreCommon {
 
         private double ApplyCalibration(uint channel, double raw) {
             switch (_configs[channel].CalibrationType) {
+                case CalType.None:
+                    return raw;
+
                 case CalType.mXplusB:
                     return raw * _configs[channel].M + _configs[channel].B;
+
+                case CalType.Log10:
+                    return Math.Pow(10.0, raw * _configs[channel].M + _configs[channel].B);
 
                 case CalType.MultiPoint:
                     return Interpolate(raw, _configs[channel].InputPoints, _configs[channel].AdjustedPoints);
@@ -194,7 +201,6 @@ namespace SigCoreCommon {
                     return raw;
             }
         }
-
         public void ApplyInputRange(uint channel) {
             Range range = _configs[channel].InputRange;
             Ads1115Gain gain;
@@ -216,13 +222,17 @@ namespace SigCoreCommon {
         }
 
         public void ApplyMux(uint channel) {
+            if (channel > 3)
+                throw new ArgumentOutOfRangeException(nameof(channel));
+
             Range range = _configs[channel].InputRange;
             uint address0 = channel * 2;
             uint address1 = channel * 2 + 1;
             uint addressEn = channel + 12;
 
+            // Configuration never leaves a signal path enabled.  Sampling owns
+            // the enable bits and selects exactly one TMUX at a time.
             _muxController.Outputs[addressEn] = false;
-            _muxController.SendRegisters();
 
             switch (range) {
                 case Range.Voltage5V:
@@ -246,8 +256,27 @@ namespace SigCoreCommon {
                     break;
             }
 
-            _muxController.Outputs[addressEn] = true;
             _muxController.SendRegisters();
+        }
+
+        private void SelectOnlyMux(uint channel) {
+            if (channel > 3)
+                throw new ArgumentOutOfRangeException(nameof(channel));
+
+            // EN501/511/521/531 are Outputs[12..15].  Change all four shadow
+            // bits, then perform one port-B write.  This matches the efficient
+            // one-TMUX-at-a-time sequence proven by the September 5 test.
+            for (uint ch = 0; ch < 4; ch++)
+                _muxController.Outputs[ch + 12] = ch == channel;
+
+            _muxController.SendRegisterB();
+        }
+
+        public void DisableAllMuxes() {
+            for (uint ch = 0; ch < 4; ch++)
+                _muxController.Outputs[ch + 12] = false;
+
+            _muxController.SendRegisterB();
         }
 
         private static double EvaluatePolynomial(double x, double[] coeffs) {
@@ -270,15 +299,29 @@ namespace SigCoreCommon {
         }
 
         public bool GetValue() {
-            bool rtn= false;
-            bool readResult = ReadAllChannels(_samples, _sampleCount);
-            if (readResult || sendAll) {
-                rtn = true;
-            } else {
-                rtn = false;
+            bool changed = false;
+
+            try {
+                for (uint ch = 0; ch < 4; ch++) {
+                    SelectOnlyMux(ch);
+
+                    double sample = ReadChannel((int)ch, _sampleCount[ch]);
+                    if (sample != _samples[ch]) {
+                        _samples[ch] = sample;
+                        changed = true;
+                    }
+                }
+            } catch {
+                // A failed I2C/ADC transaction must never leave a TMUX enabled
+                // indefinitely.  Best-effort shutdown, then let the sampling loop
+                // handle/report/retry the original exception.
+                try { DisableAllMuxes(); } catch { }
+                throw;
             }
+
+            bool result = changed || sendAll;
             sendAll = false;
-            return rtn;
+            return result;
         }
 
         public double[] CurrentValues() {

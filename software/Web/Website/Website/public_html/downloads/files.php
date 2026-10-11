@@ -1,149 +1,143 @@
 ﻿<?php
 session_start();
 
-if (!isset($_SESSION['verified_email'])) {
-    header('Location: index.php');
-    exit;
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+
+require __DIR__ . '/../../includes/db.php';
+
+function requestHeaderValue($name)
+{
+    $serverName = 'HTTP_' . strtoupper(
+        str_replace('-', '_', $name)
+    );
+
+    return isset($_SERVER[$serverName])
+        ? $_SERVER[$serverName]
+        : null;
 }
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SigCore Software Downloads</title>
 
-    <!-- styles.css is one level UP from /downloads -->
-    <link rel="stylesheet" href="../styles.css">
-</head>
-<body>
-    <div id="header-container"></div>
+function logOldEndpointAttempt($pdo, $event)
+{
+    try {
+        $traceId = md5(
+            uniqid((string) mt_rand(), true)
+        );
 
-    <script>
-        fetch("../header.html")
-            .then(response => response.text())
-            .then(data => document.getElementById("header-container").innerHTML = data)
-            .catch(error => console.error("Error loading the header:", error));
-    </script>
+        $method = isset($_SERVER['REQUEST_METHOD'])
+            ? $_SERVER['REQUEST_METHOD']
+            : '';
 
-    <main class="main-content">
-        <div class="section-title">
-            <p class="large-text" style="margin-left: 15px;">Software</p>
-        </div>
+        $requestUri = isset($_SERVER['REQUEST_URI'])
+            ? $_SERVER['REQUEST_URI']
+            : '';
 
-        <!-- Python Library Section -->
-        <div class="specs-container">
-            <div class="spec-card">
-                <h1>Python Library</h1>
+        $ipAddress = isset($_SERVER['REMOTE_ADDR'])
+            ? $_SERVER['REMOTE_ADDR']
+            : 'unknown';
 
-                <h2>1. Requirements</h2>
-                <p>Make sure Python 3.7+ is installed and <code>pip</code> is available on your system.</p>
+        $email = isset($_POST['email'])
+            ? strtolower(trim($_POST['email']))
+            : null;
 
-                <h2>2. Download the Package</h2>
-                <p>
-                    Click the button below to download the latest release of the Python package:
-                </p>
-                <p>
-                    <a class="download-link" href="SigCore-1.0.0-py3-none-any.whl">
-                        Download Python Package
-                    </a>
-                </p>
-
-                <h2>3. Install via pip</h2>
-                <p>Open a terminal and run the following command:</p>
-                <pre><code>pip install https://sigcoreuc.com/downloads/SigCore-1.0.0-py3-none-any.whl</code></pre>
-
-                <h2>4. Test the Installation</h2>
-                <pre><code>from SigCore import SigCore, Relays
-
-device = SigCore()
-if device.connect():
-    device.set_digital_output(Relays.R1, True)
-    device.disconnect()
-</code></pre>
-
-                <h2>Need Help?</h2>
-                <p>Visit our <a href="../support.html">Support Page</a> or <a href="../contact.html">Contact Us</a> for assistance.</p>
-            </div>
-        </div>
-
-        <!-- .NET Library Section -->
-        <div class="specs-container">
-            <div class="spec-card">
-                <h1>.NET Library</h1>
-
-                <h2>1. Requirements</h2>
-                <p>Requires .NET Framework 4.8 or later.</p>
-
-                <h2>2. Download the Library</h2>
-                <p>
-                    Click below to download the latest version of the SigCore .NET library:
-                </p>
-                <p>
-                    <a class="download-link" href="SigCoreInstaller.exe">
-                        Download SigCore.dll
-                    </a>
-                </p>
-
-                <h2>3. Usage</h2>
-                <p>Reference <code>SigCore.dll</code> in your .NET Framework 4.8 projects.</p>
-                <p>For IntelliSense support, ensure <code>SigCore.xml</code> is placed alongside the DLL.</p>
-
-                <h2>Need Help?</h2>
-                <p>Visit our <a href="../support.html">Support Page</a> or <a href="../contact.html">Contact Us</a> for assistance.</p>
-            </div>
-        </div>
-
-        <!-- Control Panel Application Section -->
-        <div class="specs-container">
-            <div class="spec-card">
-                <h1>Control Panel Application</h1>
-
-                <h2>1. Requirements</h2>
-                <p>Works on Windows 10 or later with .NET Framework 4.8 installed.</p>
-
-                <h2>2. Download the Installer</h2>
-                <p>
-                    Click below to download the latest installer for the Control Panel application:
-                </p>
-                <p>
-                    <a class="download-link" href="ControlPanelSetup.exe">
-                        Download ControlPanelSetup.exe
-                    </a>
-                </p>
-
-                <h2>3. Installation Path</h2>
-                <pre><code>C:\Program Files\en-Z-em\ControlPanel</code></pre>
-
-                <h2>4. Features</h2>
-                <ul>
-                    <li>Relay control (R1–R8)</li>
-                    <li>Digital and analog input monitoring</li>
-                    <li>Analog output configuration</li>
-                    <li>Custom calibration and settings</li>
-                </ul>
-
-                <h2>Need Help?</h2>
-                <p>Visit our <a href="../support.html">Support Page</a> or <a href="../contact.html">Contact Us</a> for assistance.</p>
-            </div>
-        </div>
-    </main>
-
-    <div id="footer-container"></div>
-
-    <script>
-        fetch("../footer.html")
-            .then(response => response.text())
-            .then(data => document.getElementById("footer-container").innerHTML = data)
-            .catch(error => console.error("Error loading the footer:", error));
-    </script>
-
-    <script>
-        function toggleMobileMenu() {
-            const menu = document.querySelector(".nav-menu");
-            if (menu) menu.classList.toggle("show");
+        if ($email === '') {
+            $email = null;
         }
-    </script>
-</body>
-</html>
+
+        $sql = "
+            INSERT INTO request_log
+            (
+                timestamp_utc,
+                trace_id,
+                event,
+                ip_address,
+                method,
+                request_uri,
+                email,
+                user_agent,
+                referer,
+                accept_language,
+                accept_encoding,
+                sec_ch_ua,
+                sec_ch_ua_mobile,
+                sec_ch_ua_platform,
+                sec_ch_ua_platform_version,
+                sec_ch_ua_arch,
+                sec_ch_ua_bitness,
+                sec_ch_ua_model
+            )
+            VALUES
+            (
+                UTC_TIMESTAMP(6),
+                :trace_id,
+                :event,
+                :ip_address,
+                :method,
+                :request_uri,
+                :email,
+                :user_agent,
+                :referer,
+                :accept_language,
+                :accept_encoding,
+                :sec_ch_ua,
+                :sec_ch_ua_mobile,
+                :sec_ch_ua_platform,
+                :sec_ch_ua_platform_version,
+                :sec_ch_ua_arch,
+                :sec_ch_ua_bitness,
+                :sec_ch_ua_model
+            )
+        ";
+
+        $stmt = $pdo->prepare($sql);
+
+        $stmt->execute(array(
+            ':trace_id' => substr($traceId, 0, 32),
+            ':event' => $event,
+            ':ip_address' => substr($ipAddress, 0, 45),
+            ':method' => substr($method, 0, 8),
+            ':request_uri' => substr($requestUri, 0, 255),
+            ':email' => $email,
+            ':user_agent' => isset($_SERVER['HTTP_USER_AGENT'])
+                ? $_SERVER['HTTP_USER_AGENT']
+                : null,
+            ':referer' => isset($_SERVER['HTTP_REFERER'])
+                ? $_SERVER['HTTP_REFERER']
+                : null,
+            ':accept_language' => isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])
+                ? $_SERVER['HTTP_ACCEPT_LANGUAGE']
+                : null,
+            ':accept_encoding' => isset($_SERVER['HTTP_ACCEPT_ENCODING'])
+                ? $_SERVER['HTTP_ACCEPT_ENCODING']
+                : null,
+            ':sec_ch_ua' => requestHeaderValue('Sec-CH-UA'),
+            ':sec_ch_ua_mobile' =>
+                requestHeaderValue('Sec-CH-UA-Mobile'),
+            ':sec_ch_ua_platform' =>
+                requestHeaderValue('Sec-CH-UA-Platform'),
+            ':sec_ch_ua_platform_version' =>
+                requestHeaderValue('Sec-CH-UA-Platform-Version'),
+            ':sec_ch_ua_arch' =>
+                requestHeaderValue('Sec-CH-UA-Arch'),
+            ':sec_ch_ua_bitness' =>
+                requestHeaderValue('Sec-CH-UA-Bitness'),
+            ':sec_ch_ua_model' =>
+                requestHeaderValue('Sec-CH-UA-Model')
+        ));
+    } catch (Exception $e) {
+        error_log(
+            'Old endpoint logging failed: ' . $e->getMessage()
+        );
+    }
+}
+
+logOldEndpointAttempt(
+    $pdo,
+    'old_file_attempt'
+);
+
+http_response_code(410);
+header('Content-Type: text/plain; charset=UTF-8');
+
+exit('Gone');

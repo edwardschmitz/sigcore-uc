@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace FactorySettings {
 
@@ -12,6 +13,7 @@ namespace FactorySettings {
         public int LastSerial { get; set; } = 0;
         public string LastRev { get; set; } = "";
         public string LastVer { get; set; } = "";
+        public List<FactoryLabelRecord> PendingLabels { get; set; } = new List<FactoryLabelRecord>();
 
         public static string GetFolderPath() {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);

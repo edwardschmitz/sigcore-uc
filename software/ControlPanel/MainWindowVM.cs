@@ -22,6 +22,7 @@ using Zeroconf;
 namespace ControlPanel {
     public class MainWindowVM : ViewModelBase, IDimmer {
         private SigCoreSystem system;
+        private string _targetIp = string.Empty;
 
         // ----------------------------------------------------
         // Basic Info
@@ -38,29 +39,42 @@ namespace ControlPanel {
             set { _part = value; OnPropertyChanged(); }
         }
 
-        private string _serialNum = "120023";
+        private string _serialNum = string.Empty;
         public string SerialNum {
             get => _serialNum;
             set { _serialNum = value; OnPropertyChanged(); }
         }
 
-        private string rev = "revA";
+        // Header metadata stays blank until a device connection is established.
+        private string _controlPanelVersion = string.Empty;
+        public string ControlPanelVersion {
+            get => _controlPanelVersion;
+            private set { _controlPanelVersion = value; OnPropertyChanged(); }
+        }
+
+        public string CoreVersionDisplay =>
+            string.IsNullOrWhiteSpace(Rev) || string.IsNullOrWhiteSpace(Ver)
+                ? string.Empty : $"Core: {Rev} / v{Ver}";
+
+        private string rev = string.Empty;
         public string Rev {
             get => rev;
             set {
                 rev = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CoreVersionDisplay));
             }
         }
-        private string ver = "1.0.0";
+        private string ver = string.Empty;
         public string Ver {
             get => ver;
             set {
                 ver = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(CoreVersionDisplay));
             }
         }
-        private string ipAddress = "xxx.xxx.xxx.xxx";
+        private string ipAddress = string.Empty;
         public string IPAddress {
             get => ipAddress;
             set {
@@ -105,7 +119,7 @@ namespace ControlPanel {
         public string LogStatus {
             get => logStatus;
             set {
-                logStatus = value; 
+                logStatus = value;
                 OnPropertyChanged();
             }
         }
@@ -146,6 +160,7 @@ namespace ControlPanel {
             system.RelayChanged += OnRelayChanged;
             system.AnalogOutChanged += OnAnalogOutChanged;
             system.LoggerStatusChanged += OnLoggerStatusChanged;
+            system.ConnectionStateChanged += OnConnectionStateChanged;
             //system.PIDCurValChanged += OnPIDChanged;
 
             Relays = new ObservableCollection<RelayChannel> {
@@ -206,15 +221,21 @@ namespace ControlPanel {
             } else {
                 DiscoverSigCore_Click();
             }
+
+            system.ConnectionWarning += msg => {
+                MessageBox.Show(msg, "Connection Warning");
+            };
+
             SetDim(false);
         }
 
-        private async Task AutoConnect(string ip) {
-            ConnectStatus connected;
-            connected = await Connect(ip);
-            if (connected != ConnectStatus.Connected) {
+        private Task AutoConnect(string ip) {
+            if (string.IsNullOrWhiteSpace(ip)) {
                 DiscoverSigCore_Click();
+                return Task.CompletedTask;
             }
+
+            return StartManagedConnectionAsync(ip);
         }
 
         private void GetStatusCommand() {
@@ -281,13 +302,17 @@ namespace ControlPanel {
         }
 
         private void ResetAll() {
-            for (uint i = 0; i < Relays.Count; i++)
-                _ = system.SetRelayAsync(i, false);
-            for (uint i = 0; i < AnalogOutputs.Count; i++) {
-                _ = system.SetAOutValueAsync(i, 0);
-            }
-            for (uint i = 0; i < PidControllers.Count; i++) {
-                _ = system.SetPIDAutoAsync(i, false);
+            if (system.IsConnected) {
+                for (uint i = 0; i < Relays.Count; i++)
+                    _ = system.SetRelayAsync(i, false);
+
+                for (uint i = 0; i < AnalogOutputs.Count; i++) {
+                    _ = system.SetAOutValueAsync(i, 0);
+                }
+
+                for (uint i = 0; i < PidControllers.Count; i++) {
+                    _ = system.SetPIDAutoAsync(i, false);
+                }
             }
 
             OnPropertyChanged(string.Empty);
@@ -393,17 +418,11 @@ namespace ControlPanel {
             SetDim(true);
 
             try {
-                // Send restart command
                 await system.RestartAsync();
-
-                // Close local connection immediately
-                if (system.IsConnected) {
-                    system.Close();
-                }
 
                 MessageBox.Show(
                     "The SigCore UC server is restarting.\n\n" +
-                    "Please reconnect once the server has finished restarting.",
+                    "The Control Panel will reconnect automatically.",
                     "Server Restarting",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
@@ -412,17 +431,25 @@ namespace ControlPanel {
             }
         }
 
-        private async Task<ConnectStatus> Connect(string ipAddress) {
-            ConnectStatus status =
-                await system.ConnectAsync(ipAddress);
+        private async Task StartManagedConnectionAsync(string ipAddress) {
+            _targetIp = ipAddress;
+            ConnectionStatus = "Connecting";
 
-            if (status == ConnectStatus.Connected) {
-                OnConnected(ipAddress);
-            } else {
-                ShowConnectFailure(status);
+            try {
+                await system.StartAsync(ipAddress);
+            } catch (OperationCanceledException) {
+                // A deliberate Stop() or a switch to another device cancels
+                // the current managed connection attempt.
+            } catch (Exception ex) {
+                Application.Current.Dispatcher.Invoke(() => {
+                    ConnectionStatus = "Connection Fault";
+                    MessageBox.Show(
+                        "Connection failed: " + ex.Message,
+                        "Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                });
             }
-
-            return status;
         }
         private void DiscoverSigCore_Click() {
             _ = DiscoverSigCore_ClickAsync();
@@ -430,24 +457,28 @@ namespace ControlPanel {
         private async Task DiscoverSigCore_ClickAsync() {
             try {
                 SetDim(true);
+
                 SigCoreDiscovery discovery = new SigCoreDiscovery();
 
-                discovery.Start();
-                await Task.Delay(3000);
-                discovery.Stop();
+                IReadOnlyList<SigCoreDevice> devices =
+                    await discovery.DiscoverAsync();
 
-                IReadOnlyList<IZeroconfHost> devices = discovery.GetDiscoveredDevices();
+                if (devices.Count == 0) {
+                    MessageBox.Show("No SigCore UC devices found on the network.", "Discovery");
+                    return;
+                }
 
-                IZeroconfHost selected;
                 SelectSigCoreDlg dlg = new SelectSigCoreDlg(devices);
                 dlg.Owner = Application.Current.MainWindow;
-                if (dlg.ShowDialog() == true && dlg.SelectedHost != null) {
-                    selected = dlg.SelectedHost;
 
-                    if (system.IsConnected) {
-                        system.Close();
-                    }
-                    await Connect(selected.IPAddress);
+                if (dlg.ShowDialog() == true && dlg.SelectedDevice != null) {
+                    SigCoreDevice selected = dlg.SelectedDevice;
+
+                    if (!selected.Ready || string.IsNullOrWhiteSpace(selected.Address))
+                        return;
+
+                    system.Stop();
+                    _ = StartManagedConnectionAsync(selected.Address);
                 }
             } catch (Exception ex) {
                 MessageBox.Show("Connection failed: " + ex.Message, "Error");
@@ -456,94 +487,58 @@ namespace ControlPanel {
             }
         }
 
-        private async Task<bool> ShowReconnectDialogAsync() {
-            try {
-                SigCoreDiscovery discovery = new SigCoreDiscovery();
-                discovery.Start();
-                await Task.Delay(3000);
-                discovery.Stop();
-
-                IReadOnlyList<IZeroconfHost> devices = discovery.GetDiscoveredDevices();
-                if (devices.Count == 0) {
-                    MessageBox.Show("No SigCore UC devices found on the network.", "Reconnect");
-                    return false;
-                }
-
-                SelectSigCoreDlg dlg = new SelectSigCoreDlg(devices);
-                dlg.Owner = Application.Current.MainWindow;
-
-                if (dlg.ShowDialog() == true && dlg.SelectedHost != null) {
-                    ConnectStatus status =
-                        await system.ConnectAsync(dlg.SelectedHost.IPAddress);
-
-                    if (status == ConnectStatus.Connected) {
-                        OnConnected(dlg.SelectedHost.IPAddress);
-                        return true;
-                    } else {
-                        ShowConnectFailure(status);
-                    }
-                }
-
-                return false;
-            } catch (Exception ex) {
-                MessageBox.Show("Reconnect failed: " + ex.Message, "Error");
-                return false;
-            }
-        }
         public async void HandleSystemResume() {
-            try {
-                if (system.IsConnected) {
-                    system.Close();
-                }
+            // SigCoreSystem owns reconnect. After resume, allow the network
+            // stack to settle; the managed connection loop will recover the
+            // existing target without Control Panel creating another loop.
+            await Task.Delay(2000);
 
-                // Allow NICs to come back online
-                await Task.Delay(2000);
+            if (system.ConnectionState == SigCoreConnectionState.Disconnected &&
+                !string.IsNullOrWhiteSpace(_targetIp)) {
 
-                ConnectStatus status =
-                    await system.ConnectAsync(IPAddress);
-
-                if (status == ConnectStatus.Connected) {
-                    OnConnected(IPAddress);
-                    return;
-                }
-
-                // Direct reconnect failed — prompt user
-                await ShowReconnectDialogAsync();
-            } catch {
-                // Remain disconnected but stable
+                _ = StartManagedConnectionAsync(_targetIp);
             }
         }
+
         private void OnConnected(string ipAddress) {
             InitializeComponents();
-            _ = system.SubscribeAsync();
             IPAddress = ipAddress;
+            if (string.IsNullOrEmpty(ControlPanelVersion)) {
+                var v = typeof(MainWindowVM).Assembly.GetName().Version;
+                if (v != null)
+                    ControlPanelVersion = $"Control Panel: v{v.Major}.{v.Minor}.{Math.Max(0, v.Build)}";
+            }
             ConnectionStatus = "Connected";
         }
-        private void ShowConnectFailure(ConnectStatus status) {
-            ConnectionStatus = "Not Connected";
-            if (status == ConnectStatus.TcpFailed) {
-                MessageBox.Show(
-                    "Unable to connect to the server.\n\n" +
-                    "The server may not be running or the IP address is incorrect.",
-                    "Connection Failed",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-            } else if (status == ConnectStatus.ProtocolRejected) {
-                MessageBox.Show(
-                    "Connection rejected due to protocol mismatch.\n\n" +
-                    "Client and server versions are incompatible.",
-                    "Protocol Mismatch",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            } else if (status == ConnectStatus.Timeout) {
-                MessageBox.Show(
-                    "Connection timed out.\n\n" +
-                    "The server did not respond within the expected time.",
-                    "Connection Timeout",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-            }
+        private void OnConnectionStateChanged(SigCoreConnectionState state) {
+            Application.Current.Dispatcher.Invoke(() => {
+                switch (state) {
+                    case SigCoreConnectionState.Connecting:
+                    case SigCoreConnectionState.Handshaking:
+                    case SigCoreConnectionState.Subscribing:
+                        ConnectionStatus = "Connecting";
+                        break;
+
+                    case SigCoreConnectionState.Connected:
+                        OnConnected(_targetIp);
+                        break;
+
+                    case SigCoreConnectionState.Reconnecting:
+                        ConnectionStatus = "Reconnecting";
+                        break;
+
+                    case SigCoreConnectionState.Faulted:
+                        ConnectionStatus = "Connection Fault";
+                        break;
+
+                    case SigCoreConnectionState.Disconnected:
+                    default:
+                        ConnectionStatus = "Not Connected";
+                        break;
+                }
+            });
         }
+
         private string _connectionStatus = "Not Connected";
         public string ConnectionStatus {
             get => _connectionStatus;

@@ -48,11 +48,12 @@ namespace ControlPanel.Controls {
         private static void OnIsRelayOnChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
             RelayControl control = (RelayControl)d;
 
-            // Just forward the value into visuals if needed.
             bool newState = (bool)e.NewValue;
             control.OnRelayToggled(newState);
-        }
 
+            control.OnPropertyChanged(nameof(IsNormallyOpenClosed));
+            control.OnPropertyChanged(nameof(IsNormallyClosedClosed));
+        }
         protected virtual void OnRelayToggled(bool isOn) {
             // optional LED or animation updates
         }
@@ -119,6 +120,37 @@ namespace ControlPanel.Controls {
         public uint Channel {
             get { return (uint)GetValue(ChannelProperty); }
             set { SetValue(ChannelProperty, value); }
+        }
+        public static readonly DependencyProperty InvertedLogicProperty =
+          DependencyProperty.Register(
+              nameof(InvertedLogic),
+              typeof(bool),
+              typeof(RelayControl),
+              new FrameworkPropertyMetadata(
+                  false,
+                  FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
+                  OnInvertedLogicChanged));
+
+        public bool InvertedLogic {
+            get { return (bool)GetValue(InvertedLogicProperty); }
+            set { SetValue(InvertedLogicProperty, value); }
+        }
+
+        private static void OnInvertedLogicChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            RelayControl control = (RelayControl)d;
+            control.OnPropertyChanged(nameof(IsNormallyOpenClosed));
+            control.OnPropertyChanged(nameof(IsNormallyClosedClosed));
+        }
+        public bool IsNormallyOpenClosed {
+            get { return IsRelayOn ^ InvertedLogic; }
+        }
+
+        public bool IsNormallyClosedClosed {
+            get { return !IsNormallyOpenClosed; }
+        }
+
+        private void OnPropertyChanged(string propertyName) {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 

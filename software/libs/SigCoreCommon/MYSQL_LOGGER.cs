@@ -1,4 +1,4 @@
-﻿using MySqlConnector;
+using MySqlConnector;
 using Newtonsoft.Json.Linq;
 using SigCoreCommon.Payloads;
 using System;
@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace SigCoreCommon {
     public class MYSQL_LOGGER {
+        private static readonly Log EventLog = new Log();
         private readonly HardwareManager owner;
         public DataLoggerConfig Config { get; }
 
@@ -21,7 +22,6 @@ namespace SigCoreCommon {
         // =====================================================
         public async Task<int> WriteConfigHeaderAsync() {
             if (!Config.Enabled) {
-                Console.WriteLine("MYSQL_LOGGER: Logging disabled; skipping config write.");
                 return -1;
             }
 
@@ -35,7 +35,6 @@ namespace SigCoreCommon {
             };
 
             int configId = await SaveConfigToDatabaseAsync(configJson);
-            Console.WriteLine($"MYSQL_LOGGER: New config_current ID = {configId}");
             return configId;
         }
 
@@ -73,7 +72,6 @@ namespace SigCoreCommon {
         // =====================================================
         public async Task LogSnapshotAsync(Dictionary<string, double> snapshot) {
             if (!Config.Enabled) {
-                Console.WriteLine("MYSQL_LOGGER: Logging disabled by config.");
                 return;
             }
 
@@ -118,7 +116,6 @@ namespace SigCoreCommon {
                 }
 
                 if (rows.Count == 0) {
-                    Console.WriteLine("LogSnapshotAsync: No data to log");
                     return;
                 }
 
@@ -132,7 +129,11 @@ namespace SigCoreCommon {
                         int inserted = await cmd.ExecuteNonQueryAsync();
                     }
                 } catch (Exception ex) {
-                    Console.WriteLine($"LogSnapshotAsync: Insert failed - {ex.Message}");
+                    EventLog.Error(
+                        "DataLogger",
+                        "SnapshotInsertFailure",
+                        "Data logger snapshot insert failed.",
+                        ex);
                 }
             }
         }

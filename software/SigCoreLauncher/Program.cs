@@ -1,5 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+using SigCoreCommon;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,8 +8,10 @@ namespace SigCoreLauncher {
         private static readonly CancellationTokenSource shutdownSource =
             new CancellationTokenSource();
 
+        private static readonly Log log = new Log();
+
         static async Task Main(string[] args) {
-            Console.WriteLine(">>>=== SigCore Launcher Service (updated) ===<<<");
+            Log.Initialize("SigCoreLauncher", ownsSession: true);
 
             RegisterSignalHandlers();
 
@@ -19,11 +21,12 @@ namespace SigCoreLauncher {
                 await launcher.RunAsync(shutdownSource.Token);
             } catch (OperationCanceledException) {
             } catch (Exception ex) {
-                Console.WriteLine("Launcher encountered a fatal error:");
-                Console.WriteLine(ex.ToString());
+                log.Error(
+                    "Lifecycle",
+                    "FatalError",
+                    "Launcher terminated because of an unhandled exception.",
+                    ex);
             }
-
-            Console.WriteLine("Launcher exiting.");
         }
 
         private static void RegisterSignalHandlers() {

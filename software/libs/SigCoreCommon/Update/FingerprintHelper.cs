@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -25,7 +25,6 @@ namespace SigCoreCommon.Update {
                     sb.Append(hash[i].ToString("x2"));
                 }
 
-                Console.WriteLine($"PEM: Path: {publicKeyPemPath}, Finger Print: {sb}");
                 return sb.ToString();
             }
         }

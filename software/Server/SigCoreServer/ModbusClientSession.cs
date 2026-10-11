@@ -1,4 +1,4 @@
-﻿using SigCoreCommon;
+using SigCoreCommon;
 using System;
 using System.IO;
 using System.Net.Sockets;
@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SigCoreServer {
     public class ModbusClientSession {
+        private static readonly Log _log = new Log();
         private readonly TcpClient _client;
         private readonly int _sessionId;
         private readonly HardwareManager _hardware;
@@ -24,12 +25,11 @@ namespace SigCoreServer {
                 while (true) {
                     int length = await stream.ReadAsync(buffer, 0, buffer.Length);
                     if (length == 0) {
-                        Console.WriteLine("Modbus client disconnected");
                         break;
                     }
 
                     if (length < 8) {
-                        Console.WriteLine("Invalid Modbus request (too short)");
+                        _log.Warn("Modbus", "InvalidRequest", $"Request too short. Bytes={length}.");
                         continue;
                     }
 
@@ -41,8 +41,12 @@ namespace SigCoreServer {
                         await stream.WriteAsync(response, 0, response.Length);
                     }
                 }
+            } catch (IOException) {
+                // Normal client disconnects can surface as I/O exceptions.
+            } catch (SocketException) {
+                // Normal client disconnects can surface as socket exceptions.
             } catch (Exception ex) {
-                Console.WriteLine("Modbus session error: " + ex.Message);
+                _log.Error("Modbus", "SessionFailed", $"Unexpected Modbus session failure. Session={_sessionId}.", ex);
             } finally {
                 _client.Close();
             }

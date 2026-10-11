@@ -31,13 +31,28 @@ namespace ControlPanel.Dialogs {
         public static NameValueItem[] Ranges {
             get {
                 (string Name, int Value)[] src = AInConfigPayload.Ranges;
-                NameValueItem[] result = new NameValueItem[src.Length];
+                var result = new System.Collections.Generic.List<NameValueItem>(src.Length);
+                NameValueItem reference = null;
 
-                for (int i = 0; i < src.Length; i++) {
-                    result[i] = new NameValueItem(src[i].Name, src[i].Value);
+                foreach (var range in src) {
+                    if (range.Name == "Voltage10V") {
+                        // Rev B uses the legacy 10 V protocol value for the 2.500 V reference.
+                        reference = new NameValueItem("2.500V Reference", range.Value);
+                    } else {
+                        result.Add(new NameValueItem(range.Name, range.Value));
+                    }
                 }
 
-                return result;
+                if (reference != null) {
+                    int groundSenseIndex = result.FindIndex(item => item.Name == "GNDSense");
+                    if (groundSenseIndex >= 0) {
+                        result.Insert(groundSenseIndex, reference);
+                    } else {
+                        result.Add(reference);
+                    }
+                }
+
+                return result.ToArray();
             }
         }
 

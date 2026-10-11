@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace SigCoreCommon {
     public interface IDispatcher {
@@ -60,6 +60,7 @@ namespace SigCoreCommon {
         SigCoreMessage HandleSetNetworkConfig(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleNetworkConfig(JObject payload, ulong msgId, ISession session);
         SigCoreMessage HandleConnectResult(JObject payload, ulong msgId, ISession session);
+        SigCoreMessage HandleFactoryResetResult(JObject payload, ulong msgId, ISession session);
 
 
         Task NotifyDInChanged(bool[] vals);

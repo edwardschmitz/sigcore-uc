@@ -85,6 +85,12 @@
             <TextBlock Grid.Row="5" Grid.Column="0" Text="Display:" 
                        VerticalAlignment="Center" TextAlignment="Right"
                        Margin="5,2" Padding="5,2"/>
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Range:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
+            <TextBlock Grid.Row="7" Grid.Column="0" Text="Cal Type:" 
+                       VerticalAlignment="Center" TextAlignment="Right"
+                       Margin="5,2" Padding="5,2"/>
             <ComboBox Grid.Row="5" Grid.Column="1"
                       Margin="5,2" Padding="5,2"
                       ItemsSource="{x:Static local:AInConfigDlgVM.DisplayFormats}"
@@ -110,7 +116,10 @@
             <StackPanel Grid.Row="8" Grid.ColumnSpan="2" Orientation="Vertical" 
                         x:Name="MxBPanel"
                         >
-                <TextBlock Text="y = m·x + b" FontWeight="Bold" Margin="5,5,5,0"/>
+                <TextBlock x:Name="FormulaText"
+           Text="y = m·x + b"
+           FontWeight="Bold"
+           Margin="5,5,5,0"/>
                 <StackPanel Orientation="Horizontal" Margin="5,2">
                     <TextBlock Text="m:" VerticalAlignment="Center" Margin="5,2" Padding="5,2"/>
                     <TextBox Text="{Binding M, Mode=TwoWay}" Width="80" Margin="5,2" Padding="5,2"/>

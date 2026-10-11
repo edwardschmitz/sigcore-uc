@@ -10,6 +10,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="getting-started-qr.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ControlPanel\ControlPanel.csproj" />
     <ProjectReference Include="..\libs\SigCoreCommon\SigCoreCommon.csproj" />
   </ItemGroup>

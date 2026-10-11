@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
@@ -6,6 +6,7 @@ using System.IO;
 namespace SigCoreCommon.Update {
 
     public class DeviceConfig {
+        private static readonly Log EventLog = new Log();
 
         private static readonly string path = "/opt/sigcore/device.json";
 
@@ -45,7 +46,11 @@ namespace SigCoreCommon.Update {
                 cfg.Signature      = (string?)obj["signature"]        ?? cfg.Signature;
 
             } catch (Exception ex) {
-                Console.WriteLine($"DeviceConfig.Load: corrupted file, using defaults. Error: {ex.Message}");
+                EventLog.Error(
+                    "Configuration",
+                    "DeviceConfigLoadFailure",
+                    "Device configuration is corrupt; defaults will be used.",
+                    ex);
             }
 
             return cfg;
@@ -65,11 +70,6 @@ namespace SigCoreCommon.Update {
             _ = Url;
             _ = Signature;
 
-            LogFile log = new LogFile();
-            log.Info($"DeviceConfig.Save: ManifestUrl{ManifestUrl}\nManifestSigUrl{ManifestSigUrl}");
-
-            Console.WriteLine($"Saving: {Url}\n{Signature}");
-            
             string json = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(pathname, json);
         }

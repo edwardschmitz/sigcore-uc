@@ -6,8 +6,8 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         Title="Factory Settings"
-        Width="600"
-        Height="420">
+        Width="660"
+        Height="500">
 
     <Grid Margin="20">
 
@@ -58,10 +58,25 @@
                         Command="{Binding ApplyFactorySettingsCmd}"
                         IsEnabled="{Binding IsConnected}" />
 
-                <Button Content="Print Labels"
+                <Button Content="Create Label Sheet"
                         Padding="20,2"
                         Margin="5,2"
-                        Command="{Binding PrintLabelsCmd}"
+                        Command="{Binding PrintLabelsCmd}" />
+
+                <TextBlock Text="{Binding PendingLabelCount, StringFormat=Saved labels: {0}}"
+                           HorizontalAlignment="Center"
+                           Margin="5,0,5,8"
+                           Foreground="DimGray" />
+
+                <Button Content="Clear Saved Labels"
+                        Padding="20,2"
+                        Margin="5,2,5,10"
+                        Command="{Binding ClearLabelsCmd}" />
+
+                <Button Content="Reboot"
+                        Padding="20,2"
+                        Margin="5,2"
+                        Command="{Binding RebootCmd}"
                         IsEnabled="{Binding IsConnected}" />
 
                 <Button Content="Close"
@@ -83,6 +98,8 @@
                     <RowDefinition Height="Auto"/>
                     <!-- Date -->
                     <RowDefinition Height="Auto"/>
+                    <!-- Unit Number -->
+                    <RowDefinition Height="Auto"/>
                     <!-- Serial -->
                     <RowDefinition Height="Auto"/>
                     <!-- Revision -->
@@ -92,6 +109,8 @@
                     <!-- Web Path -->
                     <RowDefinition Height="Auto"/>
                     <!-- Hostname -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- MAC Address -->
                     <RowDefinition Height="Auto"/>
                     <!-- System Name -->
                 </Grid.RowDefinitions>
@@ -108,74 +127,103 @@
                            Margin="5,2"
                            Padding="5,2"/>
 
-                <!-- SERIAL -->
+                <!-- UNIT NUMBER -->
                 <TextBlock Grid.Row="1" Grid.Column="0"
-                           Text="Serial:"
+                           Text="Unit Number:"
                            HorizontalAlignment="Right"
                            Margin="5,2"
                            Padding="5,2"/>
 
                 <TextBox Grid.Row="1" Grid.Column="1"
-                         Text="{Binding Serial}"
+                         Text="{Binding UnitNumber, UpdateSourceTrigger=PropertyChanged}"
+                         MaxLength="6"
                          Margin="5,2"
                          Padding="5,2"/>
 
-                <!-- REVISION -->
+                <!-- SERIAL -->
                 <TextBlock Grid.Row="2" Grid.Column="0"
-                           Text="Revision:"
+                           Text="Serial:"
                            HorizontalAlignment="Right"
                            Margin="5,2"
                            Padding="5,2"/>
 
                 <TextBox Grid.Row="2" Grid.Column="1"
-                         Text="{Binding Revision}"
+                         Text="{Binding Serial, Mode=OneWay}"
+                         IsReadOnly="True"
                          Margin="5,2"
                          Padding="5,2"/>
 
-                <!-- VERSION -->
+                <!-- REVISION -->
                 <TextBlock Grid.Row="3" Grid.Column="0"
-                           Text="Version:"
+                           Text="Revision:"
                            HorizontalAlignment="Right"
                            Margin="5,2"
                            Padding="5,2"/>
 
                 <TextBox Grid.Row="3" Grid.Column="1"
-                         Text="{Binding Version}"
+                         Text="{Binding Revision}"
                          Margin="5,2"
                          Padding="5,2"/>
 
-                <!-- WEB PATH -->
+                <!-- VERSION -->
                 <TextBlock Grid.Row="4" Grid.Column="0"
-                           Text="Web Path:"
+                           Text="Version:"
                            HorizontalAlignment="Right"
                            Margin="5,2"
                            Padding="5,2"/>
 
                 <TextBox Grid.Row="4" Grid.Column="1"
-                         Text="{Binding WebPath}"
+                         Text="{Binding Version}"
                          Margin="5,2"
                          Padding="5,2"/>
 
-                <!-- HOSTNAME -->
+                <!-- WEB PATH -->
                 <TextBlock Grid.Row="5" Grid.Column="0"
-                           Text="Hostname:"
+                           Text="Web Path:"
                            HorizontalAlignment="Right"
                            Margin="5,2"
                            Padding="5,2"/>
 
                 <TextBox Grid.Row="5" Grid.Column="1"
-                         Text="{Binding Hostname}"
+                         Text="{Binding WebPath, Mode=OneWay}"
+                         IsReadOnly="True"
                          Margin="5,2"
                          Padding="5,2"/>
 
-                <!-- SYSTEM NAME -->
+                <!-- HOSTNAME -->
                 <TextBlock Grid.Row="6" Grid.Column="0"
-                           Text="System Name:"
+                           Text="Hostname:"
                            HorizontalAlignment="Right"
                            Margin="5,2"
                            Padding="5,2"/>
 
                 <TextBox Grid.Row="6" Grid.Column="1"
+                         Text="{Binding Hostname, Mode=OneWay}"
+                         IsReadOnly="True"
+                         Margin="5,2"
+                         Padding="5,2"/>
+
+                <!-- MAC ADDRESS -->
+                <TextBlock Grid.Row="7" Grid.Column="0"
+                           Text="MAC Address:"
+                           HorizontalAlignment="Right"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+                <TextBox Grid.Row="7" Grid.Column="1"
+                         Text="{Binding MacAddress, Mode=OneWay}"
+                         IsReadOnly="True"
+                         Margin="5,2"
+                         Padding="5,2"/>
+
+                <!-- SYSTEM NAME -->
+                <TextBlock Grid.Row="8" Grid.Column="0"
+                           Text="System Name:"
+                           HorizontalAlignment="Right"
+                           Margin="5,2"
+                           Padding="5,2"/>
+
+                <TextBox Grid.Row="8" Grid.Column="1"
                          Text="{Binding SystemName}"
                          Margin="5,2"
                          Padding="5,2"/>

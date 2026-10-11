@@ -1,0 +1,44 @@
+<Window x:Class="ControlPanel.Dialogs.ReconnectionDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Connection Lost"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight"
+        FontFamily="Segoe UI"
+        FontSize="14">
+
+    <Border CornerRadius="8"
+            BorderBrush="#888"
+            BorderThickness="1"
+            Background="White"
+            Padding="10"
+            Margin="10">
+        <Border.Effect>
+            <DropShadowEffect Color="#805C40"
+                              Opacity=".4"
+                              BlurRadius="10"
+                              ShadowDepth="6"/>
+        </Border.Effect>
+
+        <StackPanel MinWidth="290">
+            <TextBlock Text="Connection Lost"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="5,0,5,10"/>
+            <TextBlock Text="Attempting to reconnect..."
+                       HorizontalAlignment="Center"
+                       Margin="5,5,5,18"/>
+            <Button Content="Close Control Panel"
+                    MinWidth="150"
+                    HorizontalAlignment="Center"
+                    Margin="5,2"
+                    Click="CloseControlPanel_Click"/>
+        </StackPanel>
+    </Border>
+</Window>

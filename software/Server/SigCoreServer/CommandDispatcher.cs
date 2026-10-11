@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using SigCoreCommon;
 using SigCoreCommon.Payloads;
 using System;
@@ -13,6 +13,7 @@ namespace SigCoreServer {
         OsManager osManager;
 
         private readonly ConcurrentDictionary<ISession, bool> _subscribers = new ConcurrentDictionary<ISession, bool>();
+        private static readonly Log _log = new Log();
 
         public CommandDispatcher(HardwareManager hwMan, OsManager osMan) {
             hardwareManager = hwMan;
@@ -27,19 +28,22 @@ namespace SigCoreServer {
             return null;
         }
 
+        public SigCoreMessage HandleFactoryResetResult(JObject payload, ulong msgId, ISession session) {
+            return null;
+        }
+
         public SigCoreMessage HandleConnect(JObject payload, ulong msgId, ISession session) {
             int version = payload.Value<int>("version");
             return SigCoreMessage.CreateConnectResult(msgId, version);
         }
 
         public SigCoreMessage HandleError(JObject payload, ulong msgId, ISession session) {
-            Console.WriteLine("Error Message Received");
-            Console.WriteLine(payload.ToString());
+            _log.Warn("Protocol", "ClientErrorReceived", payload?.ToString() ?? "Client sent an empty error payload.");
             return null;
         }
 
         public SigCoreMessage HandlePing(JObject payload, ulong msgId, ISession session) {
-            Console.WriteLine("Ping");
+
             return SigCoreMessage.CreatePong(msgId);
         }
 
@@ -197,11 +201,29 @@ namespace SigCoreServer {
 
 
         public SigCoreMessage HandleSubscribe(JObject payload, ulong msgId, ISession session) {
-            _subscribers.TryAdd(session, true);
+            bool added = _subscribers.TryAdd(session, true);
+
+            _log.Info(
+                "Subscription",
+                added ? "Subscribed" : "SubscribeRepeated",
+                $"Session {session.SessionID} subscribed to server notifications.");
+
             return null; 
         }
+
+        public void RemoveSubscriber(ISession session) {
+            if (session == null)
+                return;
+
+            if (_subscribers.TryRemove(session, out _)) {
+                _log.Info(
+                    "Subscription",
+                    "SubscriberRemoved",
+                    $"Session {session.SessionID} removed from subscriber list.");
+            }
+        }
         public SigCoreMessage HandleGetFRAM(JObject payload, ulong msgId, ISession session) {
-            JObject fram = hardwareManager.ReadConfigFromFram();
+            JObject fram = hardwareManager.BuildConfigPayload();
             return SigCoreMessage.CreateFRAM(msgId, fram);
         }
         public SigCoreMessage HandleGetLoggingConfig(JObject payload, ulong msgId, ISession session) {
@@ -235,6 +257,11 @@ namespace SigCoreServer {
             hardwareManager.GetSystemStatus(status);
             osManager.GetSystemStatus(status);
             hardwareManager.GetWiFiStatus(status);
+
+            // Machine-readable update configuration. Existing status consumers
+            // can ignore this additive field.
+            status["update"] = hardwareManager.GetUpdateConfig();
+
             return SigCoreMessage.CreateStatus(status, msgId);
         }
 
@@ -307,26 +334,100 @@ namespace SigCoreServer {
         }
 
         public SigCoreMessage HandleFactoryReset(JObject payloadObj, ulong msgId, ISession session) {
-            JObject payload = payloadObj as JObject;
-            if (payload == null)
-                return null;
+            try {
+                if (payloadObj == null) {
+                    return SigCoreMessage.CreateFactoryResetResult(
+                        msgId,
+                        false,
+                        "Factory Settings payload is missing.");
+                }
 
-            string serial = (string)payload["serial"];
-            string systemName = (string)payload["systemName"];
-            string revision = (string)payload["revision"];
-            string version = (string)payload["version"];
-            string hostname = (string)payload["hostname"];
-            string manifestURL = (string)payload["manifest_url"];
-            string manifestSigUrl = (string)payload["manifest_sig_url"];
-            string URL = (string)payload["url"];
-            string sigUrl = (string)payload["signature"];
+                string serial = (string)payloadObj["serial"] ?? "";
+                string systemName = (string)payloadObj["systemName"] ?? "";
+                string revision = (string)payloadObj["revision"] ?? "";
+                string version = (string)payloadObj["version"] ?? "";
+                string hostname = (string)payloadObj["hostname"] ?? "";
+                string manifestURL = (string)payloadObj["manifest_url"] ?? "";
+                string manifestSigUrl = (string)payloadObj["manifest_sig_url"] ?? "";
+                string URL = (string)payloadObj["url"] ?? "";
+                string sigUrl = (string)payloadObj["signature"] ?? "";
 
-            LogFile log = new LogFile();
-            log.Info("HandleFactoryReset");
-            hardwareManager.FactoryReset(serial, systemName, version, revision, manifestURL, manifestSigUrl, URL, sigUrl, hostname);
-            osManager.FactoryReset(hostname);
+                if (string.IsNullOrWhiteSpace(serial) ||
+                    string.IsNullOrWhiteSpace(revision) ||
+                    string.IsNullOrWhiteSpace(version) ||
+                    string.IsNullOrWhiteSpace(hostname) ||
+                    string.IsNullOrWhiteSpace(systemName)) {
 
-            return null;
+                    return SigCoreMessage.CreateFactoryResetResult(
+                        msgId,
+                        false,
+                        "Serial, revision, version, hostname, and system name are required.");
+                }
+
+                hardwareManager.FactoryReset(
+                    serial,
+                    systemName,
+                    version,
+                    revision,
+                    manifestURL,
+                    manifestSigUrl,
+                    URL,
+                    sigUrl,
+                    hostname);
+
+                OsManager.CommandResult osResult = osManager.FactoryReset(hostname);
+
+                JObject verification = hardwareManager.VerifyFactoryReset(
+                    serial,
+                    systemName,
+                    version,
+                    revision,
+                    manifestURL,
+                    manifestSigUrl,
+                    URL,
+                    sigUrl,
+                    hostname);
+
+                bool hardwareVerified = verification.Value<bool>("success");
+                bool osVerified = osResult.ExitCode == 0;
+
+                JObject details = new JObject {
+                    ["configurationVerified"] = hardwareVerified,
+                    ["osHostnameVerified"] = osVerified,
+                    ["osExitCode"] = osResult.ExitCode,
+                    ["verification"] = verification
+                };
+
+                if (!osVerified) {
+                    details["osError"] = osResult.StdErr ?? "";
+                    return SigCoreMessage.CreateFactoryResetResult(
+                        msgId,
+                        false,
+                        "Factory configuration was written, but the OS hostname update failed.",
+                        details);
+                }
+
+                if (!hardwareVerified) {
+                    return SigCoreMessage.CreateFactoryResetResult(
+                        msgId,
+                        false,
+                        "Factory Settings verification failed.",
+                        details);
+                }
+
+                return SigCoreMessage.CreateFactoryResetResult(
+                    msgId,
+                    true,
+                    "Factory Settings applied and verified.",
+                    details);
+
+            } catch (Exception ex) {
+                _log.Error("FactorySettings", "FactoryResetFailed", "Factory Settings failed.", ex);
+                return SigCoreMessage.CreateFactoryResetResult(
+                    msgId,
+                    false,
+                    "Factory Settings failed: " + ex.Message);
+            }
         }
 
     }

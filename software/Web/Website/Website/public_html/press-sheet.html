@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SigCore Press Kit</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="press-sheet.css">
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="24ed1392-77e8-4294-876a-e55dc3d9f56e"></script>
+
 </head>
+
 <body>
     <div id="header-container"></div>
 
@@ -17,74 +21,278 @@
             .catch(error => console.error("Error loading the header:", error));
     </script>
 
-    <main class="main-content">
+    <main class="press-main">
         <div class="section-title">
-            <p class="large-text" style="margin-left: 15px;">Press Kit</p>
+            <img src="/images/sigcore-uc-logo.png" height="150" />
+        </div>
+        <div class="tagline">
+            A General-Purpose Test Controller
+        </div>
+        <section class="press-hero">
+            <h1>Press Kit</h1>
+            <p>
+                SigCore UC is a flexible industrial automation and control platform designed
+                to help engineers build test systems, instrumentation interfaces, and custom
+                automation solutions faster.
+            </p>
+        </section>
+
+        <div class="press-card press-availability">
+            <h2>Follow the SigCore UC Launch</h2>
+
+            <p>
+                SigCore UC is currently in Crowd Supply pre-launch.
+                Follow the campaign to receive launch notifications and project updates.
+            </p>
+
+            <a class="press-button"
+               href="https://www.crowdsupply.com/en-z-em/sigcore-uc"
+               target="_blank">
+                Follow on Crowd Supply
+            </a>
         </div>
 
-        <!-- Press Availability Section -->
-        <div class="specs-container">
-            <div class="spec-card">
-                <h1>Press Availability</h1>
+        <div class="press-card press-photos">
+            <h2>System Architecture</h2>
+
+            <p>
+                SigCore UC combines industrial I/O, embedded Linux services,
+                protocol integration, scripting support, and higher-level
+                automation interfaces into a unified control platform.
+            </p>
+
+            <a href="images/6ea73582-0c74-4e27-a99d-1a1a40b071b1.png" target="_blank">
+                <img src="images/6ea73582-0c74-4e27-a99d-1a1a40b071b1.png"
+                     alt="SigCore UC Architecture"
+                     style="width:100%; border-radius:10px; margin-top:16px;">
+            </a>
+        </div>
+
+        <section class="press-grid">
+            <div class="press-card">
+                <h2>Problem</h2>
                 <p>
-                    Evaluation units of the SigCore UC are available for members of the press.
-                    I am also generally available for interviews or to provide additional details about the product.
+                    Custom automation projects often require engineers to combine controllers,
+                    I/O hardware, scripting environments, protocol gateways, and separate software tools.
+                    This slows development and creates unnecessary integration friction.
+                </p>
+            </div>
+
+            <div class="press-card">
+                <h2>Solution</h2>
+                <p>
+                    SigCore UC brings industrial I/O, programmable control logic, scripting,
+                    protocol integration, and embedded deployment into one practical platform,
+                    reducing setup time and making custom automation easier to build and maintain.
+                </p>
+            </div>
+        </section>
+
+        <section class="press-grid">
+            <div class="press-card">
+                <h2>Key Benefits</h2>
+                <ul>
+                    <li>Faster setup for test systems and industrial automation</li>
+                    <li>Reduced integration complexity</li>
+                    <li>Flexible control logic for custom workflows</li>
+                    <li>Useful for instrumentation, monitoring, and equipment control</li>
+                    <li>Designed for practical, adaptable automation</li>
+                </ul>
+            </div>
+
+            <div class="press-card">
+                <h2>Example Applications</h2>
+                <ul>
+                    <li>Environmental and thermal test systems</li>
+                    <li>Laboratory automation</li>
+                    <li>Instrumentation control</li>
+                    <li>Industrial monitoring</li>
+                    <li>OEM equipment integration</li>
+                    <li>Custom manufacturing workflows</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="press-card press-photos">
+            <h2>Press Images</h2>
+            <p>
+                High-resolution product images are available for download.
+                Click any image to open the full version.
+            </p>
+
+            <div class="press-photo-grid">
+                <a href="/images/angle-view.jpg" target="_blank" download>
+                    <div class="photo-frame">
+                        <img src="/images/angle-view.jpg" alt="SigCore UC angle view">
+                    </div>
+                </a>
+
+                <a href="/images/front-angle.jpg" target="_blank" download>
+                    <div class="photo-frame">
+                        <img src="/images/front-angle.jpg" alt="SigCore UC front angle view">
+                    </div>
+                </a>
+
+                <a href="/images/front.jpg" target="_blank" download>
+                    <div class="photo-frame">
+                        <img src="/images/front.jpg" alt="SigCore UC front view">
+                    </div>
+                </a>
+
+                <a href="/images/top-view.jpg" target="_blank" download>
+                    <div class="photo-frame">
+                        <img src="/images/top-view.jpg" alt="SigCore UC top view">
+                    </div>
+                </a>
+
+                <a href="/images/sigcore-uc-logo.png" target="_blank" download>
+                    <div class="photo-frame">
+                        <img src="/images/sigcore-uc-logo.jpg" alt="SigCore UC angle view">
+                    </div>
+                </a>
+
+                <a href="/images/6ea73582-0c74-4e27-a99d-1a1a40b071b1.png" target="_blank" download>
+                    <div class="photo-frame">
+                        <img src="/images/6ea73582-0c74-4e27-a99d-1a1a40b071b1.png" alt="SigCore UC angle view">
+                    </div>
+                </a>
+
+                <a href="/images/Screenshot 2026-05-31 151013.png" target="_blank" download>
+                    <div class="photo-frame">
+                        <img src="/images/Screenshot 2026-05-31 151013.png" alt="SigCore UC angle view">
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <section class="press-grid">
+            <div class="press-card">
+                <h2>Technical Highlights</h2>
+
+                <ul>
+                    <li>
+                        <strong>PID CONTROL:</strong>
+                        Built-in industrial-grade PID loops for closed-loop process control.
+                    </li>
+
+                    <li>
+                        <strong>SIGNAL CONDITIONING:</strong>
+                        All I/O fully conditioned and ready for direct use.
+                    </li>
+
+                    <li>
+                        <strong>8 RELAY OUTPUTS:</strong>
+                        Isolated relay outputs rated for 120VAC / 10A with NO/NC terminals.
+                    </li>
+
+                    <li>
+                        <strong>8 DIGITAL INPUTS:</strong>
+                        <ul>
+                            <li>VIN &gt; 2VDC = ON</li>
+                            <li>VIN &lt; 1VDC = OFF</li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <strong>4 ANALOG INPUTS:</strong>
+                        <ul>
+                            <li>0–5VDC</li>
+                            <li>0–10VDC</li>
+                            <li>0–500mV</li>
+                            <li>4–20mA</li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <strong>4 ANALOG OUTPUTS:</strong>
+                        <ul>
+                            <li>0–5VDC output</li>
+                            <li>PWM output support</li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <strong>CONTROL SOFTWARE:</strong>
+                        Ethernet and USB connected monitoring, calibration, and configuration software.
+                    </li>
+
+                    <li>
+                        <strong>PROGRAMMING:</strong>
+                        Python, .NET, and LabVIEW APIs with example code and documentation included.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="press-card">
+                <h2>Why This Is Different</h2>
+                <p>
+                    SigCore UC is designed for engineers who need to build real automation systems quickly,
+                    without stitching together separate PLCs, protocol gateways, scripting environments,
+                    and custom software from scratch
                 </p>
                 <p>
-                    Please feel free to <a href="contacts.html">contact me</a> to request a unit or set up a time to talk.
+                    It focuses on faster setup, practical integration, and flexible control for test systems,
+                    instrumentation, and industrial automation.
                 </p>
+                <p>
+                    Unlike traditional PLC or DAQ setups, SigCore UC combines industrial I/O,
+                    scripting, monitoring, calibration tools, and protocol integration into a
+                    single compact platform that is easy to deploy, maintain and expand.
+                </p>
+            </div>
+        </section>
+
+        <div class="press-card">
+            <h2>About en Z em</h2>
+
+            <p>
+                en Z em develops embedded systems, industrial automation, and test-system
+                technologies focused on practical real-world engineering applications.
+            </p>
+
+            <p>
+                The company was founded by engineer Edward Schmitz with a focus on creating
+                flexible, approachable automation tools that reduce integration complexity
+                and accelerate custom system development.
+            </p>
+
+            <p>
+                SigCore UC was designed to bridge the gap between industrial control hardware,
+                instrumentation, scripting, and modern software integration.
+            </p>
+        </div>
+
+        <div class="press-card press-photos">
+            <h2>Product Demonstration</h2>
+
+            <p>
+                Demonstration video showing SigCore UC hardware and software operation.
+            </p>
+
+            <div style="display:flex; justify-content:center; margin-top:20px;">
+                <iframe width="900"
+                        height="506"
+                        src="https://www.youtube.com/embed/jj86np321jk?si=2_3rp6cE8RfAzMiv"
+                        title="SigCore UC Demonstration Video"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen
+                        style="max-width:100%; border-radius:10px;">
+                </iframe>
             </div>
         </div>
 
-        <!-- Press Sheet Section -->
-        <div class="specs-container">
-            <div class="spec-card">
-                <h1>Press Sheet</h1>
-                <p>Download the official SigCore UC press sheet below.</p>
-                <p style="text-align:center;">
-                    <a href="downloads/press-sheet.pdf" target="_blank">
-                        <img src="images/press-sheet-preview.png"
-                             alt="Product Image � Press Sheet Preview"
-                             style="max-width:50%; height:auto; border:1px solid #ccc; margin-bottom:10px; display:block; margin-left:auto; margin-right:auto;">
-                    </a>
-                </p>
-                <p>
-                    <a class="download-link" href="downloads/press-sheet.pdf" target="_blank">
-                        Download Press Sheet (PDF)
-                    </a>
-                </p>
-            </div>
-        </div>
+        <section class="press-card press-availability">
+            <h2>Press Availability</h2>
+            <p>
+                Evaluation units of SigCore UC are available for members of the press.
+                I am also available for interviews or to provide additional product details.
+            </p>
+            <a class="press-button" href="/contacts.html">Contact Me</a>
+        </section>
 
-        <!-- Press Photos Section -->
-        <div class="specs-container">
-            <div class="spec-card">
-                <h1>Press Photos</h1>
-                <p>High-resolution product and lifestyle images are available for download. Click any image to open the full version.</p>
-                <div class="press-photo-grid">
-                    <a href="images/angle-view.jpg" target="_blank" download>
-                        <div class="photo-frame">
-                            <img src="images/angle-view.jpg" alt="Product Image 1">
-                        </div>
-                    </a>
-                    <a href="images/front-angle.jpg" target="_blank" download>
-                        <div class="photo-frame">
-                            <img src="images/front-angle.jpg" alt="Product Image 2">
-                        </div>
-                    </a>
-                    <a href="images/front.jpg" target="_blank" download>
-                        <div class="photo-frame">
-                            <img src="images/front.jpg" alt="Product Image 3">
-                        </div>
-                    </a>
-                    <a href="images/top-view.jpg" target="_blank" download>
-                        <div class="photo-frame">
-                            <img src="images/top-view.jpg" alt="Product Image 4">
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
     </main>
 
     <div id="footer-container"></div>
@@ -95,12 +303,12 @@
             .then(data => document.getElementById("footer-container").innerHTML = data)
             .catch(error => console.error("Error loading the footer:", error));
     </script>
+
     <script>
         function toggleMobileMenu() {
             const menu = document.querySelector(".nav-menu");
             menu.classList.toggle("show");
         }
     </script>
-
 </body>
 </html>

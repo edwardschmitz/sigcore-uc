@@ -9,11 +9,15 @@
         WindowState="Maximized"
         mc:Ignorable="d"
         d:DataContext="MainWindowVM"
-        Title="MainWindow" Height="450" Width="800">
+        Title="SigCore UC Control Panel" Height="450" Width="800">
 
 
     <Grid x:Name="RootGrid">
-        <Viewbox Stretch="Uniform" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Viewbox Grid.Row="0" Stretch="Uniform" Margin="10">
             <Grid HorizontalAlignment="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -28,48 +32,24 @@
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Margin="30,0,0,0">
-                    <control:HamburgerButton x:Name="UnitNameButton" Grid.Column="2"
-                                         Command="{Binding Path=SettingsCmd}"
-                         VerticalAlignment="Top" Margin="0,8,0,0" ToolTip="Edit Properties"/>
-
-                    <StackPanel>
-                        <TextBlock Text="{Binding Path=Name}" 
-                                   FontSize="36" FontWeight="Bold"
-                                   HorizontalAlignment="Left"
-                                   Margin="0"
-                                   />
-                        <TextBlock Text="{Binding Path=SerialNum}" 
-                                   FontSize="16" FontWeight="Bold"
-                                   HorizontalAlignment="Left"
-                                   Margin="0,0,0,0"
-                                   />
-                        <StackPanel Orientation="Horizontal"
-                                    Grid.Row="2" Grid.Column="0"
-                                    >
-                            <TextBlock Text="{Binding Path=Rev}" 
-                                       FontSize="16" FontWeight="Bold"
-                                       HorizontalAlignment="Left"
-                                       Margin="0,0,0,0"
-                                       />
-                            <TextBlock Text=" / v"
-                                       FontSize="16" FontWeight="Bold"
-                                       HorizontalAlignment="Left"
-                                       Margin="0,0,0,0"
-                                       />
-                            <TextBlock Text="{Binding Path=Ver}" 
-                                       FontSize="16" FontWeight="Bold"
-                                       HorizontalAlignment="Left"
-                                       Margin="0,0,0,0"
-                                       />
+                <!-- Device identity -->
+                <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="30,0,5,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <control:HamburgerButton x:Name="UnitNameButton"
+                                                 Command="{Binding Path=SettingsCmd}"
+                                                 VerticalAlignment="Top" Margin="0,8,0,0"
+                                                 ToolTip="Edit Properties"/>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Path=Name}" FontSize="36" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Path=SerialNum}" FontSize="16" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Path=IPAddress}" FontSize="16" FontWeight="Bold"/>
                         </StackPanel>
-                        <TextBlock Text="{Binding Path=IPAddress}" 
-                                   FontSize="16" FontWeight="Bold"
-                                   HorizontalAlignment="Left"
-                                   Margin="0,0,0,0"
-                                   />
                     </StackPanel>
-                </StackPanel>
+                </Grid>
 
                 <control:GroupControl Grid.Row="4" Grid.Column="0" 
                             Header="Relay Outputs" IsExpanded="True"
@@ -93,6 +73,7 @@
                                     UserID="{Binding UserID}"
                                     Channel="{Binding Path=Index, Mode=OneWay}"
                                     ConfigCommand="{Binding EditCommand}"
+                                    InvertedLogic="{Binding InvertedLogic}"                                        
                                     />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -325,7 +306,39 @@
 
             </Grid>
         </Viewbox>
-        <Border x:Name="DimOverlay"
+
+        <!-- Bottom-aligned footer: copyright and website left, versions right. -->
+        <Grid Grid.Row="1" Margin="16,4,16,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom">
+                <TextBlock Text="© 2026 Edward Schmitz · " FontSize="14" Foreground="#777777"/>
+                <TextBlock FontSize="14" VerticalAlignment="Bottom">
+                    <Hyperlink NavigateUri="https://sigcoreuc.com" RequestNavigate="Website_RequestNavigate"
+                               Foreground="#777777" Cursor="Hand">sigcoreuc.com
+                        <Hyperlink.Style>
+                            <Style TargetType="Hyperlink">
+                                <Setter Property="TextDecorations" Value="{x:Null}"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="TextDecorations" Value="Underline"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Hyperlink.Style>
+                    </Hyperlink>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Grid.Column="1" VerticalAlignment="Bottom" TextBlock.TextAlignment="Right">
+                <TextBlock Text="{Binding Path=CoreVersionDisplay}" FontSize="14"
+                           Foreground="#777777" HorizontalAlignment="Right"/>
+                <TextBlock Text="{Binding Path=ControlPanelVersion}" FontSize="14"
+                           Foreground="#777777" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Grid>
+        <Border x:Name="DimOverlay" Grid.RowSpan="2"
                 Visibility="{Binding Path=WindowVis}"
                 Background="#A0FFFFFF"   
                 IsHitTestVisible="False"/>

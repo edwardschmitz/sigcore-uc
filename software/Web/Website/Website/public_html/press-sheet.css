@@ -1,0 +1,125 @@
+﻿.press-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.press-hero {
+    background: #f9f3eb;
+    border-radius: 14px;
+    padding: 36px 42px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    text-align: center;
+}
+
+    .press-hero h1 {
+        font-size: 42px;
+        margin: 0 0 18px 0;
+        color: #333;
+    }
+
+    .press-hero p {
+        max-width: 820px;
+        margin: 0 auto;
+        font-size: 24px;
+        line-height: 1.25;
+        text-align: center;
+        font-weight: 500;
+    }
+
+.press-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.press-card {
+    background: #f9f3eb;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    text-align: left;
+}
+
+    .press-card h2 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        color: #990000;
+        font-size: 24px;
+        text-align: center;
+    }
+
+    .press-card p {
+        font-size: 16px;
+        line-height: 1.45;
+        text-align: left;
+        margin-top: 0;
+        margin-bottom: 16px;
+    }
+
+    .press-card li {
+        font-size: 16px;
+        line-height: 1.45;
+        text-align: left;
+        margin-bottom: 4px;
+    }
+
+.press-photos {
+    text-align: center;
+}
+
+    .press-photos p {
+        text-align: center;
+    }
+
+.press-availability {
+    text-align: center;
+}
+
+    .press-availability p {
+        text-align: center;
+    }
+
+.press-button {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 12px 24px;
+    background: #444;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.press-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 18px;
+}
+
+.photo-frame {
+    background: #444;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+    .photo-frame img {
+        width: 100%;
+        display: block;
+        border-radius: 4px;
+    }
+
+@media (max-width: 800px) {
+    .press-grid,
+    .press-photo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .press-hero h1 {
+        font-size: 32px;
+    }
+}

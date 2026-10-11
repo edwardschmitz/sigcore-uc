@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using SigCoreCommon;
 using SigCoreCommon.Payloads;
 using System;
@@ -8,6 +8,7 @@ using System.Net;
 namespace SigCoreServer {
 
     public class OsManager {
+        private static readonly Log _log = new Log();
 
 
         // ──────────────────────────────────────────────────────────────
@@ -58,13 +59,8 @@ namespace SigCoreServer {
         // ──────────────────────────────────────────────────────────────
 
         public CommandResult FactoryReset(string hostName) {
-            LogFile log = new LogFile();
-
-            log.Info("FactoryReset started");
-            log.Info($"Requested hostname: '{hostName}'");
-
             if (string.IsNullOrWhiteSpace(hostName)) {
-                log.Error("Hostname required");
+                _log.Error("FactorySettings", "HostnameRequired", "Factory reset requested without a hostname.");
                 return new CommandResult {
                     ExitCode = 1,
                     StdOut = "",
@@ -73,39 +69,31 @@ namespace SigCoreServer {
             }
 
             string cmd1 = $"sudo hostnamectl set-hostname {hostName}";
-            log.Info($"CMD: {cmd1}");
             CommandResult r1 = RunCommand(cmd1);
-            LogResult(log, "hostnamectl", r1);
+            LogCommandFailure("FactorySettings", "HostnameUpdateFailed", "hostnamectl", r1);
             if (r1.ExitCode != 0) return r1;
 
             string cmd2 = $"echo \"{hostName}\" | sudo tee /etc/hostname";
-            log.Info($"CMD: {cmd2}");
             CommandResult r2 = RunCommand(cmd2);
-            LogResult(log, "/etc/hostname", r2);
+            LogCommandFailure("FactorySettings", "HostnameFileUpdateFailed", "/etc/hostname", r2);
             if (r2.ExitCode != 0) return r2;
 
             string cmd3 =
                 $"sudo sed -i 's|^127\\.0\\.1\\.1.*|127.0.1.1       {hostName}|' /etc/hosts";
-            log.Info($"CMD: {cmd3}");
             CommandResult r3 = RunCommand(cmd3);
-            LogResult(log, "/etc/hosts", r3);
-
-            log.Info("FactoryReset completed");
+            LogCommandFailure("FactorySettings", "HostsFileUpdateFailed", "/etc/hosts", r3);
             return r3;
         }
 
-        private void LogResult(LogFile log, string step, CommandResult r) {
-            if (r.ExitCode == 0) {
-                log.Info($"{step}: success");
-                if (!string.IsNullOrWhiteSpace(r.StdOut))
-                    log.Info($"{step} stdout: {r.StdOut}");
-            } else {
-                log.Error($"{step}: failed (ExitCode {r.ExitCode})");
-                if (!string.IsNullOrWhiteSpace(r.StdOut))
-                    log.Info($"{step} stdout: {r.StdOut}");
-                if (!string.IsNullOrWhiteSpace(r.StdErr))
-                    log.Error($"{step} stderr: {r.StdErr}");
-            }
+        private void LogCommandFailure(string category, string eventName, string step, CommandResult result) {
+            if (result.ExitCode == 0)
+                return;
+
+            string detail = $"{step} failed. ExitCode={result.ExitCode}.";
+            if (!string.IsNullOrWhiteSpace(result.StdErr))
+                detail += $" Error={result.StdErr.Trim()}";
+
+            _log.Error(category, eventName, detail);
         }
 
         // ──────────────────────────────────────────────────────────────
@@ -138,10 +126,6 @@ namespace SigCoreServer {
             string dns
         ) {
             const string ethConn = "eth0";
-            LogFile log = new LogFile();
-
-            log.Info($"LAN:\nMethod: {(useDhcp ? "DHCP" : "Static")}");
-
             bool ok = true;
 
             CommandResult r;
@@ -382,7 +366,6 @@ namespace SigCoreServer {
 
 
         private CommandResult RunCommand(string command) {
-            Console.WriteLine($"command = {command}");
 
             ProcessStartInfo psi = new ProcessStartInfo("/bin/bash", "-c \"" + command + "\"") {
                 RedirectStandardOutput = true,
@@ -443,10 +426,6 @@ namespace SigCoreServer {
             string dns
         ) {
             const string wifiConn = "wlan0";
-            LogFile log = new LogFile();
-
-            log.Info($"Wi-Fi\nMethod: {(useDhcp ? "DHCP" : "Static")}");
-
             bool ok = true;
             CommandResult r;
 
@@ -500,12 +479,11 @@ namespace SigCoreServer {
         private bool ApplySSID(string ssid, string psk) {
             const string wifiConn = "wlan0";
 
-            Console.WriteLine($"ID={ssid}:{psk}");
-            // If SSID is blank → disable Wi-Fi cleanly
+            RemoveOtherWifiConnections();
+
             if (string.IsNullOrWhiteSpace(ssid)) {
-                RunCommand("sudo nmcli device disconnect wlan0").ToString();
-                RunCommand("sudo nmcli connection modify wlan0 connection.autoconnect no").ToString();
-                RunCommand("sudo nmcli connection down wlan0").ToString();
+                RunCommand("sudo nmcli connection modify wlan0 connection.autoconnect no");
+                RunCommand("sudo nmcli device disconnect wlan0");
                 return true;
             }
 
@@ -518,6 +496,7 @@ namespace SigCoreServer {
                 "wlan0",
                 $"ssid \"{ssid}\""
             );
+            ok &= RunCommand($"sudo nmcli con mod {wifiConn} connection.interface-name wlan0").ExitCode == 0;
 
             if (!ok)
                 return false;
@@ -536,18 +515,26 @@ namespace SigCoreServer {
                 ).ExitCode == 0;
             }
 
-            // Re-enable autoconnect when SSID is valid
             ok &= RunCommand(
                 $"sudo nmcli con mod {wifiConn} connection.autoconnect yes"
+            ).ExitCode == 0;
+            ok &= RunCommand($"sudo nmcli con mod {wifiConn} connection.autoconnect-priority 100").ExitCode == 0;
+
+            // Activate the connection immediately
+            ok &= RunCommand(
+                $"sudo nmcli con up {wifiConn}"
             ).ExitCode == 0;
 
             return ok;
         }
         private bool EnsureConnectionExists(string connName, string type, string ifName, string extraArgs = "") {
-            CommandResult r = RunCommand(
-                $"sudo nmcli con show {connName} || " +
-                $"sudo nmcli con add type {type} ifname {ifName} con-name {connName} {extraArgs}"
-            );
+            CommandResult r = RunCommand($"nmcli -t -f NAME connection show | grep -w {connName}");
+
+            if (r.ExitCode == 0)
+                return true;
+
+            r = RunCommand($"sudo nmcli connection add type {type} ifname {ifName} con-name {connName} {extraArgs}");
+
             return r.ExitCode == 0;
         }
         private struct NetworkConfig {
@@ -562,6 +549,22 @@ namespace SigCoreServer {
             byte[] bytes = BitConverter.GetBytes(mask);
             Array.Reverse(bytes);
             return new IPAddress(bytes).ToString();
+        }
+        private void RemoveOtherWifiConnections() {
+            CommandResult r = RunCommand("nmcli -t -f NAME,TYPE connection show");
+
+            foreach (string line in r.StdOut.Split('\n', StringSplitOptions.RemoveEmptyEntries)) {
+                string[] parts = line.Split(':');
+                if (parts.Length != 2)
+                    continue;
+
+                string name = parts[0];
+                string type = parts[1];
+
+                if (type == "wifi" && name != "wlan0") {
+                    RunCommand($"sudo nmcli connection delete \"{name}\"");
+                }
+            }
         }
     }
 }

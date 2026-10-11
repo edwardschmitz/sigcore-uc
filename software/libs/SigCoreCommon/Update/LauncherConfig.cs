@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
@@ -6,6 +6,7 @@ using System.IO;
 namespace SigCoreCommon.Update {
 
     public class LauncherConfig {
+        private static readonly Log EventLog = new Log();
 
         private static readonly string path = "/opt/sigcore/config.json";
 
@@ -49,7 +50,11 @@ namespace SigCoreCommon.Update {
                 cfg.TempPath = (string?)obj["tmp_path"] ?? cfg.TempPath;
 
             } catch (Exception ex) {
-                Console.WriteLine($"LauncherConfig.Load: corrupted file, using defaults. Error: {ex.Message}");
+                EventLog.Error(
+                    "Configuration",
+                    "LauncherConfigLoadFailure",
+                    "Launcher configuration is corrupt; defaults will be used.",
+                    ex);
             }
 
             return cfg;

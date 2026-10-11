@@ -58,6 +58,13 @@ namespace ControlPanel {
             //    DimOverlay.SetBinding(Border.VisibilityProperty, visBinding);
             //}
         }
+        private void Website_RequestNavigate(object sender, RequestNavigateEventArgs e) {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) {
+                UseShellExecute = true
+            });
+            e.Handled = true;
+        }
+
         public void SetDim(bool isDimmed) {
             DimOverlay.Visibility = isDimmed ? Visibility.Visible : Visibility.Collapsed;
         }

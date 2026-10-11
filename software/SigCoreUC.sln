@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "sigcoreserver", "Server\Sig
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigCoreCommon", "libs\SigCoreCommon\SigCoreCommon.csproj", "{D4F22DB5-81EE-7F48-F061-7827352181CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBridge", "Clients\WebBridge\WebBridge.csproj", "{E6F53647-72D7-430D-9185-06DDBFC82D3E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlPanel", "ControlPanel\ControlPanel.csproj", "{402C73DD-F837-4776-898C-2C055BB7A48A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigCoreLauncher", "SigCoreLauncher\SigCoreLauncher.csproj", "{2F59B475-EDC4-47DB-B97A-08EDF108ABAC}"
@@ -16,6 +14,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigCoreUpdateBuilder", "SigCoreUpdateBuilder\SigCoreUpdateBuilder.csproj", "{1774ED4E-72B5-47D8-85EC-343AF0F080C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FactorySettings", "FactorySettings\FactorySettings.csproj", "{D5652739-2168-40CC-A980-3072D97DD745}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceDiscovery", "DeviceDiscovery\DeviceDiscovery.csproj", "{CACF8E08-8322-473F-B676-1586CE9CFCE8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SigCoreUpdater", "SigCoreUpdater\SigCoreUpdater.csproj", "{6C85DB22-C18F-43A3-85FC-03AD043BD9D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBridge", "WebBridge\WebBridge.csproj", "{B9C0A8A5-7C30-47B7-B52A-517E99E3D84F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,10 +35,6 @@ Global
 		{D4F22DB5-81EE-7F48-F061-7827352181CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4F22DB5-81EE-7F48-F061-7827352181CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4F22DB5-81EE-7F48-F061-7827352181CC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E6F53647-72D7-430D-9185-06DDBFC82D3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E6F53647-72D7-430D-9185-06DDBFC82D3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E6F53647-72D7-430D-9185-06DDBFC82D3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E6F53647-72D7-430D-9185-06DDBFC82D3E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{402C73DD-F837-4776-898C-2C055BB7A48A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{402C73DD-F837-4776-898C-2C055BB7A48A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{402C73DD-F837-4776-898C-2C055BB7A48A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +51,18 @@ Global
 		{D5652739-2168-40CC-A980-3072D97DD745}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5652739-2168-40CC-A980-3072D97DD745}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5652739-2168-40CC-A980-3072D97DD745}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CACF8E08-8322-473F-B676-1586CE9CFCE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CACF8E08-8322-473F-B676-1586CE9CFCE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CACF8E08-8322-473F-B676-1586CE9CFCE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CACF8E08-8322-473F-B676-1586CE9CFCE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C85DB22-C18F-43A3-85FC-03AD043BD9D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C85DB22-C18F-43A3-85FC-03AD043BD9D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C85DB22-C18F-43A3-85FC-03AD043BD9D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C85DB22-C18F-43A3-85FC-03AD043BD9D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9C0A8A5-7C30-47B7-B52A-517E99E3D84F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9C0A8A5-7C30-47B7-B52A-517E99E3D84F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9C0A8A5-7C30-47B7-B52A-517E99E3D84F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9C0A8A5-7C30-47B7-B52A-517E99E3D84F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Device.I2c;
 using System.Threading;
@@ -70,32 +70,46 @@ namespace SigCoreCommon {
         /// </summary>
         public bool ReadAllChannels(double[] samples, int[] samplesPerChannel) {
             bool result = false;
-            int delayMs = GetConversionDelayMs();
 
             for (int ch = 0; ch < 4; ch++) {
-                InputMultiplexer mux = channelMap[ch];
-                SetMultiplexer(mux, measurementRange[ch]);
-                Thread.Sleep(delayMs);
-
-                ReadContinuousVoltage(); // Discard
-                Thread.Sleep(delayMs);
-
-                double sum = 0;
-                for (int i = 0; i < samplesPerChannel[ch]; i++) {
-                    short raw = ReadContinuousVoltage();
-                    double scale = GetFullScaleVoltage(measurementRange[ch]);
-                    double volts = raw * scale / 32768.0;
-                    sum += volts;
-                    Thread.Sleep(delayMs);
-                }
-
-                double sample = sum / samplesPerChannel[ch];
+                double sample = ReadChannel(ch, samplesPerChannel[ch]);
                 if (sample != samples[ch]) {
                     samples[ch] = sample;
                     result = true;
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Reads one ADS1115 channel, including the normal post-MUX discard and
+        /// configured sample averaging.  A_IN uses this so it can select exactly
+        /// one external TMUX before each ADC channel is measured.
+        /// </summary>
+        public double ReadChannel(int channel, int samplesPerChannel) {
+            if (channel < 0 || channel >= channelMap.Length)
+                throw new ArgumentOutOfRangeException(nameof(channel));
+            if (samplesPerChannel < 1)
+                throw new ArgumentOutOfRangeException(nameof(samplesPerChannel));
+
+            int delayMs = GetConversionDelayMs();
+            InputMultiplexer mux = channelMap[channel];
+
+            SetMultiplexer(mux, measurementRange[channel]);
+            Thread.Sleep(delayMs);
+
+            ReadContinuousVoltage(); // Discard first conversion after MUX change.
+            Thread.Sleep(delayMs);
+
+            double sum = 0;
+            for (int i = 0; i < samplesPerChannel; i++) {
+                short raw = ReadContinuousVoltage();
+                double scale = GetFullScaleVoltage(measurementRange[channel]);
+                sum += raw * scale / 32768.0;
+                Thread.Sleep(delayMs);
+            }
+
+            return sum / samplesPerChannel;
         }
 
         public void SetMultiplexer(InputMultiplexer channel, Ads1115Gain range) {

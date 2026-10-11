@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Device.I2c;
 using System.Linq;
@@ -67,20 +67,28 @@ namespace SigCoreCommon {
         }
 
         public void SendRegisters() {
-            byte olatA = 0;
-            byte olatB = 0;
+            byte olatA = BuildOutputByte(0);
+            byte olatB = BuildOutputByte(8);
 
-            for (int i = 0; i < 8; i++) {
-                if (Outputs[i]) olatA |= (byte)(1 << i);
-            }
-            for (int i = 8; i < 16; i++) {
-                if (Outputs[i]) olatB |= (byte)(1 << (i - 8));
-            }
-
-            string binaryA = Convert.ToString(olatA, 2).PadLeft(8, '0');
-            string binaryB = Convert.ToString(olatB, 2).PadLeft(8, '0');
             WriteRegister(GPIOA, olatA);
             WriteRegister(GPIOB, olatB);
+        }
+
+        // Write only port B.  The analog-input sampler uses this when it moves
+        // the TMUX enable from one channel to the next.  The TMUX address bits
+        // live on port A and do not change while sampling, so rewriting port A
+        // on every sample would be unnecessary I2C traffic.
+        public void SendRegisterB() {
+            WriteRegister(GPIOB, BuildOutputByte(8));
+        }
+
+        private byte BuildOutputByte(int startIndex) {
+            byte value = 0;
+            for (int i = 0; i < 8; i++) {
+                if (Outputs[startIndex + i])
+                    value |= (byte)(1 << i);
+            }
+            return value;
         }
 
         private void WriteRegister(byte register, byte value) {

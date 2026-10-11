@@ -1,15 +1,17 @@
-﻿using Iot.Device.Display;
+using Iot.Device.Display;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using System.Reactive.Joins;
 using System.Reflection.Metadata;
 using System.Runtime.Intrinsics.X86;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -22,34 +24,42 @@ namespace SigCoreCommon {
         Timeout
     }
 
+    public enum SigCoreConnectionState {
+        Disconnected,
+        Connecting,
+        Handshaking,
+        Subscribing,
+        Connected,
+        Reconnecting,
+        Faulted
+    }
+
 
     /// <summary>
     /// High-level client API for interacting with a SigCore UC device.
-    /// 
-    /// SigCoreSystem acts as the primary façade over the SigCore messaging
-    /// protocol. It manages connection lifecycle, request/response correlation,
-    /// fire-and-forget commands, configuration retrieval and updates, and
-    /// real-time alert subscriptions.
-    /// 
-    /// Responsibilities:
-    /// • Establish and validate session handshake with the server
-    /// • Send control commands (relay, analog out, PID, system, network)
-    /// • Perform typed request/response operations with timeout handling
-    /// • Expose strongly-typed configuration payloads
-    /// • Dispatch server-initiated alerts as .NET events
-    /// • Correlate responses using message ID tracking
-    /// 
-    /// All operations are async-first. Synchronous wrappers are provided
-    /// where necessary, but the recommended usage pattern is await-based.
-    /// 
-    /// This class is intended to be the single integration surface between
-    /// application code (UI, services, automation logic) and the SigCore
-    /// transport layer.
+    ///
+    /// SigCoreSystem is the primary façade over the SigCore messaging protocol.
+    /// Applications own the intent to connect or disconnect. SigCoreSystem owns
+    /// the mechanics of maintaining that connection, including reconnect,
+    /// handshake, and re-subscription.
     /// </summary>
     public class SigCoreSystem : IDispatcher, IDisposable {
         private readonly SigCoreClient _client;
         private readonly ConcurrentDictionary<ulong, TaskCompletionSource<JObject>> _pending;
         private TaskCompletionSource<bool> _connectHandshakeTcs;
+
+        private readonly object _connectionSync = new object();
+        private CancellationTokenSource _connectionCts;
+        private Task _connectionTask;
+        private TaskCompletionSource<bool> _firstConnectedTcs;
+        private TaskCompletionSource<bool> _disconnectTcs;
+        private SigCoreConnectionState _connectionState = SigCoreConnectionState.Disconnected;
+
+        private string _managedIp = string.Empty;
+        private int _managedPort = 7020;
+        private int _managedTimeoutMs = 5000;
+
+        public TimeSpan ReconnectDelay { get; set; } = TimeSpan.FromSeconds(1);
 
         // ===============================
         // Event Declarations
@@ -61,162 +71,260 @@ namespace SigCoreCommon {
         /// for marshaling to the appropriate synchronization context.
         /// </remarks>
 
-        /// <summary>
-        /// Raised when one or more digital input states change.
-        /// </summary>
-        /// <remarks>
-        /// The array contains the current state of all digital input channels.
-        /// The index corresponds to the channel number.
-        /// </remarks>
         public event Action<bool[]> DigitalInChanged;
-
-        /// <summary>
-        /// Raised when one or more analog input values change.
-        /// </summary>
-        /// <remarks>
-        /// The array contains the current value of all analog input channels.
-        /// The index corresponds to the channel number.
-        /// </remarks>
         public event Action<double[]> AnalogInChanged;
-
-        /// <summary>
-        /// Raised when a relay output state changes.
-        /// </summary>
-        /// <param name="channel">The relay channel number.</param>
-        /// <param name="state">The new relay state.</param>
         public event Action<uint, bool> RelayChanged;
-
-        /// <summary>
-        /// Raised when an analog output value changes.
-        /// </summary>
-        /// <param name="channel">The analog output channel number.</param>
-        /// <param name="value">The new output value.</param>
-        /// <param name="auto">True if the channel is under automatic control; otherwise false.</param>
         public event Action<uint, double, bool> AnalogOutChanged;
-
-        /// <summary>
-        /// Raised when a PID setpoint changes.
-        /// </summary>
-        /// <param name="channel">The PID channel number.</param>
-        /// <param name="value">The new setpoint value.</param>
         public event Action<uint, double> PIDSPChanged;
-
-        /// <summary>
-        /// Raised when a PID process variable changes.
-        /// </summary>
-        /// <param name="channel">The PID channel number.</param>
-        /// <param name="value">The new process variable value.</param>
         public event Action<uint, double> PIDPVChanged;
-
-        /// <summary>
-        /// Raised when a PID output value changes.
-        /// </summary>
-        /// <param name="channel">The PID channel number.</param>
-        /// <param name="value">The new output value.</param>
         public event Action<uint, double> PIDOutputChanged;
-
-        /// <summary>
-        /// Raised when a PID tolerance value changes.
-        /// </summary>
-        /// <param name="channel">The PID channel number.</param>
-        /// <param name="value">The new tolerance value.</param>
         public event Action<uint, double> PIDTolChanged;
-
-        /// <summary>
-        /// Raised when a PID deviation value changes.
-        /// </summary>
-        /// <param name="channel">The PID channel number.</param>
-        /// <param name="value">The new deviation value.</param>
         public event Action<uint, double> PIDDevChanged;
-
-        /// <summary>
-        /// Raised when the PID automatic mode state changes.
-        /// </summary>
-        /// <param name="channel">The PID channel number.</param>
-        /// <param name="auto">True if in automatic mode; otherwise false.</param>
         public event Action<uint, bool> PIDAutoChanged;
-
-        /// <summary>
-        /// Raised when the PID ramp time changes.
-        /// </summary>
-        /// <param name="channel">The PID channel number.</param>
-        /// <param name="value">The new ramp time in seconds.</param>
         public event Action<uint, double> PIDRampTimeChanged;
-
-        /// <summary>
-        /// Raised when the PID ramp target changes.
-        /// </summary>
-        /// <param name="channel">The PID channel number.</param>
-        /// <param name="value">The new ramp target value.</param>
         public event Action<uint, double> PIDRampTargetChanged;
-
-        /// <summary>
-        /// Raised when the PID ramp enable state changes.
-        /// </summary>
-        /// <param name="channel">The PID channel number.</param>
-        /// <param name="enabled">True if ramping is enabled; otherwise false.</param>
         public event Action<uint, bool> PIDRampChanged;
-
-        /// <summary>
-        /// Raised when the logger status changes.
-        /// </summary>
-        /// <param name="status">The current logger status description.</param>
-        /// <param name="logging">True if logging is active; otherwise false.</param>
         public event Action<string, bool> LoggerStatusChanged;
 
+        public event Action<string> ConnectionWarning;
+        public event Action<SigCoreConnectionState> ConnectionStateChanged;
 
         /// <summary>
-        /// Gets a value indicating whether the client is currently connected to the SigCore server.
+        /// Gets whether the underlying TCP transport is currently connected.
+        /// For managed connections, use ConnectionState == Connected to know
+        /// that handshake and subscription are also complete.
         /// </summary>
-        /// <remarks>
-        /// Returns true once the underlying transport connection has been established.
-        /// This does not necessarily imply that initialization or subscription has completed.
-        /// </remarks>
         public bool IsConnected => _client.IsConnected;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether this client session has commander privileges.
-        /// </summary>
-        /// <remarks>
-        /// Commander sessions are allowed to issue control and configuration commands.
-        /// This value is assigned during the connection handshake and reflects the
-        /// role granted by the server.
-        /// </remarks>
+        public SigCoreConnectionState ConnectionState {
+            get {
+                lock (_connectionSync) {
+                    return _connectionState;
+                }
+            }
+        }
+
         public bool IsCommander { get; set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SigCoreSystem"/> class.
-        /// </summary>
-        /// <remarks>
-        /// This constructor initializes the underlying transport client,
-        /// prepares the request/response correlation dictionary, and creates
-        /// the handshake completion source used during connection negotiation.
-        /// 
-        /// No network connection is established by this constructor. Call
-        /// <see cref="ConnectAsync(string, int)"/> to connect to a SigCore server.
-        /// </remarks>
         public SigCoreSystem() {
             _client = new SigCoreClient(this);
+            _client.ConnectionLost += HandleTransportConnectionLost;
+
             _pending = new ConcurrentDictionary<ulong, TaskCompletionSource<JObject>>();
             _connectHandshakeTcs =
                 new TaskCompletionSource<bool>(
                     TaskCreationOptions.RunContinuationsAsynchronously);
         }
 
-        public async Task<ConnectStatus> ConnectAsync(
+        // -------------------------------------------------------------
+        // MANAGED CONNECTION
+        //
+        // StartAsync means:
+        // "Connect to this SigCore and keep the connection alive until Stop()."
+        //
+        // The first call waits until the initial connection has completed
+        // handshake + subscription. After that, reconnect happens in the
+        // background automatically.
+        // -------------------------------------------------------------
+        public Task StartAsync(
             string ip,
             int port = 7020,
             int timeoutMs = 5000) {
+
+            TaskCompletionSource<bool> firstConnected;
+
+            lock (_connectionSync) {
+                if (_connectionTask != null && !_connectionTask.IsCompleted) {
+                    if (string.Equals(_managedIp, ip, StringComparison.OrdinalIgnoreCase) &&
+                        _managedPort == port) {
+
+                        if (_connectionState == SigCoreConnectionState.Connected)
+                            return Task.CompletedTask;
+
+                        return _firstConnectedTcs.Task;
+                    }
+                }
+            }
+
+            Stop();
+
+            lock (_connectionSync) {
+                _managedIp = ip;
+                _managedPort = port;
+                _managedTimeoutMs = timeoutMs;
+
+                _connectionCts = new CancellationTokenSource();
+                _firstConnectedTcs =
+                    new TaskCompletionSource<bool>(
+                        TaskCreationOptions.RunContinuationsAsynchronously);
+
+                firstConnected = _firstConnectedTcs;
+
+                CancellationToken token = _connectionCts.Token;
+                _connectionTask = Task.Run(() => ConnectionLoopAsync(token));
+            }
+
+            return firstConnected.Task;
+        }
+
+        /// <summary>
+        /// Stops managed reconnect behavior and closes the current connection.
+        /// </summary>
+        public void Stop() {
+            CancellationTokenSource cts;
+            TaskCompletionSource<bool> firstConnected;
+            TaskCompletionSource<bool> disconnected;
+
+            lock (_connectionSync) {
+                cts = _connectionCts;
+                firstConnected = _firstConnectedTcs;
+                disconnected = _disconnectTcs;
+
+                _connectionCts = null;
+                _connectionTask = null;
+                _firstConnectedTcs = null;
+                _disconnectTcs = null;
+            }
+
+            try { cts?.Cancel(); } catch { }
+            try { disconnected?.TrySetCanceled(); } catch { }
+            try { firstConnected?.TrySetCanceled(); } catch { }
+
+            _client.Close();
+
+            FailPendingRequests(
+                new IOException("SigCore connection stopped."));
+
+            SetConnectionState(SigCoreConnectionState.Disconnected);
+
+            try { cts?.Dispose(); } catch { }
+        }
+
+        private async Task ConnectionLoopAsync(CancellationToken token) {
+            bool connectedBefore = false;
+
+            try {
+                while (!token.IsCancellationRequested) {
+                    SetConnectionState(
+                        connectedBefore
+                            ? SigCoreConnectionState.Reconnecting
+                            : SigCoreConnectionState.Connecting);
+
+                    TaskCompletionSource<bool> disconnectTcs =
+                        new TaskCompletionSource<bool>(
+                            TaskCreationOptions.RunContinuationsAsynchronously);
+
+                    lock (_connectionSync) {
+                        _disconnectTcs = disconnectTcs;
+                    }
+
+                    ConnectStatus status =
+                        await ConnectOnceAsync(
+                            _managedIp,
+                            _managedPort,
+                            _managedTimeoutMs,
+                            managedConnection: true);
+
+                    if (token.IsCancellationRequested)
+                        break;
+
+                    if (status == ConnectStatus.ProtocolRejected) {
+                        SetConnectionState(SigCoreConnectionState.Faulted);
+
+                        lock (_connectionSync) {
+                            _firstConnectedTcs?.TrySetException(
+                                new InvalidOperationException(
+                                    "SigCore server rejected the connection."));
+                        }
+
+                        return;
+                    }
+
+                    if (status != ConnectStatus.Connected) {
+                        await DelayBeforeReconnect(token);
+                        continue;
+                    }
+
+                    try {
+                        SetConnectionState(SigCoreConnectionState.Subscribing);
+                        await SubscribeAsync();
+
+                        if (!_client.IsConnected)
+                            throw new IOException(
+                                "SigCore connection was lost during subscription.");
+
+                        connectedBefore = true;
+                        SetConnectionState(SigCoreConnectionState.Connected);
+
+                        lock (_connectionSync) {
+                            _firstConnectedTcs?.TrySetResult(true);
+                        }
+
+                        await disconnectTcs.Task.WaitAsync(token);
+                    } catch (OperationCanceledException) when (token.IsCancellationRequested) {
+                        break;
+                    } catch (Exception ex) {
+                        NotifyConnectionWarning(
+                            "SigCore connection lost: " + ex.Message);
+
+                        _client.Close();
+                    }
+
+                    if (!token.IsCancellationRequested)
+                        await DelayBeforeReconnect(token);
+                }
+            } catch (OperationCanceledException) {
+            } finally {
+                if (token.IsCancellationRequested)
+                    SetConnectionState(SigCoreConnectionState.Disconnected);
+            }
+        }
+
+        private async Task DelayBeforeReconnect(CancellationToken token) {
+            if (ReconnectDelay <= TimeSpan.Zero)
+                return;
+
+            await Task.Delay(ReconnectDelay, token);
+        }
+
+        // -------------------------------------------------------------
+        // ONE-SHOT CONNECTION PRIMITIVE
+        //
+        // Retained for compatibility and for callers that explicitly do not
+        // want managed reconnect behavior. New long-lived applications should
+        // use StartAsync().
+        // -------------------------------------------------------------
+        public Task<ConnectStatus> ConnectAsync(
+            string ip,
+            int port = 7020,
+            int timeoutMs = 5000) {
+
+            return ConnectOnceAsync(
+                ip,
+                port,
+                timeoutMs,
+                managedConnection: false);
+        }
+
+        private async Task<ConnectStatus> ConnectOnceAsync(
+            string ip,
+            int port,
+            int timeoutMs,
+            bool managedConnection) {
+
             bool tcpConnected = await _client.ConnectAsync(ip, port);
 
             if (!tcpConnected)
                 return ConnectStatus.TcpFailed;
 
+            if (managedConnection)
+                SetConnectionState(SigCoreConnectionState.Handshaking);
+
             try {
                 JObject payload =
                     await RequestAsync(
                         SigCoreMessage.CreateConnect(),
-                        timeoutMs);  // Let RequestAsync handle timeout
+                        timeoutMs);
 
                 bool accepted =
                     payload.Value<bool>("accepted");
@@ -230,29 +338,66 @@ namespace SigCoreCommon {
             } catch (TimeoutException) {
                 _client.Close();
                 return ConnectStatus.Timeout;
+            } catch (Exception ex) {
+                _client.Close();
+
+                NotifyConnectionWarning(
+                    "SigCore connection failed: " + ex.Message);
+
+                return ConnectStatus.TcpFailed;
             }
         }
 
-        /// <summary>
-        /// Closes the current connection to the SigCore server.
-        /// </summary>
-        /// <remarks>
-        /// This immediately terminates the underlying transport connection.
-        /// Any pending requests may fail or timeout.
-        /// </remarks>
-        public void Close() {
-            _client.Close();
+        private void HandleTransportConnectionLost(string reason) {
+            FailPendingRequests(
+                new IOException(
+                    string.IsNullOrWhiteSpace(reason)
+                        ? "SigCore transport connection was lost."
+                        : reason));
+
+            TaskCompletionSource<bool> disconnectTcs;
+            bool managed;
+
+            lock (_connectionSync) {
+                disconnectTcs = _disconnectTcs;
+                managed = _connectionTask != null;
+            }
+
+            if (managed)
+                SetConnectionState(SigCoreConnectionState.Reconnecting);
+
+            disconnectTcs?.TrySetResult(true);
+        }
+
+        private void FailPendingRequests(Exception exception) {
+            foreach (KeyValuePair<ulong, TaskCompletionSource<JObject>> entry in _pending.ToArray()) {
+                if (_pending.TryRemove(entry.Key, out TaskCompletionSource<JObject> tcs))
+                    tcs.TrySetException(exception);
+            }
+        }
+
+        private void SetConnectionState(SigCoreConnectionState state) {
+            bool changed;
+
+            lock (_connectionSync) {
+                changed = _connectionState != state;
+                _connectionState = state;
+            }
+
+            if (changed)
+                ConnectionStateChanged?.Invoke(state);
         }
 
         /// <summary>
-        /// Releases resources used by the <see cref="SigCoreSystem"/>.
+        /// Stops managed reconnect behavior and closes the transport.
         /// </summary>
-        /// <remarks>
-        /// This method closes the underlying connection. After disposal,
-        /// the instance should not be used.
-        /// </remarks>
+        public void Close() {
+            Stop();
+        }
+
         public void Dispose() {
-            _client.Close();
+            _client.ConnectionLost -= HandleTransportConnectionLost;
+            Stop();
         }
 
         // ===============================
@@ -1393,7 +1538,7 @@ namespace SigCoreCommon {
         ///
         /// Commander privileges are required.
         /// </remarks>
-        public async Task FactoryReset(
+        public async Task<JObject> FactoryReset(
             string serialNo,
             string rev,
             string ver,
@@ -1408,10 +1553,14 @@ namespace SigCoreCommon {
                 serialNo, rev, ver, host, sysName,
                 manifestURL, sigUrl, url, signature);
 
-            await SendCommandAsync(msg);
+            // Factory Settings is an authoritative request/response operation.
+            // Do not report success until the Core has committed and verified it.
+            return await RequestAsync(msg, timeoutMs: 30000);
         }
 
-
+        public void NotifyConnectionWarning(string message) {
+            ConnectionWarning?.Invoke(message);
+        }
 
         // ===============================
         // Chunk 5 — Event Handling / Alerts
@@ -1509,7 +1658,6 @@ namespace SigCoreCommon {
         }
 
         public SigCoreMessage HandlePing(JObject payload, ulong msgId, ISession session) {
-            Console.WriteLine("Pong");
             return SigCoreMessage.CreatePong(msgId);
         }
 
@@ -1540,6 +1688,7 @@ namespace SigCoreCommon {
         public SigCoreMessage HandleStatus(JObject payload, ulong msgId, ISession session) => TrySetResult(payload, msgId);
         public SigCoreMessage HandleNetworkConfig(JObject payload, ulong msgId, ISession session) => TrySetResult(payload, msgId);
         public SigCoreMessage HandleConnectResult(JObject payload, ulong msgId, ISession session) => TrySetResult(payload, msgId);
+        public SigCoreMessage HandleFactoryResetResult(JObject payload, ulong msgId, ISession session) => TrySetResult(payload, msgId);
 
         //
         //

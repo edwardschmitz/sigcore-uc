@@ -7,7 +7,8 @@
 **/bin/
 **/obj/
 **/publish/
-build/
+/build/*
+!/build/*.bat
 
 # Build outputs
 *.exe
@@ -20,6 +21,7 @@ build/
 # NuGet + temp
 packages/
 *.cache
+*.zip
 *.tmp
 *.log
 *.db
@@ -38,4 +40,6 @@ software/web/localwebsite/root/
 docs/Accounting/
 docs/Marketing/
 software/Web/Website/Website/includes/
+private-files/
+keys/
 

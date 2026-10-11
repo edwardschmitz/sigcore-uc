@@ -57,6 +57,7 @@ namespace SigCoreCommon {
             }
         }
 
+
         public virtual void Initialize() {
             // Apply current IODIR and pull-ups
             WriteRegister(IODIR, _iodirShadow);

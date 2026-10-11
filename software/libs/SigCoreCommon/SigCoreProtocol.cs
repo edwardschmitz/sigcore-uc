@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SigCoreCommon.Payloads;
 using System;
@@ -80,6 +80,7 @@ namespace SigCoreCommon {
             SetNetworkConfig = 58,
             GetNetworkConfig = 59,
             ConnectResult = 60,
+            FactoryResetResult = 61,
 
         }
 
@@ -153,6 +154,7 @@ namespace SigCoreCommon {
                 case MsgType.SetNetworkConfig: return dispatcher.HandleSetNetworkConfig(Payload, MsgId, session);
                 case MsgType.NetworkConfig: return dispatcher.HandleNetworkConfig(Payload, MsgId, session);
                 case MsgType.ConnectResult: return dispatcher.HandleConnectResult(Payload, MsgId, session);
+                case MsgType.FactoryResetResult: return dispatcher.HandleFactoryResetResult(Payload, MsgId, session);
                 default: return null;
             }
         }
@@ -184,6 +186,14 @@ namespace SigCoreCommon {
         }
 
         private const int ProtocolVersion = 12;
+        public static SigCoreMessage CreateConnect(uint sessionID, bool isCommander) {
+            JObject payload = new JObject {
+                ["sessionID"] = sessionID,
+                ["isCommander"] = isCommander,
+                ["version"] = ProtocolVersion.ToString(),
+            };
+            return CreateBase(MsgType.Connect, payload);
+        }
         public static SigCoreMessage CreateConnect() {
             JObject payload = new JObject { 
                 ["version"] = ProtocolVersion, 
@@ -483,6 +493,21 @@ namespace SigCoreCommon {
             };
 
             return CreateBase(MsgType.FactoryReset, payload);
+        }
+
+        public static SigCoreMessage CreateFactoryResetResult(
+            ulong msgId,
+            bool success,
+            string message,
+            JObject details = null
+        ) {
+            JObject payload = new JObject {
+                ["success"] = success,
+                ["message"] = message ?? "",
+                ["details"] = details ?? new JObject()
+            };
+
+            return CreateBase(msgId, MsgType.FactoryResetResult, payload);
         }
 
         // ----------- Errors and Status -----------

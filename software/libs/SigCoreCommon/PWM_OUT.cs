@@ -1,8 +1,9 @@
-﻿using Iot.Device.Common;
+using Iot.Device.Common;
 using System;
 
 namespace SigCoreCommon {
     public class PWM_OUT : Pca9685Driver {
+        private static readonly Log EventLog = new Log();
         private const int address = 0x40;
         private readonly uint[] _channels = { 0, 2, 4, 6 };
 
@@ -11,7 +12,7 @@ namespace SigCoreCommon {
         public void SetDutyCycle(int index, double percent) {
 
             if (index < 0 || index >= _channels.Length) {
-                Console.WriteLine("Invalid index");
+                EventLog.Warn("Configuration", "InvalidPwmIndex", "Invalid PWM output index requested.");
                 return;
             }
 

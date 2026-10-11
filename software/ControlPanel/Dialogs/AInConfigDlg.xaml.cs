@@ -32,27 +32,26 @@ namespace ControlPanel.Dialogs {
         public static Array CalTypes { get; } = AInConfigPayload.CalTypes;
         public static Array DisplayFormats { get; } = AInConfigPayload.DisplayFormats;
         private void UpdateCalibrationVisibility(int calType) {
-            // Collapse everything first
             MxBPanel.Visibility = Visibility.Collapsed;
             PolynomialPanel.Visibility = Visibility.Collapsed;
             MultiPointPanel.Visibility = Visibility.Collapsed;
 
-            // These values must match the payload enum values
-            // 0 = None
-            // 1 = mXplusB
-            // 2 = MultiPoint
-            // 3 = Polynomial
-
-            switch (calType) {
-                case 1: // mXplusB
+            switch ((A_IN.CalType)calType) {
+                case A_IN.CalType.mXplusB:
                     MxBPanel.Visibility = Visibility.Visible;
+                    FormulaText.Text = "y = m·x + b";
                     break;
 
-                case 2: // MultiPoint
+                case A_IN.CalType.Log10:
+                    MxBPanel.Visibility = Visibility.Visible;
+                    FormulaText.Text = "y = 10^(m·x + b)";
+                    break;
+
+                case A_IN.CalType.MultiPoint:
                     MultiPointPanel.Visibility = Visibility.Visible;
                     break;
 
-                case 3: // Polynomial
+                case A_IN.CalType.Polynomial:
                     PolynomialPanel.Visibility = Visibility.Visible;
                     break;
             }

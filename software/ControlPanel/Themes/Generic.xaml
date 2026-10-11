@@ -175,17 +175,17 @@
 
                             <!-- Indicators -->
                             <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="0" Margin="5">
-                                <control:LedIndicator IsOn="{Binding IsRelayOn, RelativeSource={RelativeSource TemplatedParent}}"  
-                                                Label="N/O"
-                                                OnColor="#00FF00"
-                                                OffColor="DimGray"
-                                                Margin="5,2"/>
+                                <control:LedIndicator IsOn="{Binding IsNormallyOpenClosed, RelativeSource={RelativeSource TemplatedParent}}"  
+                                      Label="N/O"
+                                      OnColor="#00FF00"
+                                      OffColor="DimGray"
+                                      Margin="5,2"/>
 
-                                <control:LedIndicator IsOn="{Binding IsRelayOn, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource InvertBooleanConverter}}"  
-                                                Label="N/C"
-                                                OnColor="#FF0000"
-                                                OffColor="DimGray"
-                                                Margin="5,2"/>
+                                <control:LedIndicator IsOn="{Binding IsNormallyClosedClosed, RelativeSource={RelativeSource TemplatedParent}}"  
+                                      Label="N/C"
+                                      OnColor="#FF0000"
+                                      OffColor="DimGray"
+                                      Margin="5,2"/>
                             </StackPanel>
 
                             <control:HamburgerButton x:Name="HamburgerBtn" Grid.Column="1" 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -21,38 +21,35 @@ namespace SigCoreCommon.Update {
             string publicKeyPemPath,
             string inputFile,
             string signatureFile) {
-            LogFile log = new LogFile();
 
-            log.Info("VerifyFile: starting");
-            log.Info($"  inputFile       = '{inputFile}'");
-            log.Info($"  signatureFile   = '{signatureFile}'");
-            log.Info($"  publicKeyPem    = '{publicKeyPemPath}'");
+            Log log = new Log();
 
             if (!File.Exists(inputFile)) {
-                log.Error("VerifyFile: input file does not exist");
+                log.Error(
+                    "Security",
+                    "SignatureInputMissing",
+                    "Signature verification input file is missing.");
                 return false;
             }
 
             if (!File.Exists(signatureFile)) {
-                log.Error("VerifyFile: signature file does not exist");
+                log.Error(
+                    "Security",
+                    "SignatureFileMissing",
+                    "Signature file is missing.");
                 return false;
             }
 
             if (!File.Exists(publicKeyPemPath)) {
-                log.Error("VerifyFile: public key file does not exist");
+                log.Error(
+                    "Security",
+                    "PublicKeyMissing",
+                    "Public verification key is missing.");
                 return false;
             }
 
             byte[] data = File.ReadAllBytes(inputFile);
             byte[] signature = File.ReadAllBytes(signatureFile);
-
-            log.Info($"VerifyFile: input size      = {data.Length} bytes");
-            log.Info($"VerifyFile: signature size  = {signature.Length} bytes");
-
-            string dataHash = Convert.ToHexString(
-                System.Security.Cryptography.SHA256.HashData(data));
-
-            log.Info($"VerifyFile: input SHA256    = {dataHash}");
 
             return VerifyData(data, signature, publicKeyPemPath);
         }
@@ -80,20 +77,13 @@ namespace SigCoreCommon.Update {
             byte[] data,
             byte[] signature,
             string publicKeyPemPath) {
-            LogFile log = new LogFile();
 
-            log.Info("VerifyData: starting");
-
-            string pem = File.ReadAllText(publicKeyPemPath);
-            log.Info($"VerifyData: public key PEM length = {pem.Length} chars");
-
+            Log log = new Log();
             RSA rsa = null;
 
             try {
+                string pem = File.ReadAllText(publicKeyPemPath);
                 rsa = LoadPublicKeyFromPem(pem);
-
-                int keySize = rsa.KeySize;
-                log.Info($"VerifyData: RSA key size = {keySize} bits");
 
                 bool ok = rsa.VerifyData(
                     data,
@@ -101,15 +91,20 @@ namespace SigCoreCommon.Update {
                     HashAlgorithmName.SHA256,
                     RSASignaturePadding.Pkcs1);
 
-                if (ok) {
-                    log.Info("VerifyData: signature verification PASSED");
-                } else {
-                    log.Error("VerifyData: signature verification FAILED");
+                if (!ok) {
+                    log.Error(
+                        "Security",
+                        "SignatureVerificationFailure",
+                        "Signature verification failed.");
                 }
 
                 return ok;
             } catch (Exception ex) {
-                log.Error("VerifyData: exception during verification", ex);
+                log.Error(
+                    "Security",
+                    "SignatureVerificationException",
+                    "Signature verification could not be completed.",
+                    ex);
                 return false;
             } finally {
                 rsa?.Dispose();

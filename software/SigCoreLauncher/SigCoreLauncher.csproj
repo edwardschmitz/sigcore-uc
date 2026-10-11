@@ -11,13 +11,17 @@
 		<RuntimeIdentifier>linux-arm64</RuntimeIdentifier>
 		<SelfContained>true</SelfContained>
 		<PublishSingleFile>true</PublishSingleFile>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 		<PublishTrimmed>false</PublishTrimmed>
-		<PublishDir>bin\Release\net8.0\linux-arm64\publish\</PublishDir>
+		<PublishDir>..\..\build\launcher\publish\</PublishDir>
 		<BaseOutputPath>..\..\build\launcher</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Include="SkiaSharp" Version="4.152.0" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.152.0" />
+		<PackageReference Include="System.Device.Gpio" Version="4.2.0" />
 		<PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
 	</ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 
@@ -49,28 +49,22 @@ namespace SigCoreCommon.Update {
         // EXTRACT SCU
         // ============================================================================
         public static void Extract(string scuFile, string targetFolder) {
-            Console.WriteLine("ScuArchive.Extract >>> Starting");
 
-            Console.WriteLine($"ScuArchive.Extract >>> scuFile: {scuFile}");
 
             if (!File.Exists(scuFile))
                 throw new Exception("SCU file does not exist: " + scuFile);
 
-            Console.WriteLine("ScuArchive.Extract >>> Exists / Delete");
 
             if (Directory.Exists(targetFolder))
                 Directory.Delete(targetFolder, true);
 
-            Console.WriteLine("ScuArchive.Extract >>> CreateDirectory");
 
             Directory.CreateDirectory(targetFolder);
 
-            Console.WriteLine("ScuArchive.Extract >>> Using: FileStream, BinaryReader");
 
             using (FileStream fs = new FileStream(scuFile, FileMode.Open, FileAccess.Read))
             using (BinaryReader br = new BinaryReader(fs, Encoding.UTF8)) {
                 // Header
-                Console.WriteLine("ScuArchive.Extract >>> inside using");
 
                 string header = Encoding.ASCII.GetString(br.ReadBytes(4));
                 if (header != Magic)
@@ -78,7 +72,6 @@ namespace SigCoreCommon.Update {
 
                 uint fileCount = br.ReadUInt32();
 
-                Console.WriteLine("ScuArchive.Extract >>> Starting for loop");
 
                 for (uint i = 0; i < fileCount; i++) {
                     ushort pathLen = br.ReadUInt16();
@@ -93,7 +86,6 @@ namespace SigCoreCommon.Update {
                     if (!string.IsNullOrEmpty(dir))
                         Directory.CreateDirectory(dir);
 
-                    Console.WriteLine("ScuArchive.Extract >>> using: FileStream fsOut");
 
                     using (FileStream fsOut = new FileStream(outPath, FileMode.Create, FileAccess.Write)) {
                         const int bufSize = 65536;

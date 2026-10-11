@@ -54,6 +54,18 @@ namespace ControlPanel.IOChannelHandlers {
 
         private void ShowConfig(RelayConfigPayload config) {
             UserID = config.Name;
+            InvertedLogic = config.InvertedLogic;
+        }
+        private bool invertedLogic;
+
+        public bool InvertedLogic {
+            get { return invertedLogic; }
+            set {
+                if (invertedLogic != value) {
+                    invertedLogic = value;
+                    OnPropertyChanged(nameof(InvertedLogic));
+                }
+            }
         }
     }
 }

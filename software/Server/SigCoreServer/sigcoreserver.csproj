@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Configuration>Release</Configuration>
+		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<RuntimeIdentifier>linux-arm64</RuntimeIdentifier>
 		<SelfContained>true</SelfContained>
 		<PublishSingleFile>true</PublishSingleFile>
-		<PublishTrimmed>true</PublishTrimmed>
-		<PublishDir>bin\Release\net8.0\linux-arm64\publish\</PublishDir>
-		<OutputType>Exe</OutputType>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<PublishTrimmed>false</PublishTrimmed>
+		<PublishDir>..\..\..\build\server\publish\</PublishDir>
 		<BaseOutputPath>..\..\..\build\server</BaseOutputPath>
 	</PropertyGroup>
 

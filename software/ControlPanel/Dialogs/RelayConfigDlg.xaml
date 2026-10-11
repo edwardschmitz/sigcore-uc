@@ -10,8 +10,7 @@
         Background="Transparent"
         ResizeMode="NoResize"
         FontSize="14"
-        FontFamily="Segoe UI"
-        >
+        FontFamily="Segoe UI">
 
     <Border CornerRadius="8"
             BorderBrush="#888"
@@ -30,6 +29,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -37,7 +37,6 @@
                 <ColumnDefinition Width="200"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Header -->
             <TextBlock Text="Relay Configuration"
                        FontSize="16"
                        FontWeight="Bold"
@@ -45,7 +44,6 @@
                        HorizontalAlignment="Center"
                        Margin="5,0,5,10"/>
 
-            <!-- Name -->
             <TextBlock Text="Name:"
                        Grid.Row="1"
                        Grid.Column="0"
@@ -60,7 +58,6 @@
                      Padding="5,2"
                      Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-            <!-- Default State -->
             <TextBlock Text="Default State:"
                        Grid.Row="2"
                        Grid.Column="0"
@@ -71,11 +68,10 @@
             <CheckBox Grid.Row="2"
                       Grid.Column="1"
                       IsChecked="{Binding DefaultState, Mode=TwoWay}"
-                                            VerticalAlignment="Bottom"
-Margin="10,2"
-                        Padding="5,10"  />
+                      VerticalAlignment="Center"
+                      Margin="10,2"
+                      Padding="5,10"/>
 
-            <!-- Fail Safe -->
             <TextBlock Text="Fail-Safe State:"
                        Grid.Row="3"
                        Grid.Column="0"
@@ -86,12 +82,25 @@ Margin="10,2"
             <CheckBox Grid.Row="3"
                       Grid.Column="1"
                       IsChecked="{Binding FailSafeState, Mode=TwoWay}"
-                                            VerticalAlignment="Bottom"
-Margin="10,2"
-                        Padding="5,10"  />
+                      VerticalAlignment="Center"
+                      Margin="10,2"
+                      Padding="5,10"/>
 
-            <!-- Buttons -->
-            <StackPanel Grid.Row="4"
+            <TextBlock Text="Inverted Logic:"
+                       Grid.Row="4"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <CheckBox Grid.Row="4"
+                      Grid.Column="1"
+                      IsChecked="{Binding InvertedLogic, Mode=TwoWay}"
+                      VerticalAlignment="Center"
+                      Margin="10,2"
+                      Padding="5,10"/>
+
+            <StackPanel Grid.Row="5"
                         Grid.ColumnSpan="2"
                         Orientation="Horizontal"
                         HorizontalAlignment="Center"

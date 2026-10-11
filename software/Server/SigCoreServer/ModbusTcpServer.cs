@@ -1,4 +1,4 @@
-﻿using SigCoreCommon;
+using SigCoreCommon;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -20,12 +20,8 @@ namespace SigCoreServer {
             _listener.Start();
             _isRunning = true;
 
-            Console.WriteLine("Modbus TCP Server started on port 1502");
-
             while (_isRunning) {
                 TcpClient client = await _listener.AcceptTcpClientAsync();
-                Console.WriteLine("--- Modbus Client Connected ---");
-
                 ModbusClientSession session = new ModbusClientSession(client, _nextSessionId++, _hardware);
                 _ = session.RunAsync(); // fire and forget
             }

@@ -1,7 +1,4 @@
-﻿using SigCoreCommon; // assuming RelayConfig lives there
-using SigCoreCommon.Payloads;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using SigCoreCommon.Payloads;
 
 namespace ControlPanel.Dialogs {
     public class RelayConfigDlgVM : ViewModelBase {
@@ -12,7 +9,7 @@ namespace ControlPanel.Dialogs {
         }
 
         public string Name {
-            get { return _config.Name; }
+            get => _config.Name;
             set {
                 if (_config.Name != value) {
                     _config.Name = value;
@@ -22,7 +19,7 @@ namespace ControlPanel.Dialogs {
         }
 
         public bool DefaultState {
-            get { return _config.DefaultState; }
+            get => _config.DefaultState;
             set {
                 if (_config.DefaultState != value) {
                     _config.DefaultState = value;
@@ -32,7 +29,7 @@ namespace ControlPanel.Dialogs {
         }
 
         public bool FailSafeState {
-            get { return _config.FailSafeState; }
+            get => _config.FailSafeState;
             set {
                 if (_config.FailSafeState != value) {
                     _config.FailSafeState = value;
@@ -41,7 +38,16 @@ namespace ControlPanel.Dialogs {
             }
         }
 
-        public RelayConfigPayload Config { get { return _config; } }
+        public bool InvertedLogic {
+            get => _config.InvertedLogic;
+            set {
+                if (_config.InvertedLogic != value) {
+                    _config.InvertedLogic = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
+        public RelayConfigPayload Config => _config;
     }
 }
