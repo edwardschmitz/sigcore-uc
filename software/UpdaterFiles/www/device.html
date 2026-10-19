@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SigCore UC | Device</title><link rel="stylesheet" href="/css/site.css"><link rel="stylesheet" href="/css/device.css?v=20261014e"><script src="/js/site-nav.js" defer></script><script src="/js/device.js?v=20261015b" defer></script><style>#eth-static-fields[hidden],#wifi-static-fields[hidden]{display:none!important}</style></head>
+<body><header class="site-header" data-site-header></header>
+<main class="site-main device-main">
+<div class="page-heading"><h1>Device</h1><p>Software, settings and maintenance</p></div>
+<div id="device-error" class="device-message" role="status" hidden></div>
+<section class="panel device-card" aria-labelledby="updates-heading"><h2 id="updates-heading">Software Updates</h2><div class="device-fields update-grid">
+<div class="device-field"><span>Installed version</span><strong id="update-version">Unavailable</strong></div>
+<div class="device-field"><span>Hardware revision</span><strong id="update-revision">Unavailable</strong></div>
+<div class="device-field"><span>Update status</span><strong id="update-status">Unavailable</strong></div>
+<div class="device-field"><span>Available version</span><strong id="update-available">Unavailable</strong></div></div>
+<div class="device-actions"><button type="button" class="device-button" id="refresh-status">Refresh Status</button><span id="device-last-updated" class="device-hint"></span></div>
+<p class="device-hint">Software updates are managed automatically by SigCore UC.</p></section>
+<section class="panel device-card" aria-labelledby="system-heading"><h2 id="system-heading">System Settings</h2>
+<form id="system-form" autocomplete="off"><div class="device-form-grid">
+<label for="system-name">System Name</label><input id="system-name" type="text" >
+<label for="system-sampling">Analog Sampling Rate</label><select id="system-sampling" ><option value="0">Low</option><option value="1">Medium</option><option value="2">High</option></select>
+<label for="system-pwm">PWM Frequency (Hz)</label><input id="system-pwm" type="number" min="1" step="1" >
+</div><div class="device-actions"><button type="submit" class="device-button">Save System Settings</button><span class="device-hint" id="system-result"></span></div></form></section>
+<section class="panel device-card" aria-labelledby="network-heading"><h2 id="network-heading">Network Settings</h2>
+<form id="network-form" autocomplete="off"><div class="device-net-columns">
+<fieldset class="device-subcard"><legend>Ethernet (eth0)</legend><label class="device-check"><input type="checkbox" id="eth-dhcp">Use DHCP</label>
+<div class="device-form-grid" id="eth-static-fields"><label for="eth-ip">IP Address</label><input id="eth-ip" ><label for="eth-mask">Subnet Mask</label><input id="eth-mask" ><label for="eth-gateway">Gateway</label><input id="eth-gateway" ><label for="eth-dns">DNS</label><input id="eth-dns" ></div></fieldset>
+<fieldset class="device-subcard"><legend>Wi-Fi (wlan0)</legend><div class="device-form-grid"><label for="wifi-ssid">SSID</label><input id="wifi-ssid" ><label for="wifi-password">Password</label><div style="display:flex;gap:8px;align-items:center"><input id="wifi-password" type="password" autocomplete="off" style="flex:1;min-width:0"><button id="wifi-password-toggle" type="button" style="padding:8px 14px;white-space:nowrap">Show</button></div></div><label class="device-check"><input type="checkbox" id="wifi-dhcp">Use DHCP</label>
+<div class="device-form-grid" id="wifi-static-fields"><label for="wifi-ip">IP Address</label><input id="wifi-ip" ><label for="wifi-mask">Subnet Mask</label><input id="wifi-mask" ><label for="wifi-gateway">Gateway</label><input id="wifi-gateway" ><label for="wifi-dns">DNS</label><input id="wifi-dns" ></div></fieldset></div>
+<div class="device-actions"><button type="submit" class="device-button">Apply Network Settings</button><span class="device-hint" id="network-result"></span></div></form></section>
+<section class="panel device-card" aria-labelledby="logger-heading"><h2 id="logger-heading">MySQL Logger</h2>
+<form id="logger-form" autocomplete="off"><div class="device-form-grid">
+<label for="logger-enabled">Enabled</label><div><input id="logger-enabled" type="checkbox" ></div>
+<label for="logger-interval">Interval (sec)</label><input id="logger-interval" type="number" >
+<label for="logger-server">Server</label><input id="logger-server" >
+<label for="logger-port">Port</label><input id="logger-port" type="number" >
+<label for="logger-db">Database</label><input id="logger-db" >
+<label for="logger-user">User</label><input id="logger-user" >
+<label for="logger-password">Password</label><div style="display:flex; gap:8px; width:100%;"><input id="logger-password" type="password" autocomplete="off" style="flex:1; min-width:0;"><button id="logger-password-toggle" type="button">Show</button></div>
+<label for="logger-table">Table Name</label><input id="logger-table" >
+<label for="logger-conn">Connection Timeout (s)</label><input id="logger-conn" type="number" >
+<label for="logger-command">Command Timeout (s)</label><input id="logger-command" type="number" >
+</div><div class="device-actions"><button type="submit" class="device-button">Save Logger Settings</button><span class="device-hint" id="logger-result"></span></div></form></section>
+<section class="panel device-card" aria-labelledby="maint-heading"><h2 id="maint-heading">Maintenance</h2>
+<div class="device-maint-item"><div><strong>Logs</strong><p>Review diagnostic and system events.</p></div><a class="device-button device-link-button" href="logviewer.php">Open Log Viewer</a></div>
+<div class="device-maint-item"><div><strong>Backup / Restore Properties</strong><p>Export or restore device settings.</p></div><span class="device-hint">Under Construction</span></div>
+<div class="device-maint-item"><div><strong>Restart Device</strong><p>Restart the SigCore UC controller.</p></div><button type="button" class="device-button" disabled>Restart</button></div>
+<div class="device-maint-item"><div><strong>Version Recovery</strong><p>Select an installed software version to recover. Automatic updates will be disabled.</p></div><span class="device-hint">Under Construction</span></div>
+</section></main><footer class="site-footer" data-site-footer></footer></body></html>

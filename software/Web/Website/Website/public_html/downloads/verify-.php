@@ -120,7 +120,7 @@ if ($row) {
     }
 
     $_SESSION['verified_email'] = $email;
-    header("Location: files.php");
+    header("Location: files-.php");
     exit;
 }
 
@@ -135,7 +135,7 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($user && (int)$user['verified'] === 1) {
     $_SESSION['verified_email'] = $email;
-    header("Location: files.php");
+    header("Location: files-.php");
     exit;
 }
 

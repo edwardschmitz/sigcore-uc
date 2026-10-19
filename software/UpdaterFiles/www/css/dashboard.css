@@ -1,0 +1,11 @@
+/* Dashboard-only presentation. Keeps the product site theme without duplicating the HMI. */
+.dashboard-main{width:min(1140px,100%)}
+.dashboard-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.dashboard-detail-panel{padding:23px 25px;min-width:0}
+.dashboard-detail-panel h2{margin:0 0 14px;color:var(--accent);font-size:1.25rem}
+.dashboard-facts{margin:0}
+.dashboard-facts>div{display:grid;grid-template-columns:minmax(135px,42%) minmax(0,1fr);gap:12px;padding:11px 0;border-bottom:1px solid var(--border);align-items:baseline}
+.dashboard-facts>div:last-child{border-bottom:0}
+.dashboard-facts dt{color:#635f5b;font-size:.92rem}
+.dashboard-facts dd{margin:0;font-weight:600;overflow-wrap:anywhere;font-size:.95rem;font-variant-numeric:tabular-nums}
+@media(max-width:700px){.dashboard-details{grid-template-columns:1fr}.dashboard-detail-panel{padding:18px}.dashboard-facts>div{grid-template-columns:minmax(115px,42%) minmax(0,1fr)}}

@@ -35,6 +35,7 @@ set "SIGNING_KEY=%REPO%\keys\sigcore_private.pem"
 set "DEPLOY_KEY=%REPO%\keys\sigcore_deploy"
 set "NOTES=***"
 set "STAGING=%REPO%\build\update\updates\%REV%\%VER%"
+set "INSTALLERS=%REPO%\build\installers"
 set "GIT_TAG=%REV%-v%VER%"
 
 rem -------- Hostinger SFTP --------
@@ -46,6 +47,8 @@ rem Hostinger's domain web root. The hPanel File Manager labels this as
 rem public_html, but SSH/SFTP reaches it through domains\sigcoreuc.com.
 set "SFTP_REMOTE=/home/u637891956/domains/sigcoreuc.com/public_html/pre-launch/%REV%"
 set "SFTP_BATCH=%TEMP%\sigcore_sftp_%RANDOM%_%RANDOM%.txt"
+set "INSTALLER_BATCH=%TEMP%\sigcore_installers_%RANDOM%_%RANDOM%.txt"
+set "INSTALLER_REMOTE=/home/u637891956/domains/sigcoreuc.com/public_html/downloads"
 
 rem ============================================================
 echo(
@@ -72,9 +75,9 @@ if not exist "%DEPLOY_KEY%" (
     goto :failed
 )
 
-rem -------- Git preflight: release must match a committed source state --------
+rem -------- Git: release uses all current working changes --------
 echo(
-echo Checking Git release state...
+echo Checking Git repository...
 where git >nul 2>&1 || (
     echo ERROR: Git is not installed or is not in PATH.
     goto :failed
@@ -83,23 +86,40 @@ git -C "%REPO%" rev-parse --is-inside-work-tree >nul 2>&1 || (
     echo ERROR: Repository is not a Git work tree: %REPO%
     goto :failed
 )
+git -C "%REPO%" rev-parse -q --verify "refs/tags/%GIT_TAG%" >nul 2>&1
+if not errorlevel 1 (
+    echo ERROR: Git tag already exists: %GIT_TAG%
+    goto :failed
+)
+
+rem -------- Shared Windows components version --------
+echo(
+echo Checking Control Panel version...
+call "%~dp0change-control-panel-version.bat"
+set "VERSION_RESULT=%ERRORLEVEL%"
+if "%VERSION_RESULT%"=="1" goto :failed
+if not "%VERSION_RESULT%"=="0" if not "%VERSION_RESULT%"=="2" (
+    echo ERROR: Unexpected version manager return code: %VERSION_RESULT%
+    goto :failed
+)
+
+rem -------- Commit ALL current Git changes for this release --------
+rem Include modified, added, and deleted files; do not classify or exclude any.
+echo(
+echo Recording all current changes in Git...
+git -C "%REPO%" add -A || goto :failed
+git -C "%REPO%" diff --cached --quiet
+set "GIT_DIFF_RESULT=%ERRORLEVEL%"
+if "%GIT_DIFF_RESULT%"=="1" (
+    git -C "%REPO%" commit -m "SigCore UC %REV% %VER% release" || goto :failed
+) else if not "%GIT_DIFF_RESULT%"=="0" (
+    echo ERROR: Could not inspect staged Git changes.
+    goto :failed
+)
 set "GIT_COMMIT="
 for /f "delims=" %%H in ('git -C "%REPO%" rev-parse HEAD') do set "GIT_COMMIT=%%H"
 if not defined GIT_COMMIT (
     echo ERROR: Cannot determine Git commit.
-    goto :failed
-)
-set "GIT_DIRTY="
-for /f "delims=" %%S in ('git -C "%REPO%" status --porcelain --untracked-files=normal') do set "GIT_DIRTY=1"
-if defined GIT_DIRTY (
-    echo ERROR: Uncommitted or untracked files exist in the repository.
-    echo Commit or otherwise resolve them before building a release.
-    git -C "%REPO%" status --short
-    goto :failed
-)
-git -C "%REPO%" rev-parse -q --verify "refs/tags/%GIT_TAG%" >nul 2>&1
-if not errorlevel 1 (
-    echo ERROR: Git tag already exists: %GIT_TAG%
     goto :failed
 )
 echo   Commit: %GIT_COMMIT%
@@ -177,6 +197,38 @@ sftp -b "%SFTP_BATCH%" -i "%DEPLOY_KEY%" -P %SFTP_PORT% %SFTP_USER%@%SFTP_HOST% 
 
 if exist "%SFTP_BATCH%" del /q "%SFTP_BATCH%"
 
+rem -------- Publish Windows installers to the live website --------
+rem Each file uploads to a temporary filename first. mv -f then atomically
+rem replaces the live file; directory permissions are never copied or changed.
+rem Do not delete any remote files or mirror local deletions.
+echo(
+echo Publishing Windows installers to website...
+if not exist "%INSTALLERS%\ControlPanelSetup.exe" (
+    echo ERROR: Control Panel installer not found.
+    goto :failed
+)
+if not exist "%INSTALLERS%\SigCoreCommon.exe" (
+    echo ERROR: SigCoreCommon installer not found.
+    goto :failed
+)
+
+rem Validate the remote directory before uploading anything.
+ssh -o BatchMode=yes -i "%DEPLOY_KEY%" -p %SFTP_PORT% %SFTP_USER%@%SFTP_HOST% "test -d '%INSTALLER_REMOTE%'" || goto :failed
+
+set "INSTALLERS_SFTP=%INSTALLERS:\=/%"
+> "%INSTALLER_BATCH%" echo cd %INSTALLER_REMOTE%
+>>"%INSTALLER_BATCH%" echo lcd "%INSTALLERS_SFTP%"
+>>"%INSTALLER_BATCH%" echo put ControlPanelSetup.exe ControlPanelSetup.exe.uploading
+>>"%INSTALLER_BATCH%" echo put SigCoreCommon.exe SigCoreCommon.exe.uploading
+>>"%INSTALLER_BATCH%" echo bye
+sftp -b "%INSTALLER_BATCH%" -o BatchMode=yes -i "%DEPLOY_KEY%" -P %SFTP_PORT% %SFTP_USER%@%SFTP_HOST% || goto :failed
+if exist "%INSTALLER_BATCH%" del /q "%INSTALLER_BATCH%"
+
+rem Only publish when BOTH uploads completed. Rename each file in place.
+ssh -o BatchMode=yes -i "%DEPLOY_KEY%" -p %SFTP_PORT% %SFTP_USER%@%SFTP_HOST% "mv -f '%INSTALLER_REMOTE%/ControlPanelSetup.exe.uploading' '%INSTALLER_REMOTE%/ControlPanelSetup.exe' && mv -f '%INSTALLER_REMOTE%/SigCoreCommon.exe.uploading' '%INSTALLER_REMOTE%/SigCoreCommon.exe'" || goto :failed
+
+echo   Published ControlPanelSetup.exe and SigCoreCommon.exe
+
 rem -------- Tag only after the package was staged successfully --------
 git -C "%REPO%" tag -a "%GIT_TAG%" "%GIT_COMMIT%" -m "SigCore UC %REV% %VER% staged release" || (
     echo ERROR: Package was staged, but the Git tag could not be created.
@@ -203,10 +255,12 @@ exit /b 0
 set "ERR=%ERRORLEVEL%"
 if "%ERR%"=="0" set "ERR=1"
 if exist "%SFTP_BATCH%" del /q "%SFTP_BATCH%"
+if exist "%INSTALLER_BATCH%" del /q "%INSTALLER_BATCH%"
 echo(
 echo =========================================
 echo  BUILD / STAGING FAILED
-echo  Nothing was promoted to the live folder.
+echo  Rev B update was not promoted to the live folder.
+echo  If installer publishing started, check the website installers.
 echo =========================================
 echo(
 endlocal & exit /b %ERR%

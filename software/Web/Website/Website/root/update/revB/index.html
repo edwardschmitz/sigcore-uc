@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SigCore UC | Device Home</title>
+  <style>
+    :root { color-scheme: dark; --bg:#101317; --panel:#181d23; --border:#343c47; --text:#e8edf2; --muted:#9ca8b6; --green:#4caf50; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font-family:Segoe UI,Arial,sans-serif; }
+    header { padding:20px max(24px, calc((100vw - 960px)/2)); background:#15191e; border-bottom:1px solid var(--border); }
+    h1 { margin:0; font-size:24px; font-weight:600; }
+    main { max-width:960px; margin:0 auto; padding:32px 24px; }
+    .subtitle { color:var(--muted); margin:0 0 24px; }
+    .links { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+    .card { display:block; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:24px; color:inherit; text-decoration:none; transition:border-color .15s,background .15s; }
+    .card:hover, .card:focus-visible { border-color:var(--green); background:#20262e; outline:none; }
+    .card h2 { margin:0 0 10px; font-size:19px; font-weight:600; }
+    .card p { margin:0; color:var(--muted); line-height:1.5; }
+  </style>
+</head>
+<body>
+  <header><h1>SigCore UC</h1></header>
+  <main>
+    <p class="subtitle">Device website</p>
+    <nav class="links" aria-label="Device pages">
+      <a class="card" href="status.html">
+        <h2>Status</h2>
+        <p>Device information, system health, and network status.</p>
+      </a>
+      <a class="card" href="logviewer.php">
+        <h2>Log Viewer</h2>
+        <p>View and filter device log records.</p>
+      </a>
+    </nav>
+  </main>
+</body>
+</html>

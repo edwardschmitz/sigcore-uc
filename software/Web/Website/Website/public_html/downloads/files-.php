@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['verified_email'])) {
-    header('Location: index.php');
+    header('Location: index-.php');
     exit;
 }
 ?>
@@ -33,69 +33,6 @@ if (!isset($_SESSION['verified_email'])) {
             <p class="large-text" style="margin-left: 15px;">Software</p>
         </div>
 
-        <!-- Python Library Section -->
-        <div class="specs-container">
-            <div class="spec-card">
-                <h1>Python Library</h1>
-
-                <h2>1. Requirements</h2>
-                <p>Make sure Python 3.7+ is installed and <code>pip</code> is available on your system.</p>
-
-                <h2>2. Download the Package</h2>
-                <p>
-                    Click the button below to download the latest release of the Python package:
-                </p>
-                <p>
-                    <a class="download-link" href="SigCore-1.0.0-py3-none-any.whl">
-                        Download Python Package
-                    </a>
-                </p>
-
-                <h2>3. Install via pip</h2>
-                <p>Open a terminal and run the following command:</p>
-                <pre><code>pip install https://sigcoreuc.com/downloads/SigCore-1.0.0-py3-none-any.whl</code></pre>
-
-                <h2>4. Test the Installation</h2>
-                <pre><code>from SigCore import SigCore, Relays
-
-device = SigCore()
-if device.connect():
-    device.set_digital_output(Relays.R1, True)
-    device.disconnect()
-</code></pre>
-
-                <h2>Need Help?</h2>
-                <p>Visit our <a href="../support.html">Support Page</a> or <a href="../contact.html">Contact Us</a> for assistance.</p>
-            </div>
-        </div>
-
-        <!-- .NET Library Section -->
-        <div class="specs-container">
-            <div class="spec-card">
-                <h1>.NET Library</h1>
-
-                <h2>1. Requirements</h2>
-                <p>Requires .NET Framework 4.8 or later.</p>
-
-                <h2>2. Download the Library</h2>
-                <p>
-                    Click below to download the latest version of the SigCore .NET library:
-                </p>
-                <p>
-                    <a class="download-link" href="SigCoreInstaller.exe">
-                        Download SigCore.dll
-                    </a>
-                </p>
-
-                <h2>3. Usage</h2>
-                <p>Reference <code>SigCore.dll</code> in your .NET Framework 4.8 projects.</p>
-                <p>For IntelliSense support, ensure <code>SigCore.xml</code> is placed alongside the DLL.</p>
-
-                <h2>Need Help?</h2>
-                <p>Visit our <a href="../support.html">Support Page</a> or <a href="../contact.html">Contact Us</a> for assistance.</p>
-            </div>
-        </div>
-
         <!-- Control Panel Application Section -->
         <div class="specs-container">
             <div class="spec-card">
@@ -115,7 +52,7 @@ if device.connect():
                 </p>
 
                 <h2>3. Installation Path</h2>
-                <pre><code>C:\Program Files\en-Z-em\ControlPanel</code></pre>
+                <pre><code>C:\Program Files (x86)\SigCore\ControlPanel</code></pre>
 
                 <h2>4. Features</h2>
                 <ul>

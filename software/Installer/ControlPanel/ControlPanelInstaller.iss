@@ -1,3 +1,7 @@
+#ifndef WindowsVersion
+  #error WindowsVersion must be passed by build.bat
+#endif
+
 ; -------------------------------------------------------------
 ; SigCore UC - Control Panel Installer
 ; Location: software\Installer\ControlPanel
@@ -5,7 +9,7 @@
 
 [Setup]
 AppName=SigCore UC Control Panel
-AppVersion=1.0.45
+AppVersion={#WindowsVersion}
 AppPublisher=en Z em
 DefaultDirName={pf}\SigCore\ControlPanel
 DefaultGroupName=SigCore UC

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SigCore UC Status</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 24px;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        h1 {
+            margin-bottom: 4px;
+        }
+
+        .subtle {
+            color: #666;
+            margin-top: 0;
+        }
+
+        .connection {
+            display: inline-block;
+            padding: 6px 10px;
+            border: 1px solid #bbb;
+            border-radius: 4px;
+            background: #fff;
+            margin-bottom: 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 14px;
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            margin: 0 0 10px 0;
+        }
+
+        .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .error {
+            color: #9b0000;
+            white-space: pre-wrap;
+        }
+
+        pre {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 12px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>SigCore UC Status and Live Update</h1>
+    <p class="subtle">Live data through Apache/PHP</p>
+
+    <div id="connection" class="connection">Connecting...</div>
+    <div id="error" class="error"></div>
+
+    <h2>Analog Inputs</h2>
+    <div id="analogInputs" class="grid"></div>
+
+    <h2>Digital Inputs</h2>
+    <div id="digitalInputs" class="grid"></div>
+
+    <h2>Relays</h2>
+    <div id="relays" class="grid"></div>
+
+    <h2>Analog Outputs</h2>
+    <div id="analogOutputs" class="grid"></div>
+
+    <details>
+        <summary>Raw state</summary>
+        <pre id="rawState"></pre>
+    </details>
+
+    <script>
+        const POLL_MS = 500;
+
+        function card(title, value) {
+            const div = document.createElement('div');
+            div.className = 'card';
+
+            const heading = document.createElement('h2');
+            heading.textContent = title;
+
+            const val = document.createElement('div');
+            val.className = 'value';
+            val.textContent = value;
+
+            div.appendChild(heading);
+            div.appendChild(val);
+
+            return div;
+        }
+
+        function renderArray(containerId, prefix, values, formatter) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (!Array.isArray(values)) {
+                return;
+            }
+
+            values.forEach((value, index) => {
+                container.appendChild(
+                    card(prefix + (index + 1), formatter(value, index))
+                );
+            });
+        }
+
+        function formatNumber(value) {
+            const n = Number(value);
+
+            if (!Number.isFinite(n)) {
+                return String(value);
+            }
+
+            return n.toFixed(3);
+        }
+
+        function render(state) {
+            const connection = state.connection || {};
+            document.getElementById('connection').textContent =
+                'Core: ' + (connection.state || 'Unknown');
+
+            renderArray(
+                'analogInputs',
+                'AI',
+                state.analogInputs,
+                value => formatNumber(value)
+            );
+
+            renderArray(
+                'digitalInputs',
+                'DI',
+                state.digitalInputs,
+                value => value ? 'ON' : 'OFF'
+            );
+
+            renderArray(
+                'relays',
+                'R',
+                state.relays,
+                value => value ? 'ON' : 'OFF'
+            );
+
+            const aoValues =
+                state.analogOutputs && Array.isArray(state.analogOutputs.values)
+                    ? state.analogOutputs.values
+                    : [];
+
+            const aoAuto =
+                state.analogOutputs && Array.isArray(state.analogOutputs.auto)
+                    ? state.analogOutputs.auto
+                    : [];
+
+            renderArray(
+                'analogOutputs',
+                'AO',
+                aoValues,
+                (value, index) => {
+                    const mode = aoAuto[index] ? 'AUTO' : 'MANUAL';
+                    return formatNumber(value) + ' (' + mode + ')';
+                }
+            );
+
+            document.getElementById('rawState').textContent =
+                JSON.stringify(state, null, 2);
+        }
+
+        async function poll() {
+            const error = document.getElementById('error');
+
+            try {
+                const response = await fetch('/api/state.php', {
+                    cache: 'no-store'
+                });
+
+                const text = await response.text();
+
+                let data;
+
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    throw new Error(
+                        'Invalid response from /api/state.php:\n' + text
+                    );
+                }
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.error || ('HTTP ' + response.status)
+                    );
+                }
+
+                error.textContent = '';
+                render(data);
+            } catch (ex) {
+                document.getElementById('connection').textContent =
+                    'Core: unavailable';
+
+                error.textContent = ex.message;
+            } finally {
+                window.setTimeout(poll, POLL_MS);
+            }
+        }
+
+        poll();
+    </script>
+</body>
+</html>

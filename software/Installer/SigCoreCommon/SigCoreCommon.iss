@@ -1,12 +1,16 @@
+#ifndef WindowsVersion
+  #error WindowsVersion must be passed by build.bat
+#endif
+
 ; -------------------------------------------------------------
 ; SigCore UC - SigCoreCommon Library Installer
 ; -------------------------------------------------------------
 
 [Setup]
 AppName=SigCore Common Library
-AppVersion=1.0.50
+AppVersion={#WindowsVersion}
 AppPublisher=en Z em
-DefaultDirName={autopf}\en-Z-em\Common
+DefaultDirName={pf}\SigCore\Common
 DefaultGroupName=SigCore UC
 
 OutputDir=..\..\..\build\installers
