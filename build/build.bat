@@ -103,7 +103,7 @@ exit /b 0
 :find_file
 set "FOUND="
 for /r "%ROOT%\software" %%F in (%~1) do (
-    if not defined FOUND set "FOUND=%%~fF"
+    if not defined FOUND if exist "%%~fF" set "FOUND=%%~fF"
 )
 if not defined FOUND (
     echo ERROR: Cannot locate %~1 under software.
