@@ -316,8 +316,8 @@
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Bottom">
                 <TextBlock Text="© 2026 Edward Schmitz · " FontSize="14" Foreground="#777777"/>
                 <TextBlock FontSize="14" VerticalAlignment="Bottom">
-                    <Hyperlink NavigateUri="https://sigcoreuc.com" RequestNavigate="Website_RequestNavigate"
-                               Foreground="#777777" Cursor="Hand">sigcoreuc.com
+                    <Hyperlink Click="Website_Click"
+                               Foreground="#777777" Cursor="Hand">Local Device Website
                         <Hyperlink.Style>
                             <Style TargetType="Hyperlink">
                                 <Setter Property="TextDecorations" Value="{x:Null}"/>

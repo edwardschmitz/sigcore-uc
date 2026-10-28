@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="How to connect, configure, and use SigCore UC Rev B inputs, outputs, and network features.">
+<title>SigCore UC | Device Guide</title>
+<link rel="stylesheet" href="/css/site.css?v=6">
+<link rel="stylesheet" href="/css/hardware-reference.css?v=4">
+<script src="/js/site-nav.js?v=shell2" defer></script>
+</head>
+<body><header class="site-header" data-site-header></header>
+<main class="site-main wide hardware-guide" id="top">
+<div class="page-heading"><h1>Device Guide</h1><p>Connect your SigCore UC, configure its inputs and outputs, and put it to work.</p></div>
+<div class="guide-layout">
+<nav class="guide-toc" aria-label="On this page"><span class="toc-kicker">IN THIS GUIDE</span>
+<a href="#start">Get started</a><a href="#connect">Connect to the device</a><a href="#orientation">Find your connections</a>
+<a href="#relay">Switch a device with a relay</a><a href="#di">Read an on/off signal</a><a href="#ai">Measure an analog signal</a>
+<a href="#ao">Send an analog output</a><a href="#properties">Save channel Properties</a><a href="#network">Network settings</a>
+<a href="#confirm">Check your installation</a><a href="#troubleshoot">Troubleshooting</a><a href="#quickref">Quick reference</a>
+</nav>
+<div class="guide-body">
+<section class="panel guide-card" id="start"><h2>Get started</h2>
+<p>SigCore UC brings together eight relay outputs, eight digital inputs, four analog inputs, and four analog outputs in one network-connected controller. Use the <strong>Dashboard</strong> to see device information, <strong>Control</strong> to view and operate channels, <strong>Properties</strong> to tailor channels to your application, and <strong>Device</strong> to manage device settings.</p>
+<div class="spec-chips"><span>8 relays</span><span>8 digital inputs</span><span>4 analog inputs</span><span>4 analog outputs</span></div>
+<h3>For a new installation</h3><ol>
+<li>Position the controller where its terminals and network connection are accessible.</li>
+<li>Plan which devices and sensors will connect to each channel. Note the channel numbers before wiring.</li>
+<li>Connect the controller to its <strong>5 V DC</strong> supply and to your local network.</li>
+<li>Open the device website or connect using the SigCore UC Control Panel.</li>
+<li>Set up channel Properties, connect one signal at a time, and verify each channel in <strong>Control</strong>.</li>
+</ol>
+<p class="guide-note"><strong>About the relay terminals:</strong> The controller is powered by 5 V DC, but relay contacts can switch an independently supplied circuit. Treat any externally connected voltage according to the circuit actually attached to the contacts.</p>
+</section>
+<section class="panel guide-card" id="connect"><h2>Connect to the device</h2>
+<h3>From a web browser</h3><ol><li>Connect SigCore UC to your local network.</li><li>In a browser on the same network, open the device's assigned IP address, for example <code>http://192.168.0.103</code>. This is an example address, not a factory default.</li><li>The Dashboard should display the device identity and status. Open <strong>Control</strong> to see channel values.</li></ol>
+<h3>From the Control Panel</h3><p>Launch the SigCore UC Control Panel, discover the unit on your network, select it, and connect. Confirm its serial number before modifying settings. See the <a href="control-panel-reference.html">Control Panel Reference</a> for individual controls and dialog explanations.</p>
+<p>If the address has changed, use device discovery or check the address assigned by your router rather than relying on a previously saved IP address.</p>
+</section>
+<section class="panel guide-card" id="orientation"><h2>Find your connections</h2>
+<p>Identify the connector group and channel number printed on your device before inserting the corresponding terminal plug. The four I/O groups have different electrical functions:</p>
+<div class="guide-table-wrap"><table><thead><tr><th>Connection</th><th>Use it for</th><th>What you'll see in Control</th></tr></thead><tbody>
+<tr><td><strong>R1–R8</strong> — relay outputs</td><td>Opening or closing an external circuit</td><td>Relay state and controls</td></tr>
+<tr><td><strong>DI1–DI8</strong> — digital inputs</td><td>Switches and other on/off signals</td><td>ON/OFF indication</td></tr>
+<tr><td><strong>AI1–AI4</strong> — analog inputs</td><td>Voltage or current measurements</td><td>Numeric live values</td></tr>
+<tr><td><strong>AO1–AO4</strong> — analog outputs</td><td>Voltage or PWM control signals</td><td>Output values and controls</td></tr>
+</tbody></table></div>
+<p>Keep a simple channel list for the installation. A name such as “Tank Level” or “Pump Enable” makes later operation much easier than remembering a channel number.</p>
+</section>
+<section class="panel guide-card" id="relay"><h2>Switch a device with a relay</h2>
+<p>Use a relay when SigCore UC needs to open or close an independently powered circuit. Each of the eight relays has three contacts:</p>
+<div class="guide-table-wrap"><table><thead><tr><th>Terminal</th><th>What it means</th></tr></thead><tbody><tr><td>COM</td><td>Common contact</td></tr><tr><td>NO</td><td>Normally open relative to COM when the relay is not energized</td></tr><tr><td>NC</td><td>Normally closed relative to COM when the relay is not energized</td></tr></tbody></table></div>
+<h3>Typical use</h3><ol><li>Choose the relay channel that will operate the external device.</li><li>Connect the external circuit through <strong>COM and NO</strong> if you want the circuit normally open, or <strong>COM and NC</strong> if you want it normally closed.</li><li>Open the relay's <strong>Properties</strong> and give it a meaningful name. Set its startup and fail-safe behavior for your application.</li><li>Use <strong>Control</strong> to change the relay state and confirm that the intended external circuit responds.</li></ol>
+<p>The contacts do not provide their own supply voltage; power for the controlled circuit comes from that circuit. The relay's published rating is 120 VAC / 10 A; ensure the specific load is within its permitted rating. Where an external circuit carries mains voltage, that circuit still requires appropriate handling and protection.</p>
+<p class="guide-note"><strong>Remember:</strong> Relay inversion can change how ON and OFF are presented in software. When verifying an installation, check the actual <strong>COM–NO</strong> or <strong>COM–NC</strong> behavior, not only the on-screen label.</p>
+</section>
+<section class="panel guide-card" id="di"><h2>Read an on/off signal</h2>
+<p>Use a digital input for a signal that has two meaningful states, such as a sensor's active/inactive output or a switch wired to provide the appropriate input voltage.</p>
+<h3>Connect and verify</h3><ol><li>Choose DI1–DI8 and identify the corresponding input and ground/reference terminals using the markings on your unit.</li><li>Connect a signal that produces the required voltage levels relative to that reference.</li><li>Open <strong>Control</strong>, operate the sensor or switch, and observe the corresponding DI indicator.</li><li>If the expected logical indication is opposite, adjust <strong>Inverted</strong> in that channel's <strong>Properties</strong>.</li><li>For mechanical switches that bounce, use the channel's debounce setting as needed.</li></ol>
+<div class="guide-table-wrap"><table><thead><tr><th>Voltage at input</th><th>Interpreted state</th></tr></thead><tbody><tr><td>1 V or less</td><td>OFF</td></tr><tr><td>2 V or more</td><td>ON</td></tr><tr><td>Between 1 and 2 V</td><td>Not a defined logic level</td></tr></tbody></table></div>
+<p>Inversion changes the logical indication, not the physical voltage required by the input. An open contact does not automatically create an ON signal; the connected circuit must supply an appropriate signal.</p>
+</section>
+<section class="panel guide-card" id="ai"><h2>Measure an analog signal</h2>
+<p>Choose an analog input for a sensor that produces a continuously varying signal. SigCore UC provides four channels, each configured independently in <strong>Properties</strong>.</p>
+<h3>For a voltage-output sensor</h3><ol><li>Identify the sensor's output range. Supported Rev B modes include <strong>0–5 V</strong> and <strong>0–500 mV</strong>.</li><li>Connect the signal and its appropriate reference to the selected analog input.</li><li>Select the corresponding measurement range in the channel's Properties.</li><li>Open Control and check the reading against a known signal or sensor condition.</li><li>Set the display name, units, precision, averaging, or calibration if the application requires it.</li></ol>
+<h3>For a 4–20 mA signal</h3><ol><li>Use an appropriate external current-loop supply and wire the transmitter according to its own instructions; SigCore UC is not assumed to provide loop power.</li><li>Connect the measurement loop to the appropriate channel terminals.</li><li>Select <strong>4–20 mA</strong> in Analog Input Properties.</li><li>Verify the reading at a known transmitter value before relying on it.</li></ol>
+<p>A sensor with a <strong>0–10 V</strong> output needs an external voltage divider or other suitable conditioning for the Rev B input. Do not connect a 10 V signal directly while the input is configured for a 0–5 V range.</p>
+<p class="guide-note"><strong>For steady readings:</strong> Averaging can smooth noisy measurements; calibration can correct known measurement errors. Neither changes the physical input's permissible range.</p>
+</section>
+<section class="panel guide-card" id="ao"><h2>Send an analog output</h2>
+<p>Each of the four analog outputs can supply a configurable control signal. Choose the mode expected by the receiving device: <strong>0–5 V</strong> voltage output or <strong>PWM</strong>.</p>
+<h3>Set up an output</h3><ol><li>Identify the control signal required by the equipment you are connecting.</li><li>Open the selected analog output's <strong>Properties</strong> and choose the appropriate mode.</li><li>Configure any units or output scaling used by your application.</li><li>Connect the output to the receiving device's compatible signal input and reference.</li><li>Use <strong>Control</strong> to command a test value and verify the external response.</li></ol>
+<p>PWM is a pulsed signal, not a steady analog voltage. Use voltage mode for equipment expecting a continuous control voltage unless that equipment specifically accepts PWM.</p>
+</section>
+<section class="panel guide-card" id="properties"><h2>Save channel Properties</h2>
+<p>Properties personalize the channels so that Control reflects your installation. Channel names help operators understand what each point does. Other Properties affect the way a channel operates or is displayed.</p>
+<div class="guide-table-wrap"><table><thead><tr><th>Channel</th><th>Common Properties</th><th>Why you'd change them</th></tr></thead><tbody>
+<tr><td>Relay</td><td>Name, default state, fail-safe state, inversion</td><td>Match the connected equipment and desired behavior</td></tr>
+<tr><td>Digital input</td><td>Name, inversion, debounce</td><td>Match sensor logic and filter switch bounce</td></tr>
+<tr><td>Analog input</td><td>Range, units, precision, averaging, calibration</td><td>Match the sensor and display a useful measurement</td></tr>
+<tr><td>Analog output</td><td>Mode, units, scaling and control settings</td><td>Match the receiving device</td></tr>
+</tbody></table></div>
+<p>Change one channel at a time, save its Properties, then confirm the result on the <strong>Control</strong> page. For descriptions of each dialog field, see the <a href="control-panel-reference.html">Control Panel Reference</a>.</p>
+</section>
+<section class="panel guide-card" id="network"><h2>Network and device settings</h2>
+<p>The <strong>Device</strong> page contains system and network settings. The Dashboard shows the currently reported network information, which may differ from a saved static address when DHCP is enabled.</p>
+<h3>Use DHCP</h3><p>Leave DHCP enabled if your router should assign the device's address automatically. To find the unit later, use discovery, its hostname (when your network supports name resolution), or the router's device list.</p>
+<h3>Use a static address</h3><p>Disable DHCP for the applicable interface, enter the address, subnet mask, gateway, and DNS settings appropriate to your network, and apply them. An incorrect address can make the website unreachable from your computer until the network settings are corrected.</p>
+<p>Network Properties also include Wi-Fi configuration. Keep the saved Wi-Fi password when making unrelated changes; change it only when you intend to replace it.</p>
+</section>
+<section class="panel guide-card" id="confirm"><h2>Check your installation</h2>
+<p>Before putting the device into regular operation, verify the actual connected signals rather than relying on names or assumptions:</p>
+<ol><li>Confirm that the Dashboard identifies the intended unit and that the device is ready.</li><li>Change each connected digital signal and confirm the correct DI channel changes state.</li><li>Operate each connected relay and check that the intended contact path operates the load.</li><li>Compare analog input readings with a known signal or operating condition.</li><li>Command each analog output through a suitable test range and confirm the receiving equipment reacts correctly.</li><li>Review channel names and Properties so the displayed controls match the installation.</li><li>Verify the device remains reachable at its intended network address.</li></ol>
+<p>Where a circuit could actuate equipment, perform the first test under controlled conditions appropriate to that equipment.</p>
+</section>
+<section class="panel guide-card" id="troubleshoot"><h2>If something doesn't behave as expected</h2>
+<div class="guide-table-wrap"><table><thead><tr><th>Symptom</th><th>What to check first</th></tr></thead><tbody>
+<tr><td>Can't open the device website</td><td>Device power, network connection, computer subnet, current DHCP address, or device discovery</td></tr>
+<tr><td>DI shows the opposite state</td><td>Input voltage and the channel's Inverted Property</td></tr>
+<tr><td>Relay switches opposite the intended circuit behavior</td><td>COM/NO/NC wiring and Relay Properties, including inversion</td></tr>
+<tr><td>Analog measurement looks wrong</td><td>Selected input range, connected reference, sensor output type, and calibration</td></tr>
+<tr><td>Analog output doesn't control equipment</td><td>Voltage versus PWM mode, signal reference, required equipment input, and scaling</td></tr>
+<tr><td>Network changes made the unit hard to find</td><td>Current device address, DHCP assignment, hostname resolution, and network settings</td></tr>
+</tbody></table></div>
+<p>For system events and diagnostic messages, open <strong>Logs</strong>. For detailed configuration controls, use <strong>Properties</strong>. If an interface is still not responding as expected, record the serial number, channel, settings, and observed behavior before contacting support.</p>
+</section>
+<section class="panel guide-card" id="quickref"><h2>Quick reference</h2>
+<div class="guide-table-wrap"><table><thead><tr><th>Feature</th><th>SigCore UC Rev B</th></tr></thead><tbody>
+<tr><td>Power input</td><td>5 V DC</td></tr><tr><td>Relays</td><td>8, with COM / NO / NC contacts; rated 120 VAC / 10 A</td></tr><tr><td>Digital inputs</td><td>8; OFF ≤ 1 V; ON ≥ 2 V</td></tr><tr><td>Analog inputs</td><td>4; 0–5 V, 0–500 mV, or 4–20 mA</td></tr><tr><td>Analog outputs</td><td>4; 0–5 V or PWM</td></tr><tr><td>Host computer</td><td>Raspberry Pi 4 Model B</td></tr><tr><td>Network access</td><td>Device website and SigCore UC Control Panel</td></tr>
+</tbody></table></div>
+<p>Need a particular setting explained? Open the <a href="control-panel-reference.html">Control Panel Reference</a>. For further assistance, use <a href="support.html">Support</a>.</p>
+<p><a href="#top">Back to top ↑</a></p>
+</section>
+</div></div>
+</main><footer class="site-footer" data-site-footer></footer></body></html>

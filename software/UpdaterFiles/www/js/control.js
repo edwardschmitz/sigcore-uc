@@ -69,7 +69,16 @@
     const tasks=[];for(const kind of ['relay','di','ai','ao'])for(let i=0;i<cfg[kind].length;i++)tasks.push({kind,i});
     // Sequential requests avoid a burst of heavy configuration messages on Core's TCP channel.
     for(const {kind,i} of tasks){
-      try{const r=await fetch(`/api/config.php?kind=${kind}&channel=${i}`,{cache:'no-store'});cfg[kind][i]=await parseResponse(r);updateLabels();}
+      try{
+        const r=await fetch(`/api/config.php?kind=${kind}&channel=${i}`,{cache:'no-store'});
+        cfg[kind][i]=await parseResponse(r);
+        updateLabels();
+        // The first state poll may finish before relay configuration loads.
+        // Redraw the contacts when invertedLogic becomes known, even if the
+        // relay has not changed state since that first poll.
+        if(kind==='relay' && typeof refs.relay[i].state==='boolean')
+          contactLeds(refs.relay[i],refs.relay[i].state,i);
+      }
       catch(e){console.warn(`Configuration ${kind}${i+1} unavailable:`,e.message);}
     }
   }

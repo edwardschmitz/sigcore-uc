@@ -1,38 +1,43 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SigCore UC | Device Home</title>
-  <style>
-    :root { color-scheme: dark; --bg:#101317; --panel:#181d23; --border:#343c47; --text:#e8edf2; --muted:#9ca8b6; --green:#4caf50; }
-    * { box-sizing: border-box; }
-    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font-family:Segoe UI,Arial,sans-serif; }
-    header { padding:20px max(24px, calc((100vw - 960px)/2)); background:#15191e; border-bottom:1px solid var(--border); }
-    h1 { margin:0; font-size:24px; font-weight:600; }
-    main { max-width:960px; margin:0 auto; padding:32px 24px; }
-    .subtitle { color:var(--muted); margin:0 0 24px; }
-    .links { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
-    .card { display:block; background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:24px; color:inherit; text-decoration:none; transition:border-color .15s,background .15s; }
-    .card:hover, .card:focus-visible { border-color:var(--green); background:#20262e; outline:none; }
-    .card h2 { margin:0 0 10px; font-size:19px; font-weight:600; }
-    .card p { margin:0; color:var(--muted); line-height:1.5; }
-  </style>
-</head>
-<body>
-  <header><h1>SigCore UC</h1></header>
-  <main>
-    <p class="subtitle">Device website</p>
-    <nav class="links" aria-label="Device pages">
-      <a class="card" href="status.html">
-        <h2>Status</h2>
-        <p>Device information, system health, and network status.</p>
-      </a>
-      <a class="card" href="logviewer.php">
-        <h2>Log Viewer</h2>
-        <p>View and filter device log records.</p>
-      </a>
-    </nav>
-  </main>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SigCore UC | Dashboard</title>
+<link rel="stylesheet" href="/css/site.css?v=6"><link rel="stylesheet" href="/css/dashboard.css?v=1">
+<script src="/js/site-nav.js?v=shell2" defer></script><script src="/js/dashboard.js?v=20261014c" defer></script>
+</head><body>
+<header class="site-header" data-site-header></header>
+<main class="site-main dashboard-main">
+  <div class="page-heading"><h1>Dashboard</h1><p>Device information and system health</p></div>
+  <div id="dashboard-alert" class="dashboard-alert" role="status" hidden></div>
+  <section class="dashboard-summary" aria-label="System overview">
+    <div class="panel summary-card"><h2>Device</h2><strong id="device-serial">—</strong><span id="device-revision">Hardware revision unavailable</span></div>
+    <div class="panel summary-card"><h2>System Status</h2><strong id="device-ready" class="status-value">Checking…</strong><span id="device-connection">Status unavailable</span></div>
+    <div class="panel summary-card"><h2>Software</h2><strong id="device-software">—</strong><span id="device-hostname">Hostname unavailable</span></div>
+    <div class="panel summary-card"><h2>Uptime</h2><strong id="device-uptime">—</strong><span>Since last restart</span></div>
+  </section>
+  <div class="dashboard-details">
+    <section class="panel dashboard-detail-panel"><h2>System Health</h2>
+      <dl class="dashboard-facts">
+        <div><dt>CPU Temperature</dt><dd id="health-temperature">—</dd></div>
+        <div><dt>CPU Load</dt><dd id="health-load">—</dd></div>
+        <div><dt>Memory</dt><dd id="health-memory">—</dd></div>
+        <div><dt>Disk</dt><dd id="health-disk">—</dd></div>
+        <div><dt>Raspberry Pi Model</dt><dd id="health-model">—</dd></div>
+        <div><dt>Kernel</dt><dd id="health-kernel">—</dd></div>
+      </dl>
+    </section>
+    <section class="panel dashboard-detail-panel"><h2>Network</h2>
+      <dl class="dashboard-facts">
+        <div><dt>Hostname</dt><dd id="net-hostname">—</dd></div>
+        <div><dt>IP Address</dt><dd id="net-ip">—</dd></div>
+        <div><dt>Subnet Mask</dt><dd id="net-subnet">—</dd></div>
+        <div><dt>Gateway</dt><dd id="net-gateway">—</dd></div>
+        <div><dt>DNS</dt><dd id="net-dns">—</dd></div>
+        <div><dt>MAC Address</dt><dd id="net-mac">—</dd></div>
+        <div><dt>Network Mode</dt><dd id="net-mode">—</dd></div>
+      </dl>
+    </section>
+  </div>
+  <p id="dashboard-updated" class="dashboard-updated" aria-live="off">Waiting for device status…</p>
+</main>
+<footer class="site-footer" data-site-footer></footer>
+</body></html>

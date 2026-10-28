@@ -273,140 +273,22 @@ function h(?string $value): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SigCore Log Viewer</title>
-<style>
-:root {
-    color-scheme: dark;
-    --bg:#101317;
-    --panel:#181d23;
-    --panel2:#20262e;
-    --border:#343c47;
-    --text:#e8edf2;
-    --muted:#9ca8b6;
-    --green:#4caf50;
-    --info:#79b8ff;
-    --warn:#ffd166;
-    --error:#ff6b6b;
-}
-* { box-sizing:border-box; }
-body {
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:Segoe UI, Arial, sans-serif;
-}
-header {
-    padding:14px 18px;
-    border-bottom:1px solid var(--border);
-    background:#15191e;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-h1 { margin:0; font-size:20px; font-weight:600; }
-main { padding:14px; }
-form {
-    display:grid;
-    grid-template-columns:repeat(6, minmax(130px,1fr));
-    gap:10px;
-    margin-bottom:12px;
-}
-.field label {
-    display:block;
-    color:var(--muted);
-    font-size:12px;
-    margin-bottom:4px;
-}
-input,select,button {
-    width:100%;
-    padding:8px 9px;
-    border:1px solid var(--border);
-    border-radius:5px;
-    background:var(--panel);
-    color:var(--text);
-}
-button {
-    cursor:pointer;
-    background:var(--panel2);
-}
-button:hover { border-color:#5b6675; }
-.message-filter { grid-column:span 3; }
-.actions {
-    display:flex;
-    gap:8px;
-    margin-bottom:12px;
-}
-.actions button,
-.actions a {
-    width:auto;
-    min-width:90px;
-}
-.actions a {
-    padding:8px 12px;
-    border:1px solid var(--border);
-    border-radius:5px;
-    background:var(--panel2);
-    color:var(--text);
-    text-decoration:none;
-    text-align:center;
-}
-.notice { margin-bottom:12px; padding:10px; border:1px solid var(--border); border-radius:5px; color:var(--muted); }
-.error {
-    margin-bottom:12px;
-    padding:10px;
-    border:1px solid #7b333d;
-    border-radius:5px;
-    background:#351d22;
-    color:#ffd7dc;
-}
-.table-wrap {
-    overflow-x:auto;
-    border:1px solid var(--border);
-    border-radius:6px;
-}
-table {
-    width:100%;
-    border-collapse:collapse;
-    min-width:1200px;
-    font-size:13px;
-}
-th {
-    position:sticky;
-    top:0;
-    z-index:2;
-    padding:8px;
-    text-align:left;
-    background:var(--panel2);
-    border-bottom:1px solid var(--border);
-}
-td {
-    padding:7px 8px;
-    border-bottom:1px solid #252b33;
-    vertical-align:top;
-}
-tr:hover td { background:#171c22; }
-.level-INFO { color:var(--info); }
-.level-WARN { color:var(--warn); font-weight:700; }
-.level-ERROR { color:var(--error); font-weight:700; }
-.message { min-width:380px; white-space:normal; }
-.count { color:var(--muted); font-size:13px; }
-@media (max-width:1100px) {
-    form { grid-template-columns:repeat(3,1fr); }
-}
-</style>
+<link rel="stylesheet" href="/css/site.css?v=6">
+<link rel="stylesheet" href="/css/logs.css">
+<script src="/js/site-nav.js?v=shell2" defer></script>
 </head>
 <body>
-<header>
-    <h1>SigCore Log Viewer</h1>
-    <div class="count"><?= h(strtoupper($activeSource)) ?> · <?= count($rows) ?> record<?= count($rows) === 1 ? '' : 's' ?></div>
-</header>
+<header class="site-header" data-site-header></header>
+<main class="site-main wide">
+<div class="page-heading"><h1>Log Viewer</h1><p>Device diagnostics and events</p></div>
+<div class="log-summary"><?= h(strtoupper($activeSource)) ?> · <?= count($rows) ?> record<?= count($rows) === 1 ? '' : 's' ?></div>
 
-<main>
 <?php if ($sourceNotice !== ''): ?><div class="notice"><?= h($sourceNotice) ?></div><?php endif; ?>
 <?php if ($error !== null): ?>
-    <div class="error"><?= h($error) ?></div>
+    <div class="log-error"><?= h($error) ?></div>
 <?php endif; ?>
 
-<form method="get" id="filterForm">
+<form method="get" id="filterForm" class="log-filters panel">
     <div class="field">
         <label>Log source</label>
         <select name="logsource">
@@ -501,7 +383,7 @@ tr:hover td { background:#171c22; }
 </form>
 
 <div class="table-wrap">
-<table>
+<table class="log-table">
 <thead>
 <tr>
     <th>ID</th>
@@ -535,6 +417,7 @@ tr:hover td { background:#171c22; }
 </table>
 </div>
 </main>
+<footer class="site-footer" data-site-footer></footer>
 
 <script>
 (() => {

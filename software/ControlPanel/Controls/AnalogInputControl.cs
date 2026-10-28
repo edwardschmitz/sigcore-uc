@@ -58,12 +58,20 @@ namespace ControlPanel.Controls {
 
         public string FormattedValue {
             get {
-                switch (Display) {
-                    case 1: // Scientific
-                        return Value.ToString($"E{Precision}");
-                    default: // Fixed
-                        return Value.ToString($"F{Precision}");
+                string formatted = Display == 1 // Scientific
+                    ? Value.ToString($"E{Precision}")
+                    : Value.ToString($"F{Precision}"); // Fixed
+
+                // Normalize negative zero only when it rounds to zero at the
+                // selected display precision. Preserve the underlying Value.
+                if (formatted.StartsWith("-", StringComparison.Ordinal) &&
+                    double.TryParse(formatted, NumberStyles.Float,
+                        CultureInfo.CurrentCulture, out double displayedValue) &&
+                    displayedValue == 0.0) {
+                    return formatted.Substring(1);
                 }
+
+                return formatted;
             }
         }
 

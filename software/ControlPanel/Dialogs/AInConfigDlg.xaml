@@ -122,41 +122,54 @@
            Margin="5,5,5,0"/>
                 <StackPanel Orientation="Horizontal" Margin="5,2">
                     <TextBlock Text="m:" VerticalAlignment="Center" Margin="5,2" Padding="5,2"/>
-                    <TextBox Text="{Binding M, Mode=TwoWay}" Width="80" Margin="5,2" Padding="5,2"/>
+                    <TextBox Text="{Binding M, Mode=TwoWay}" Width="105" Margin="5,2" Padding="5,2"/>
                     <TextBlock Text="b:" VerticalAlignment="Center" Margin="10,2" Padding="5,2"/>
-                    <TextBox Text="{Binding B, Mode=TwoWay}" Width="80" Margin="5,2" Padding="5,2"/>
+                    <TextBox Text="{Binding B, Mode=TwoWay}" Width="105" Margin="5,2" Padding="5,2"/>
                 </StackPanel>
             </StackPanel>
 
-            <!-- Polynomial -->
-            <StackPanel Grid.Row="9" Grid.ColumnSpan="2" Orientation="Vertical"
-                        x:Name="PolynomialPanel"
-                        >
-                <TextBlock Text="Polynomial Coefficients:" FontWeight="Bold" Margin="5,5,5,0"/>
-                <TextBox Text="{Binding PolynomialCoefficientsString, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
-                <TextBlock Text="Enter the coefficients in a comma delimited list" 
-                           FontStyle="Italic" Foreground="Gray" Margin="5,2" Padding="5,2"/>
-                <TextBlock Text="example: 3 + 2x + 1x² is '3, 2, 1'" 
-                           FontStyle="Italic" Foreground="Gray" Margin="5,2" Padding="5,2"/>
+            <!-- Polynomial: coefficient table -->
+            <StackPanel Grid.Row="9" Grid.ColumnSpan="2" x:Name="PolynomialPanel" Margin="5,6,5,0" Width="400">
+                <TextBlock Text="Polynomial Calibration" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBlock Text="Enter a coefficient for each polynomial term." Foreground="Gray" FontSize="12" Margin="0,0,0,6"/>
+                <TextBlock Text="Term                  Coefficient" FontWeight="SemiBold" Margin="3,0,0,4"/>
+                <ScrollViewer Height="160" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="PolynomialRows"/>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,4">
+                    <Button Content="Add Term" Click="AddTerm_Click" Padding="12,4" Margin="0,0,8,0"/>
+                    <Button Content="Remove Highest Term" Click="RemoveTerm_Click" Padding="12,4"/>
+                </StackPanel>
+                <TextBlock x:Name="PolynomialEquation" TextWrapping="Wrap" Foreground="#555" Margin="0,4,0,0"/>
             </StackPanel>
 
-            <!-- MultiPoint -->
-            <StackPanel Grid.Row="10" Grid.ColumnSpan="2" Orientation="Vertical"
-                        x:Name="MultiPointPanel"
-                        >
-                <TextBlock Text="Multi-Point Calibration:" FontWeight="Bold" Margin="5,5,5,0"/>
-                <TextBox Text="{Binding PiecewisePairsString, Mode=TwoWay}" Margin="5,2" Padding="5,2"/>
-                <TextBlock Text="Enter point pairs as 'x1:y1, x2:y2, x3:y3'" 
-                           FontStyle="Italic" Foreground="Gray" Margin="5,2" Padding="5,2"/>
-                <TextBlock Text="example: 0:0, 1:2, 2:5" 
-                           FontStyle="Italic" Foreground="Gray" Margin="5,2" Padding="5,2"/>
+            <!-- MultiPoint: input/output calibration table -->
+            <StackPanel Grid.Row="10" Grid.ColumnSpan="2" x:Name="MultiPointPanel" Margin="5,6,5,0" Width="400">
+                <TextBlock Text="Multi-Point Calibration" FontWeight="Bold" Margin="0,0,0,4"/>
+                <TextBlock Text="Enter each input and its calibrated output." Foreground="Gray" FontSize="12" Margin="0,0,0,6"/>
+                <Grid Margin="3,0,0,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="140"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="1" Text="Input" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="2" x:Name="PointOutputHeader" Text="Output" FontWeight="SemiBold"/>
+                </Grid>
+                <ScrollViewer Height="172" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel x:Name="MultiPointRows"/>
+                </ScrollViewer>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <Button Content="Add Point" Click="AddPoint_Click" Padding="12,4" Margin="0,0,8,0"/>
+                    <Button Content="Sort by Input" Click="SortPoints_Click" Padding="12,4"/>
+                </StackPanel>
             </StackPanel>
 
             <!-- Buttons -->
             <StackPanel Grid.Row="11" Grid.ColumnSpan="2" Orientation="Horizontal"
                         HorizontalAlignment="Center" Margin="5,10,5,0">
-                <Button Content="OK" Width="80" Margin="5,2" Padding="5,2" IsDefault="True" Click="Ok_Click"/>
-                <Button Content="Cancel" Width="80" Margin="5,2" Padding="5,2" IsCancel="True"/>
+                <Button Content="OK" Width="105" Margin="5,2" Padding="5,2" IsDefault="True" Click="Ok_Click"/>
+                <Button Content="Cancel" Width="105" Margin="5,2" Padding="5,2" IsCancel="True"/>
             </StackPanel>
         </Grid>
     </Border>

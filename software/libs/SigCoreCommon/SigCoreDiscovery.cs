@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Zeroconf;
@@ -28,7 +27,6 @@ namespace SigCoreCommon {
         private readonly string _serviceType = "_sigcore._tcp.local.";
 
         private const int ControlPort = 7020;
-        private const int PingTimeoutMs = 1000;
         private const int TcpTimeoutMs = 1000;
 
         public async Task<IReadOnlyList<SigCoreDevice>> DiscoverAsync() {
@@ -53,19 +51,13 @@ namespace SigCoreCommon {
             int servicePort = GetAdvertisedServicePort(host);
             string? version = GetServiceProperty(host, "version");
 
+            // Select only IPv4 addresses and verify that Core accepts TCP connections.
             string? selectedAddress = null;
-            bool ready = false;
-
             foreach (string address in OrderAddresses(addresses)) {
-                bool pingOk = await CanPingAsync(address, PingTimeoutMs);
-
-                if (!pingOk)
-                    continue;
-
-                selectedAddress = address;
-                ready = await CanConnectAsync(address, ControlPort, TcpTimeoutMs);
-
-                break;
+                if (await CanConnectAsync(address, ControlPort, TcpTimeoutMs)) {
+                    selectedAddress = address;
+                    break;
+                }
             }
 
             if (selectedAddress == null)
@@ -82,7 +74,7 @@ namespace SigCoreCommon {
                 ServicePort = servicePort,
                 ControlPort = ControlPort,
 
-                Ready = ready,
+                Ready = true,
                 RawHost = host
             };
         }
@@ -109,20 +101,14 @@ namespace SigCoreCommon {
                     IPAddress.TryParse(address, out IPAddress? parsed);
                     return new { Text = address, Parsed = parsed };
                 })
-                .Where(x => x.Parsed != null)
-                .OrderByDescending(x => x.Parsed!.AddressFamily == AddressFamily.InterNetwork)
-                .ThenBy(x => IsLinkLocal(x.Parsed!))
+                .Where(x => x.Parsed?.AddressFamily == AddressFamily.InterNetwork)
+                .OrderBy(x => IsLinkLocal(x.Parsed!))
                 .Select(x => x.Text);
         }
 
         private static bool IsLinkLocal(IPAddress address) {
-            if (address.AddressFamily == AddressFamily.InterNetwork)
-                return address.ToString().StartsWith("169.254.");
-
-            if (address.AddressFamily == AddressFamily.InterNetworkV6)
-                return address.IsIPv6LinkLocal;
-
-            return false;
+            return address.AddressFamily == AddressFamily.InterNetwork
+                && address.ToString().StartsWith("169.254.");
         }
 
         private static int GetAdvertisedServicePort(IZeroconfHost host) {
@@ -146,17 +132,6 @@ namespace SigCoreCommon {
                     : null;
             } catch {
                 return null;
-            }
-        }
-
-        private static async Task<bool> CanPingAsync(string address, int timeoutMs) {
-            try {
-                using Ping ping = new();
-                PingReply reply = await ping.SendPingAsync(address, timeoutMs);
-
-                return reply.Status == IPStatus.Success;
-            } catch {
-                return false;
             }
         }
 

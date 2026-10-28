@@ -58,8 +58,12 @@ namespace ControlPanel {
             //    DimOverlay.SetBinding(Border.VisibilityProperty, visBinding);
             //}
         }
-        private void Website_RequestNavigate(object sender, RequestNavigateEventArgs e) {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) {
+        private void Website_Click(object sender, RoutedEventArgs e) {
+            if (vm.ConnectionStatus != "Connected" || string.IsNullOrWhiteSpace(vm.IPAddress))
+                return;
+
+            string url = $"http://{vm.IPAddress}/";
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) {
                 UseShellExecute = true
             });
             e.Handled = true;

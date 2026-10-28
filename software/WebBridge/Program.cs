@@ -15,6 +15,8 @@ actions.MapAnalogOutput(app);
 actions.MapConfiguration(app);
 actions.MapPID(app);
 DeviceSettingsEndpoints.Map(app, state);
+RestartEndpoints.Map(app, state);
+BackupRestoreEndpoints.Map(app, state);
 
 app.Lifetime.ApplicationStopping.Register(state.Stop);
 System.Console.WriteLine("[Bridge] Private data service listening on 127.0.0.1:8080");

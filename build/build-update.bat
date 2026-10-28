@@ -236,6 +236,14 @@ git -C "%REPO%" tag -a "%GIT_TAG%" "%GIT_COMMIT%" -m "SigCore UC %REV% %VER% sta
     goto :failed
 )
 
+rem -------- Push release commit and tag to GitHub --------
+echo(
+echo Pushing release to GitHub...
+git -C "%REPO%" push origin main || goto :push_failed
+git -C "%REPO%" push origin "%GIT_TAG%" || goto :push_failed
+echo   GitHub branch: main
+echo   GitHub tag:    %GIT_TAG%
+
 echo(
 echo =========================================
 echo  STAGING COMPLETE
@@ -250,6 +258,19 @@ echo(
 endlocal
 exit /b 0
 
+
+:push_failed
+set "ERR=%ERRORLEVEL%"
+if "%ERR%"=="0" set "ERR=1"
+echo(
+echo =========================================
+echo  GITHUB PUSH FAILED
+echo  The firmware was staged and installers published.
+echo  The Git commit and tag exist locally.
+echo  Check which push failed before retrying.
+echo =========================================
+echo(
+endlocal & exit /b %ERR%
 
 :failed
 set "ERR=%ERRORLEVEL%"

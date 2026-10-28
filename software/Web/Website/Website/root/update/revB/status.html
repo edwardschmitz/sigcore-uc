@@ -1,105 +1,24 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SigCore UC Status</title>
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            margin: 24px;
-            background: #f4f4f4;
-            color: #222;
-        }
-
-        h1 {
-            margin-bottom: 4px;
-        }
-
-        .subtle {
-            color: #666;
-            margin-top: 0;
-        }
-
-        .connection {
-            display: inline-block;
-            padding: 6px 10px;
-            border: 1px solid #bbb;
-            border-radius: 4px;
-            background: #fff;
-            margin-bottom: 18px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .card {
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            padding: 14px;
-        }
-
-        .card h2 {
-            font-size: 1rem;
-            margin: 0 0 10px 0;
-        }
-
-        .value {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .error {
-            color: #9b0000;
-            white-space: pre-wrap;
-        }
-
-        pre {
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            padding: 12px;
-            overflow: auto;
-        }
-    </style>
-</head>
-<body>
-    <h1>SigCore UC Status and Live Update</h1>
-    <p class="subtle">Live data through Apache/PHP</p>
-
-    <div id="connection" class="connection">Connecting...</div>
-    <div id="error" class="error"></div>
-
-    <h2>Analog Inputs</h2>
-    <div id="analogInputs" class="grid"></div>
-
-    <h2>Digital Inputs</h2>
-    <div id="digitalInputs" class="grid"></div>
-
-    <h2>Relays</h2>
-    <div id="relays" class="grid"></div>
-
-    <h2>Analog Outputs</h2>
-    <div id="analogOutputs" class="grid"></div>
-
-    <details>
-        <summary>Raw state</summary>
-        <pre id="rawState"></pre>
-    </details>
-
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SigCore UC | Live Values</title><link rel="stylesheet" href="/css/site.css?v=6"><script src="/js/site-nav.js?v=shell2" defer></script>
+</head><body>
+<header class="site-header" data-site-header></header>
+<main class="site-main"><div class="page-heading"><h1>Live Values</h1><p>Real-time device I/O</p></div>
+<div id="connection" class="connection">Connecting...</div><div id="error" class="error"></div>
+<section class="page-section"><h2>Analog Inputs</h2><div id="analogInputs" class="io-grid"></div></section>
+<section class="page-section"><h2>Digital Inputs</h2><div id="digitalInputs" class="io-grid"></div></section>
+<section class="page-section"><h2>Relays</h2><div id="relays" class="io-grid"></div></section>
+<section class="page-section"><h2>Analog Outputs</h2><div id="analogOutputs" class="io-grid"></div></section>
+<details class="raw-state"><summary>Raw state</summary><pre id="rawState"></pre></details></main>
+<footer class="site-footer" data-site-footer></footer>
     <script>
         const POLL_MS = 500;
 
         function card(title, value) {
             const div = document.createElement('div');
-            div.className = 'card';
+            div.className = 'io-card';
 
-            const heading = document.createElement('h2');
+            const heading = document.createElement('h3');
             heading.textContent = title;
 
             const val = document.createElement('div');
@@ -227,5 +146,4 @@
 
         poll();
     </script>
-</body>
-</html>
+</body></html>

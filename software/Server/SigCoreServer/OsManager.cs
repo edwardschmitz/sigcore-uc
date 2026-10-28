@@ -195,17 +195,35 @@ namespace SigCoreServer {
             double cpuTemp = GetCpuTemp();
             items.Add(MakePair("CPU Temperature", $"{cpuTemp:F1} °C"));
 
-            // Memory Usage
-            string memRaw = RunCommand("free | awk '/Mem:/ {print $3\" \" $2}'").StdOut.Trim();
-            var memParts = memRaw.Split(' ');
-            if (memParts.Length == 2 &&
-                double.TryParse(memParts[0], out double usedKb) &&
-                double.TryParse(memParts[1], out double totalKb)) {
+            // Memory Usage: read the kernel's current values directly, without shell quoting.
+            // MemAvailable accounts for reclaimable cache and is a better measure
+            // of memory available to applications than MemFree.
+            long totalKb = 0;
+            long availableKb = 0;
+            try {
+                foreach (string line in System.IO.File.ReadLines("/proc/meminfo")) {
+                    if (line.StartsWith("MemTotal:", StringComparison.Ordinal)) {
+                        string[] fields = line.Substring("MemTotal:".Length)
+                            .Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+                        if (fields.Length > 0)
+                            long.TryParse(fields[0], out totalKb);
+                    } else if (line.StartsWith("MemAvailable:", StringComparison.Ordinal)) {
+                        string[] fields = line.Substring("MemAvailable:".Length)
+                            .Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+                        if (fields.Length > 0)
+                            long.TryParse(fields[0], out availableKb);
+                    }
+                }
+            } catch (System.IO.IOException) {
+                // Report Unknown below if the kernel memory information is unavailable.
+            } catch (UnauthorizedAccessException) {
+                // Report Unknown below if the kernel memory information is inaccessible.
+            }
 
-                double usedMb = usedKb / 1024.0;
+            if (totalKb > 0 && availableKb >= 0 && availableKb <= totalKb && availableKb > 0) {
+                double usedMb = (totalKb - availableKb) / 1024.0;
                 double totalMb = totalKb / 1024.0;
-                double pct = Math.Round(usedMb / totalMb * 100.0, 1);
-
+                double pct = Math.Round((totalKb - availableKb) * 100.0 / totalKb, 1);
                 items.Add(MakePair("Memory Usage", $"{(int)usedMb}/{(int)totalMb} MB ({pct}%)"));
             } else {
                 items.Add(MakePair("Memory Usage", "Unknown"));

@@ -1,0 +1,39 @@
+/* SigCore Web HMI - Control Panel proportions, compact horizontally. */
+.hmi-main{width:min(1150px,calc(100% - 24px));padding-top:12px;font-family:Arial,Helvetica,sans-serif}
+.hmi-message{margin:0 0 9px;color:#235b32;font-size:13px;min-height:17px}
+.hmi-message.error{color:#9a2222}
+.hmi-panel{background:#aaa;border:1px solid #777;border-radius:14px;padding:11px;min-width:0}
+.hmi-panel h2{font-size:24px;line-height:1.1;color:#0b0b0b;margin:0 0 11px;font-weight:700}
+.hmi-relays{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px}
+.hmi-relay{background:#faf4eb;border:1px solid #777;border-radius:14px;padding:8px 7px;min-width:0;text-align:center;display:flex;flex-direction:column;align-items:stretch;gap:5px}
+.hmi-relay-contacts{display:flex;flex-direction:column;gap:4px;align-items:flex-start;min-height:39px}
+.hmi-contact{display:flex;gap:5px;align-items:center;font-size:12px;font-weight:700;color:#111}
+.hmi-led{display:inline-block;width:14px;height:14px;flex:none;border-radius:50%;border:2px solid #222;box-shadow:inset 0 1px 2px #ffffff55,0 0 1px #333}
+.hmi-led.green{background:#00ed00}.hmi-led.red{background:#ff1010}.hmi-led.dark{background:#505050}
+.hmi-toggle{border:2px solid #252525;border-radius:5px;padding:7px 0;font-family:Arial,Helvetica,sans-serif;font-size:17px;line-height:1.1;font-weight:700;color:#080808;background:#ddd;cursor:pointer;width:100%;transition:none!important;animation:none!important;box-shadow:none!important;outline:none}
+.hmi-toggle.on{background:#00ed00}.hmi-toggle.off{background:#f00000}
+.hmi-toggle:focus{outline:none!important;box-shadow:none!important}
+.hmi-toggle:focus-visible{outline:2px solid #222!important;outline-offset:2px}
+.hmi-toggle:active{filter:none!important;transform:none!important}
+.hmi-toggle:disabled{opacity:1;cursor:default}
+.hmi-number{font-size:18px;line-height:1.2;font-weight:700;color:#111}
+.hmi-name{font-size:13px;line-height:1.2;color:#222;min-height:16px;overflow-wrap:anywhere;font-weight:600}
+/* Panel widths are content-oriented instead of filling the whole viewport. */
+.hmi-lower{display:grid;grid-template-columns:260px 350px 350px;gap:10px;justify-content:center;margin-top:10px;align-items:start}
+.hmi-list{display:flex;flex-direction:column;gap:6px}
+.hmi-row{background:#faf4eb;border:1px solid #777;border-radius:8px;padding:5px 9px;display:flex;align-items:center;gap:10px;min-height:36px;min-width:0}
+.hmi-channel-name{font-size:15px;font-weight:600;color:#111;overflow-wrap:anywhere;min-width:0}
+.hmi-channel-id{font-weight:700;margin-right:5px}
+.hmi-value{background:#fff;border:1px solid #888;border-radius:3px;padding:4px 7px;min-width:81px;text-align:right;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;color:#111;flex:none}
+button.hmi-value{cursor:pointer}button.hmi-value:hover:not(:disabled){background:#fff9d9;border-color:#444}button.hmi-value:disabled{cursor:default;opacity:1}
+.hmi-units{font-weight:400;color:#333}
+/* Anchored editor; opening it never affects surrounding layout. */
+.hmi-dialog{position:fixed;margin:0;border:1px solid #777;border-radius:7px;background:#faf4eb;padding:12px;box-shadow:0 5px 18px #0005;min-width:0;width:218px;max-width:calc(100vw - 16px);color:#111}
+.hmi-dialog::backdrop{background:transparent}
+.hmi-dialog form{display:flex;flex-direction:column;gap:9px}
+.hmi-dialog label{font-size:14px;font-weight:700}
+.hmi-entry{display:flex;align-items:center;gap:8px}.hmi-entry input{min-width:0;width:132px;font-size:17px;padding:5px;border:1px solid #777;border-radius:4px}
+.hmi-dialog-actions{display:flex;justify-content:flex-end;gap:8px}.hmi-dialog-actions button{font-size:13px;padding:5px 9px;cursor:pointer}
+@media(max-width:1050px){.hmi-lower{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:850px){.hmi-relays{grid-template-columns:repeat(4,minmax(0,1fr))}.hmi-lower{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.hmi-relays{grid-template-columns:repeat(2,minmax(0,1fr))}.hmi-lower{grid-template-columns:1fr}}

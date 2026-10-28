@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SigCore UC | Device</title><link rel="stylesheet" href="/css/site.css"><link rel="stylesheet" href="/css/device.css?v=20261014e"><script src="/js/site-nav.js" defer></script><script src="/js/device.js?v=20261015b" defer></script><style>#eth-static-fields[hidden],#wifi-static-fields[hidden]{display:none!important}</style></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SigCore UC | Device</title><link rel="stylesheet" href="/css/site.css"><link rel="stylesheet" href="/css/device.css?v=20261020c"><script src="/js/site-nav.js" defer></script><script src="/js/device.js?v=20261020b" defer></script><style>#eth-static-fields[hidden],#wifi-static-fields[hidden]{display:none!important}</style></head>
 <body><header class="site-header" data-site-header></header>
 <main class="site-main device-main">
 <div class="page-heading"><h1>Device</h1><p>Software, settings and maintenance</p></div>
@@ -39,7 +39,12 @@
 </div><div class="device-actions"><button type="submit" class="device-button">Save Logger Settings</button><span class="device-hint" id="logger-result"></span></div></form></section>
 <section class="panel device-card" aria-labelledby="maint-heading"><h2 id="maint-heading">Maintenance</h2>
 <div class="device-maint-item"><div><strong>Logs</strong><p>Review diagnostic and system events.</p></div><a class="device-button device-link-button" href="logviewer.php">Open Log Viewer</a></div>
-<div class="device-maint-item"><div><strong>Backup / Restore Properties</strong><p>Export or restore device settings.</p></div><span class="device-hint">Under Construction</span></div>
-<div class="device-maint-item"><div><strong>Restart Device</strong><p>Restart the SigCore UC controller.</p></div><button type="button" class="device-button" disabled>Restart</button></div>
+<div class="device-maint-item device-backup-item">
+<div class="device-backup-description"><strong>Backup / Restore Properties</strong><p>Export or restore device settings.</p></div>
+<div class="device-backup-controls">
+<div class="device-backup-buttons"><button type="button" class="device-button" id="backup-config">Download Backup</button><input type="file" id="restore-file" accept=".json,application/json" hidden><button type="button" class="device-button" id="restore-config">Restore Backup</button></div>
+<span class="device-hint" id="backup-result" role="status"></span>
+</div></div>
+<div class="device-maint-item"><div><strong>Restart Device</strong><p>Restart the SigCore UC controller.</p></div><button type="button" class="device-button" id="restart-device">Restart</button></div>
 <div class="device-maint-item"><div><strong>Version Recovery</strong><p>Select an installed software version to recover. Automatic updates will be disabled.</p></div><span class="device-hint">Under Construction</span></div>
 </section></main><footer class="site-footer" data-site-footer></footer></body></html>

@@ -122,6 +122,41 @@
       save('logger',changes);
     }catch(err){message('logger-result',err.message,true);}
   });
+  $('backup-config').addEventListener('click', () => {
+    // Let the browser manage file destination and filename.
+    window.location.href = '/api/config-backup.php';
+  });
+  $('restore-config').addEventListener('click', () => $('restore-file').click());
+  $('restore-file').addEventListener('change', async () => {
+    const file = $('restore-file').files?.[0];
+    if (!file) return;
+    $('restore-file').value = '';
+    if (!confirm(`Restore settings from ${file.name}? Global and network settings will stay unchanged. The controller will restart.`)) return;
+    const button = $('restore-config'); button.disabled = true;
+    try {
+      if (file.size > 1048576) throw Error('Backup exceeds 1 MB.');
+      const data = await fetchJson('/api/config-restore.php', {method:'POST', headers:{'Content-Type':'application/json'},body:await file.text()});
+      if (!data.accepted) throw Error('Restore not accepted.');
+      message('backup-result', 'Restore accepted. Device restarting; refresh this page after reconnecting.');
+    } catch(e) { message('backup-result', 'Restore failed: '+e.message, true); }
+    finally { button.disabled=false; }
+  });
+  $('restart-device').addEventListener('click', async () => {
+    if (!confirm('Restart this SigCore UC device? All device connections will be interrupted.')) return;
+    const button = $('restart-device');
+    button.disabled = true;
+    try {
+      const result = await fetchJson('/api/restart.php', {method:'POST'});
+      if (!result.accepted) throw Error('Restart was not accepted.');
+      button.textContent = 'Restart requested';
+      $('device-error').textContent = 'Restart requested. Reconnect or reload this page after the device starts again.';
+      $('device-error').hidden = false;
+    } catch (e) {
+      $('device-error').textContent = 'Restart failed: ' + e.message;
+      $('device-error').hidden = false;
+      button.disabled = false;
+    }
+  });
   $('refresh-status').addEventListener('click',refreshStatus);
   void refreshStatus();
   void loadSettings('system');void loadSettings('network');void loadSettings('logger');

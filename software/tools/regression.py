@@ -29,8 +29,7 @@ DISCOVERY_SECONDS = 3
 
 CORE_PORT = 7020
 WEB_PORT = 80
-STATUS_PATH = "/status.html"
-EXPECTED_STATUS_TEXT = "SigCore UC Status and Live Update"
+HOME_PATH = "/"
 
 SSH_USER = "sigcoreuc"
 PROPERTIES_PATH = "/opt/sigcore/properties.json"
@@ -149,27 +148,16 @@ def tcp_test(host, port):
     return run
 
 
-def status_page_test(host):
+def home_page_test(host):
     def run():
-        url = f"http://{host}{STATUS_PATH}"
+        url = f"http://{host}{HOME_PATH}"
         try:
             with urllib.request.urlopen(url, timeout=5) as response:
                 status = response.status
-                body = response.read().decode("utf-8", errors="replace")
-
                 if status != 200:
                     raise Exception(f"HTTP {status}")
 
-                if EXPECTED_STATUS_TEXT not in body:
-                    raise Exception(
-                        f"HTTP 200, but expected text was not found: "
-                        f"{EXPECTED_STATUS_TEXT!r}"
-                    )
-
-                return (
-                    f"Actual: HTTP {status}; "
-                    f"found expected text {EXPECTED_STATUS_TEXT!r}"
-                )
+                return f"Actual: HTTP {status}"
 
         except urllib.error.HTTPError as e:
             raise Exception(f"HTTP {e.code} {e.reason}")
@@ -243,13 +231,12 @@ def test_unit(unit):
 
     results.append(
         run_test(
-            "Status page",
+            "Home page",
             [
-                f"URL: http://{test_host}{STATUS_PATH}",
+                f"URL: http://{test_host}{HOME_PATH}",
                 "Expected: HTTP 200",
-                f"Expected content: {EXPECTED_STATUS_TEXT!r}",
             ],
-            status_page_test(test_host),
+            home_page_test(test_host),
         )
     )
 
@@ -585,9 +572,9 @@ def check_runtime_health(ip):
         issues.append(f"Core is not reachable on port {CORE_PORT}: {e}")
 
     try:
-        status_page_test(ip)()
+        home_page_test(ip)()
     except Exception as e:
-        issues.append(f"Status page failed: {e}")
+        issues.append(f"Home page failed: {e}")
 
     return issues
 

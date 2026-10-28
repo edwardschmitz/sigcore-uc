@@ -287,15 +287,29 @@ namespace SigCoreCommon {
         }
 
         private static double Interpolate(double x, double[] input, double[] adjusted) {
-            if (input.Length < 2 || adjusted.Length < 2)
+            if (input == null || adjusted == null ||
+                input.Length < 2 || input.Length != adjusted.Length)
                 return x;
-            for (int i = 0; i < input.Length - 1; i++) {
-                if (x >= input[i] && x <= input[i + 1]) {
-                    double t = (x - input[i]) / (input[i + 1] - input[i]);
-                    return adjusted[i] + t * (adjusted[i + 1] - adjusted[i]);
-                }
+
+            // Outside the calibration table, extend the nearest end segment
+            // without clamping. The configuration points are ordered by input.
+            int segment;
+            if (x < input[0]) {
+                segment = 0;
+            } else if (x > input[^1]) {
+                segment = input.Length - 2;
+            } else {
+                segment = 0;
+                while (segment < input.Length - 2 && x > input[segment + 1])
+                    segment++;
             }
-            return adjusted[^1];
+
+            double dx = input[segment + 1] - input[segment];
+            if (dx == 0)
+                return x; // Invalid duplicate input points; avoid division by zero.
+
+            double t = (x - input[segment]) / dx;
+            return adjusted[segment] + t * (adjusted[segment + 1] - adjusted[segment]);
         }
 
         public bool GetValue() {

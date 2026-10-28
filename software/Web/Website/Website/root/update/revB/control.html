@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SigCore UC | Control</title>
+<link rel="stylesheet" href="/css/site.css?v=8">
+<link rel="stylesheet" href="/css/hmi.css?v=4">
+<script src="/js/site-nav.js?v=shell2" defer></script>
+<script src="/js/control.js?v=hmi3" defer></script>
+</head>
+<body>
+<header class="site-header" data-site-header></header>
+<main class="site-main hmi-main">
+<div id="control-message" class="hmi-message" role="status" aria-live="polite">Connecting to Core…</div>
+<section class="hmi-panel hmi-relay-panel" aria-labelledby="relay-heading"><h2 id="relay-heading">Relay Outputs</h2><div id="control-relays" class="hmi-relays"></div></section>
+<div class="hmi-lower">
+<section class="hmi-panel" aria-labelledby="di-heading"><h2 id="di-heading">Digital Inputs</h2><div id="control-di" class="hmi-list"></div></section>
+<section class="hmi-panel" aria-labelledby="ai-heading"><h2 id="ai-heading">Analog Inputs</h2><div id="control-ai" class="hmi-list"></div></section>
+<section class="hmi-panel" aria-labelledby="ao-heading"><h2 id="ao-heading">Analog Outputs</h2><div id="control-ao" class="hmi-list"></div></section>
+</div>
+<dialog id="ao-dialog" class="hmi-dialog" aria-labelledby="ao-dialog-title"><form id="ao-form" method="dialog"><label id="ao-dialog-title" for="ao-entry">Analog Output</label><div class="hmi-entry"><input id="ao-entry" type="number" step="any" required autocomplete="off"><span id="ao-units"></span></div><div class="hmi-dialog-actions"><button type="button" id="ao-cancel">Cancel</button><button type="submit" id="ao-set">Set</button></div></form></dialog>
+</main>
+<footer class="site-footer" data-site-footer></footer>
+</body></html>

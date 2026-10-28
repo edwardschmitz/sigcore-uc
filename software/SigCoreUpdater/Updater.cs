@@ -183,6 +183,12 @@ namespace SigCoreUpdater {
                     $"SCU verification failed for version {targetVersion}.");
             }
 
+            // The downloaded package is considered DOWNLOADED only after both
+            // its expected SHA-256 hash and signature have been verified.
+            DateTimeOffset downloadedAt = DateTimeOffset.UtcNow;
+            await new UpdateEventReporter().ReportDownloadedAsync(
+                currentConfig.Revision, targetVersion, downloadedAt, token);
+
             VersionInstaller.Prepare(
                 scuLocal,
                 stagingDirectory,
