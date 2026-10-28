@@ -6,6 +6,18 @@ set "LOG=%TEMP%\sigcore-build.log"
 
 cd /d "%ROOT%" || exit /b 1
 
+rem Avoid locked build outputs while Control Panel is running.
+:check_control_panel
+tasklist /FI "IMAGENAME eq ControlPanel.exe" /NH 2>nul | find /I "ControlPanel.exe" >nul
+if not errorlevel 1 (
+    echo Control Panel is currently running.
+    echo Close Control Panel before continuing.
+    echo.
+    echo Press any key to retry, or Ctrl+C to cancel.
+    pause >nul
+    goto :check_control_panel
+)
+
 echo Publishing...
 > "%LOG%" echo.
 
