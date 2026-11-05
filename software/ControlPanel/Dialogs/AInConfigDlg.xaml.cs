@@ -1,4 +1,4 @@
-﻿using SigCoreCommon;
+using SigCoreCommon;
 using SigCoreCommon.Payloads;
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,9 @@ namespace ControlPanel.Dialogs {
             InitializeComponent();
             vm = new AInConfigDlgVM(config);
             DataContext = vm;
+            // Keep editable text out of the payload until both integers are validated.
+            AveragingSamplesBox.Text = vm.AveragingSamples.ToString(CultureInfo.InvariantCulture);
+            PrecisionBox.Text = vm.Precision.ToString(CultureInfo.InvariantCulture);
             LoadCalibrationEditors();
             UpdateCalibrationVisibility(vm.CalibrationType);
             vm.PropertyChanged += (s, e) => {
@@ -146,6 +149,35 @@ namespace ControlPanel.Dialogs {
         }
 
         private void Ok_Click(object sender, RoutedEventArgs e) {
+            // Reject invalid numeric input before touching the configuration payload.
+            if (!int.TryParse(AveragingSamplesBox.Text.Trim(), NumberStyles.None,
+                    CultureInfo.InvariantCulture, out int averagingSamples) ||
+                averagingSamples < 1 || averagingSamples > 100) {
+                MessageBox.Show(this, "Averaging must be a whole number from 1 to 100.",
+                    "Analog Input Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
+                AveragingSamplesBox.Focus();
+                AveragingSamplesBox.SelectAll();
+                return;
+            }
+            if (!int.TryParse(PrecisionBox.Text.Trim(), NumberStyles.None,
+                    CultureInfo.InvariantCulture, out int precision) ||
+                precision < 0 || precision > 9) {
+                MessageBox.Show(this, "Precision must be a whole number from 0 to 9.",
+                    "Analog Input Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
+                PrecisionBox.Focus();
+                PrecisionBox.SelectAll();
+                return;
+            }
+
+            // Calibration slope and offset are directly bound doubles. Invalid text can otherwise
+            // leave the last valid property value in the payload without warning the user.
+            if (MxBPanel.Visibility == Visibility.Visible &&
+                (!DialogInputValidation.Validate(this,
+                    DialogInputValidation.NumericRule.Real("M", "Calibration slope (M)"),
+                    DialogInputValidation.NumericRule.Real("B", "Calibration offset (B)")) ||
+                 !DialogInputValidation.CommitBindings(this)))
+                return;
+
             switch ((A_IN.CalType)vm.CalibrationType) {
                 case A_IN.CalType.Polynomial:
                     if (coefficients.Any(c => !TryNumber(c.Text, out _))) {
@@ -168,6 +200,8 @@ namespace ControlPanel.Dialogs {
                         .Select(p => p.Input.Text.Trim() + ":" + p.Output.Text.Trim()));
                     break;
             }
+            vm.AveragingSamples = averagingSamples;
+            vm.Precision = precision;
             DialogResult = true;
         }
 

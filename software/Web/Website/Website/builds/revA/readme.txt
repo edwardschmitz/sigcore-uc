@@ -1,1 +1,0 @@
-This is an end-to-end test of the auto update feature of SigCore UC

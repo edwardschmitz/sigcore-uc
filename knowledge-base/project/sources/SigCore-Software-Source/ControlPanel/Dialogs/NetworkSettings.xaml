@@ -1,0 +1,158 @@
+﻿<Window x:Class="ControlPanel.Dialogs.NetworkSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Network Settings"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        FontFamily="Segoe UI"
+        FontSize="14">
+
+    <Border CornerRadius="8"
+            BorderBrush="#888"
+            BorderThickness="1"
+            Padding="10"
+            Background="White"
+            Margin="10">
+
+        <Border.Effect>
+            <DropShadowEffect Color="#805C40"
+                              Opacity=".4"
+                              BlurRadius="10"
+                              ShadowDepth="6"/>
+        </Border.Effect>
+
+        <StackPanel Margin="5">
+
+            <TextBlock Text="Network Settings"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,10"/>
+
+            <!-- Hostname -->
+            <StackPanel Orientation="Horizontal" Margin="5,2">
+                <TextBlock Text="Hostname:" Width="120"/>
+                <TextBox Text="{Binding Hostname, Mode=TwoWay}"
+                         Width="240"
+                         Padding="5,2"
+                         IsReadOnly="True"
+                         />
+            </StackPanel>
+
+            <!-- Ethernet -->
+            <TextBlock Text="Ethernet (eth0)"
+                       FontWeight="Bold"
+                       Margin="5,12,5,4"/>
+
+            <CheckBox x:Name="EthDhcpCheck"
+                      Content="Use DHCP"
+                      IsChecked="{Binding EthDhcpEnabled, Mode=TwoWay}"
+                      Checked="EthDhcpChanged"
+                      Unchecked="EthDhcpChanged"
+                      Margin="5,2"/>
+
+            <StackPanel x:Name="EthStaticPanel"
+                        Margin="10,0,0,0">
+
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="IP Address:" Width="120"/>
+                    <TextBox Text="{Binding EthIpAddress, Mode=TwoWay}"
+                             Width="180"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="Subnet Mask:" Width="120"/>
+                    <TextBox Text="{Binding EthSubnetMask, Mode=TwoWay}"
+                             Width="180"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="Gateway:" Width="120"/>
+                    <TextBox Text="{Binding EthGateway, Mode=TwoWay}"
+                             Width="180"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="DNS:" Width="120"/>
+                    <TextBox Text="{Binding EthDns, Mode=TwoWay}"
+                             Width="180"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Wi-Fi -->
+            <TextBlock Text="Wi-Fi (wlan0)"
+                       FontWeight="Bold"
+                       Margin="5,14,5,4"/>
+
+            <StackPanel Orientation="Horizontal" Margin="5,2">
+                <TextBlock Text="SSID:" Width="120"/>
+                <TextBox Text="{Binding WifiSSID, Mode=TwoWay}"
+                         Width="240"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="5,2">
+                <TextBlock Text="Password:" Width="120"/>
+                <TextBox Text="{Binding WifiPSK, Mode=TwoWay}"
+                         Width="240"/>
+            </StackPanel>
+
+            <CheckBox x:Name="WifiDhcpCheck"
+                      Content="Use DHCP"
+                      IsChecked="{Binding WifiDhcpEnabled, Mode=TwoWay}"
+                      Checked="WifiDhcpChanged"
+                      Unchecked="WifiDhcpChanged"
+                      Margin="5,4"/>
+
+            <StackPanel x:Name="WifiStaticPanel"
+                        Margin="10,0,0,0">
+
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="IP Address:" Width="120"/>
+                    <TextBox Text="{Binding WifiIpAddress, Mode=TwoWay}"
+                             Width="180"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="Subnet Mask:" Width="120"/>
+                    <TextBox Text="{Binding WifiSubnetMask, Mode=TwoWay}"
+                             Width="180"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="Gateway:" Width="120"/>
+                    <TextBox Text="{Binding WifiGateway, Mode=TwoWay}"
+                             Width="180"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="5,2">
+                    <TextBlock Text="DNS:" Width="120"/>
+                    <TextBox Text="{Binding WifiDns, Mode=TwoWay}"
+                             Width="180"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="5,14,5,0">
+                <Button Content="OK"
+                        Width="80"
+                        Margin="5,2"
+                        Padding="5,2"
+                        IsDefault="True"
+                        Click="Ok_Click"/>
+                <Button Content="Cancel"
+                        Width="80"
+                        Margin="5,2"
+                        Padding="5,2"
+                        IsCancel="True"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Border>
+</Window>

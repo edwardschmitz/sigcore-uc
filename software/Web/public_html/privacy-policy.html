@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | SigCore UC</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="24ed1392-77e8-4294-876a-e55dc3d9f56e"></script>
+</head>
+<body>
+    <div id="header-container"></div>
+    <script>
+        fetch("header.html").then(r => r.text()).then(t => document.getElementById("header-container").innerHTML = t);
+    </script>
+    <main class="main-content">
+        <div class="section-title">
+            <p class="large-text" style="margin-left: 15px;">Privacy Policy</p>
+        </div>
+        <div class="specs-container">
+            <div class="spec-card">
+                <h1>Privacy Policy</h1>
+            <p>en Z em operates the SigCore UC website and provides software updates for SigCore UC devices. This page describes the principal information involved in these services.</p>
+
+            <h2>SigCore UC Device Updates</h2>
+            <p>During the update process, SigCore UC sends its device serial number, hardware revision, software version, timestamp, and update status. Measurements, I/O states, device configuration, and operational logs are not transmitted as part of update telemetry.</p>
+            <p>For a more detailed explanation, see <a href="automatic-updates.html">Automatic Updates &amp; Privacy</a>.</p>
+
+            <h2>Website Analytics</h2>
+            <p>The website uses Umami analytics to understand website usage. Visits to pages may generate analytics information. This website analytics activity is separate from SigCore UC operational data and device update telemetry.</p>
+
+            <h2>Server and Network Information</h2>
+            <p>Requests to our website and update infrastructure may be processed or logged by our hosting providers, including technical network information such as the public IP address, request time, and requested resource.</p>
+
+            <h2>Information You Provide</h2>
+            <p>If you contact us or submit an email address for access to downloads or other communications, we may use the information you provide to respond to your request or provide the requested service.</p>
+
+            <h2>Operational Data</h2>
+            <p>The automatic-update mechanism does not transmit SigCore UC measurements, I/O states, device configuration, or operational logs to en Z em. We do not provide a manufacturer remote-access service for viewing or controlling customer devices.</p>
+
+            <h2>Questions</h2>
+            <p>Questions about privacy or device updates can be directed to <a href="mailto:edwardschmitzsoftware@hotmail.com">edwardschmitzsoftware@hotmail.com</a>.</p>
+            <p class="small-print">This policy describes the practices stated above; it does not describe data handling by third-party systems that a customer chooses to integrate with SigCore UC.</p>
+
+            </div>
+        </div>
+    </main>
+    <div id="footer-container"></div>
+    <script>
+        fetch("footer.html").then(r => r.text()).then(t => document.getElementById("footer-container").innerHTML = t);
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            if (menu) menu.classList.toggle("show");
+        }
+    </script>
+</body>
+</html>

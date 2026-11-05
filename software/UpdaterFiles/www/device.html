@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SigCore UC | Device</title><link rel="stylesheet" href="/css/site.css"><link rel="stylesheet" href="/css/device.css?v=20261020c"><script src="/js/site-nav.js" defer></script><script src="/js/device.js?v=20261020b" defer></script><style>#eth-static-fields[hidden],#wifi-static-fields[hidden]{display:none!important}</style></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SigCore UC | Device</title><link rel="stylesheet" href="/css/site.css"><link rel="stylesheet" href="/css/device.css?v=20261020c"><script src="/js/site-nav.js" defer></script><script src="/js/device.js?v=20261103-validation1" defer></script><style>#eth-static-fields[hidden],#wifi-static-fields[hidden]{display:none!important}</style></head>
 <body><header class="site-header" data-site-header></header>
 <main class="site-main device-main">
 <div class="page-heading"><h1>Device</h1><p>Software, settings and maintenance</p></div>
@@ -15,7 +15,7 @@
 <form id="system-form" autocomplete="off"><div class="device-form-grid">
 <label for="system-name">System Name</label><input id="system-name" type="text" >
 <label for="system-sampling">Analog Sampling Rate</label><select id="system-sampling" ><option value="0">Low</option><option value="1">Medium</option><option value="2">High</option></select>
-<label for="system-pwm">PWM Frequency (Hz)</label><input id="system-pwm" type="number" min="1" step="1" >
+<label for="system-pwm">PWM Frequency (Hz)</label><input id="system-pwm" type="number" min="1" max="2147483647" step="1" >
 </div><div class="device-actions"><button type="submit" class="device-button">Save System Settings</button><span class="device-hint" id="system-result"></span></div></form></section>
 <section class="panel device-card" aria-labelledby="network-heading"><h2 id="network-heading">Network Settings</h2>
 <form id="network-form" autocomplete="off"><div class="device-net-columns">
@@ -27,15 +27,15 @@
 <section class="panel device-card" aria-labelledby="logger-heading"><h2 id="logger-heading">MySQL Logger</h2>
 <form id="logger-form" autocomplete="off"><div class="device-form-grid">
 <label for="logger-enabled">Enabled</label><div><input id="logger-enabled" type="checkbox" ></div>
-<label for="logger-interval">Interval (sec)</label><input id="logger-interval" type="number" >
+<label for="logger-interval">Interval (sec)</label><input id="logger-interval" type="number" min="0.001" max="2147483" step="any" >
 <label for="logger-server">Server</label><input id="logger-server" >
-<label for="logger-port">Port</label><input id="logger-port" type="number" >
+<label for="logger-port">Port</label><input id="logger-port" type="number" min="1" max="65535" step="1" >
 <label for="logger-db">Database</label><input id="logger-db" >
 <label for="logger-user">User</label><input id="logger-user" >
 <label for="logger-password">Password</label><div style="display:flex; gap:8px; width:100%;"><input id="logger-password" type="password" autocomplete="off" style="flex:1; min-width:0;"><button id="logger-password-toggle" type="button">Show</button></div>
 <label for="logger-table">Table Name</label><input id="logger-table" >
-<label for="logger-conn">Connection Timeout (s)</label><input id="logger-conn" type="number" >
-<label for="logger-command">Command Timeout (s)</label><input id="logger-command" type="number" >
+<label for="logger-conn">Connection Timeout (s)</label><input id="logger-conn" type="number" min="1" step="1" >
+<label for="logger-command">Command Timeout (s)</label><input id="logger-command" type="number" min="1" step="1" >
 </div><div class="device-actions"><button type="submit" class="device-button">Save Logger Settings</button><span class="device-hint" id="logger-result"></span></div></form></section>
 <section class="panel device-card" aria-labelledby="maint-heading"><h2 id="maint-heading">Maintenance</h2>
 <div class="device-maint-item"><div><strong>Logs</strong><p>Review diagnostic and system events.</p></div><a class="device-button device-link-button" href="logviewer.php">Open Log Viewer</a></div>

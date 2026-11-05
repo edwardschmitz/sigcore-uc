@@ -21,6 +21,12 @@ namespace ControlPanel.Dialogs {
             InitializeComponent();
         }
         private void Ok_Click(object sender, RoutedEventArgs e) {
+            // The Core/hardware must define any upper PWM frequency limit; reject nonpositive input here.
+            if (!DialogInputValidation.Validate(this,
+                DialogInputValidation.NumericRule.Whole("PWMFrequency", "PWM frequency (Hz)", 1)) ||
+                !DialogInputValidation.CommitBindings(this))
+                return;
+
             DialogResult = true;
             Close();
         }

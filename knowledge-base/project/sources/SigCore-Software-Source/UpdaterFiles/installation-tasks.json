@@ -1,0 +1,24 @@
+{
+  "tasks": [
+    {
+      "id": "install-php-mysql",
+      "check": {
+        "command": "/usr/bin/php",
+        "arguments": [
+          "-r",
+          "exit(extension_loaded('pdo_mysql') ? 0 : 1);"
+        ]
+      },
+      "commands": [
+        {
+          "command": "/usr/bin/apt-get",
+          "arguments": [
+            "install",
+            "-y",
+            "php-mysql"
+          ]
+        }
+      ]
+    }
+  ]
+}

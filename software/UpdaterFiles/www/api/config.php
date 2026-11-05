@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/_bridge.php';
+require_once __DIR__ . '/_input-validation.php';
 $method = $_SERVER['REQUEST_METHOD'] ?? '';
 if (!in_array($method, ['GET', 'PUT'], true)) {
     http_response_code(405);
@@ -17,4 +18,18 @@ if (!is_string($kind) || !isset($limits[$kind]) || $channel === null || $channel
     echo json_encode(['error' => 'Invalid configuration target.']);
     exit;
 }
-emit_bridge_request($method, '/api/config/' . $kind . '/' . $channel);
+if ($method === 'GET') {
+    emit_bridge_request('GET', '/api/config/' . $kind . '/' . $channel);
+}
+$raw = file_get_contents('php://input');
+$payload = decode_config_input($raw === false ? '' : $raw);
+if (!isset($payload['config']) || !is_array($payload['config']) || array_is_list($payload['config'])) {
+    reject_invalid_input('Missing configuration object.');
+}
+validate_channel_config_input($kind, $payload['config']);
+$result = bridge_request('PUT', '/api/config/' . $kind . '/' . $channel, $raw);
+http_response_code($result['status']);
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store');
+echo $result['body'];
+exit;

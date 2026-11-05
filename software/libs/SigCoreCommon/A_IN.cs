@@ -7,6 +7,15 @@ using System.Linq;
 
 namespace SigCoreCommon {
     public class A_IN : Ads1115Driver {
+        public const int MinAveragingSamples = Ads1115Driver.MinSamplesPerChannel;
+        public const int MaxAveragingSamples = Ads1115Driver.MaxSamplesPerChannel;
+
+        public static void ValidateAveragingSamples(int count) {
+            if (count < MinAveragingSamples || count > MaxAveragingSamples)
+                throw new ArgumentOutOfRangeException(nameof(count), count,
+                    $"Analog input averaging must be between {MinAveragingSamples} and {MaxAveragingSamples} samples.");
+        }
+
         public enum CalType {
             None = 0,
             mXplusB,
@@ -33,7 +42,14 @@ namespace SigCoreCommon {
         public class AInConfig {
             public string Name { get; set; } = string.Empty;
             public string Units { get; set; } = string.Empty;
-            public int AveragingSamples { get; set; } = 1;
+            private int _averagingSamples = 1;
+            public int AveragingSamples {
+                get => _averagingSamples;
+                set {
+                    ValidateAveragingSamples(value);
+                    _averagingSamples = value;
+                }
+            }
             public CalType CalibrationType { get; set; } = CalType.mXplusB;
             public double M { get; set; } = 1.0;
             public double B { get; set; } = 0.0;
@@ -118,6 +134,9 @@ namespace SigCoreCommon {
                 if (payload == null)
                     return;
 
+                // Reject before changing any part of the existing configuration.
+                ValidateAveragingSamples(payload.AveragingSamples);
+
                 Name = payload.Name;
                 Units = payload.Units;
                 AveragingSamples = payload.AveragingSamples;
@@ -138,8 +157,11 @@ namespace SigCoreCommon {
 
         // --- Core A_IN driver members ---
         private readonly AInConfig[] _configs = new AInConfig[4];
-        private readonly double[] _samples = new double[4];
-        private int[] _sampleCount = { 1, 1, 1, 1 };
+        private readonly double[] _samples = new double[4]; // Running raw averages
+        private readonly int[] _sampleCount = { 1, 1, 1, 1 };
+        // Each channel owns a window with the newest sample at index zero.
+        private readonly double[][] _rollingSamples = new double[4][];
+        private readonly int[] _rollingCount = new int[4];
         private readonly A_DOUT _muxController = new A_DOUT();
         private const int address = 0x48;
 
@@ -151,6 +173,7 @@ namespace SigCoreCommon {
                     Name = $"AI{i + 1}",
                     Units = "V"
                 };
+                _rollingSamples[i] = new double[_sampleCount[i]];
             }
         }
 
@@ -165,12 +188,26 @@ namespace SigCoreCommon {
         }
 
         public void FromPayload(AInConfigPayload payload) {
+            if (payload == null)
+                throw new ArgumentNullException(nameof(payload));
             uint channel = payload.Channel;
             if (channel > 3)
                 throw new ArgumentOutOfRangeException(nameof(channel));
 
+            ValidateAveragingSamples(payload.AveragingSamples);
+
+            bool resetWindow = _sampleCount[channel] != payload.AveragingSamples ||
+                               _configs[channel].InputRange != (Range)payload.InputRange;
             _configs[channel].FromPayload(payload);
-            _sampleCount[channel] = _configs[channel].AveragingSamples;
+            _sampleCount[channel] = payload.AveragingSamples;
+
+            // A new averaging length or input range starts a fresh history.
+            // Other configuration edits (name, calibration, etc.) retain samples.
+            if (resetWindow) {
+                _rollingSamples[channel] = new double[payload.AveragingSamples];
+                _rollingCount[channel] = 0;
+            }
+
             ApplyMux(channel);
         }
 
@@ -319,9 +356,26 @@ namespace SigCoreCommon {
                 for (uint ch = 0; ch < 4; ch++) {
                     SelectOnlyMux(ch);
 
-                    double sample = ReadChannel((int)ch, _sampleCount[ch]);
-                    if (sample != _samples[ch]) {
-                        _samples[ch] = sample;
+                    // Exactly one physical ADC measurement per channel per pass.
+                    double sample = ReadChannel((int)ch, 1);
+                    double[] window = _rollingSamples[ch];
+                    int filled = _rollingCount[ch];
+
+                    // Newest sample goes to the front; the oldest falls off.
+                    if (filled < window.Length)
+                        _rollingCount[ch] = filled + 1;
+                    if (window.Length > 1)
+                        Array.Copy(window, 0, window, 1, Math.Min(filled, window.Length - 1));
+                    window[0] = sample;
+
+                    // Average the actual populated part of the buffer; no
+                    // initial zeros are included while the window fills.
+                    double sum = 0.0;
+                    for (int i = 0; i < _rollingCount[ch]; i++)
+                        sum += window[i];
+                    double average = sum / _rollingCount[ch];
+                    if (average != _samples[ch]) {
+                        _samples[ch] = average;
                         changed = true;
                     }
                 }

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatic Updates &amp; Privacy | SigCore UC</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="24ed1392-77e8-4294-876a-e55dc3d9f56e"></script>
+</head>
+<body>
+    <div id="header-container"></div>
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+    <main class="main-content">
+        <div class="section-title">
+            <span class="large-text">Automatic Updates &amp; Privacy</span>
+        </div>
+        <div class="specs-container">
+            <section class="spec-card">
+                <h1>Automatic Software Updates</h1>
+                <p>SigCore UC periodically checks for available software releases. When an eligible update is published, the device downloads and installs it automatically. The update request originates from SigCore UC.</p>
+            </section>
+
+            <section class="spec-card">
+                <h1>What Does SigCore UC Send During an Update?</h1>
+                <h2>Sent</h2>
+                <ul>
+                    <li>Device serial number (DSN)</li>
+                    <li>Hardware revision</li>
+                    <li>Software version</li>
+                    <li>Timestamp</li>
+                    <li>Update status</li>
+                </ul>
+                <h2>Not sent</h2>
+                <ul>
+                    <li>Measurements</li>
+                    <li>Input and output states</li>
+                    <li>Device configuration</li>
+                    <li>Operational logs</li>
+                </ul>
+                <p>Update status information helps identify whether a software release was downloaded, prepared, or installed successfully, or whether an update failed.</p>
+            </section>
+
+            <section class="spec-card">
+                <h1>Manufacturer Access</h1>
+                <p>The automatic-update system does not provide en Z em with a remote login or remote-control connection to your SigCore UC. We do not use the update system to read measurements, inspect your I/O states, retrieve configuration settings, or collect operational logs.</p>
+                <p>en Z em publishes software releases that devices may install automatically. Publishing a software update is distinct from connecting to, or issuing operational commands to, a particular customer's controller.</p>
+            </section>
+
+            <section class="spec-card">
+                <h1>Network Requests</h1>
+                <p>As with other internet requests, connections to the update server can expose the device's public network IP address to the hosting infrastructure. This is separate from the device information listed above.</p>
+            </section>
+
+            <section class="spec-card">
+                <h1>Questions</h1>
+                <p>For questions about device updates or transmitted information, <a href="contacts.html">contact en Z em</a>. For broader website and information practices, read our <a href="privacy-policy.html">Privacy Policy</a>.</p>
+            </section>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            if (menu) menu.classList.toggle("show");
+        }
+    </script>
+</body>
+</html>

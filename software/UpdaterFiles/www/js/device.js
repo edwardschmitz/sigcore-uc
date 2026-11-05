@@ -25,9 +25,39 @@
   const message=(id,text,error=false)=>{const el=$(id);el.textContent=text;el.style.color=error?'#992020':'#21783e';};
   const num = (id,min,max,integer=false) => {
     const text=val(id),number=Number(text);
-    if (text==='' || !Number.isFinite(number) || number<min || number>max || (integer && !Number.isInteger(number))) throw Error(`Invalid ${$(id).id} value.`);
+    if (text==='' || !Number.isFinite(number) || number<min || number>max ||
+        (integer && (!Number.isInteger(number) || !Number.isSafeInteger(number))) || !$(id).checkValidity()) {
+      $(id).focus(); $(id).select();
+      throw Error(`${$(id).previousElementSibling?.textContent || id} must be ${integer?'a whole number':'a number'} from ${min} to ${max}.`);
+    }
     return number;
   };
+  function ipv4(text){
+    const parts=text.split('.');
+    if(parts.length!==4 || !parts.every(s=>/^(0|[1-9]\d{0,2})$/.test(s)&&Number(s)<=255))return null;
+    return parts.map(Number);
+  }
+  function subnetMask(parts){
+    if(!parts)return false;
+    const bits=parts.map(x=>x.toString(2).padStart(8,'0')).join('');
+    return /^1+0*$/.test(bits);
+  }
+  function validateNetwork(prefix){
+    if(bool(prefix+'-dhcp'))return;
+    // An unused Wi-Fi interface may have no SSID or static settings.
+    if(prefix==='wifi' && !val('wifi-ssid') &&
+       ['ip','mask','gateway','dns'].every(key=>!val('wifi-'+key)))return;
+    const labels={ip:'IP address',mask:'subnet mask',gateway:'gateway',dns:'DNS server'};
+    for(const part of ['ip','mask','gateway','dns']){
+      const el=$(prefix+'-'+part),value=val(prefix+'-'+part);
+      if((part==='gateway'||part==='dns') && !value)continue;
+      const parsed=ipv4(value);
+      if(!parsed || (part==='mask'&&!subnetMask(parsed))){
+        el.focus();el.select();
+        throw Error(`${prefix==='eth'?'Ethernet':'Wi-Fi'} ${labels[part]} must be ${part==='mask'?'a contiguous IPv4 subnet mask':'a valid IPv4 address'}.`);
+      }
+    }
+  }
   const original={};
   async function refreshStatus(){
     const button=$('refresh-status'); button.disabled=true;
@@ -89,7 +119,7 @@
   }
   $('system-form').addEventListener('submit',e=>{
     e.preventDefault();
-    try{save('system',{systemName:val('system-name'),analogSamplingRate:num('system-sampling',0,2,true),pwm_frequency:num('system-pwm',1,1000000,true)});}
+    try{save('system',{systemName:val('system-name'),analogSamplingRate:num('system-sampling',0,2,true),pwm_frequency:num('system-pwm',1,2147483647,true)});}
     catch(err){message('system-result',err.message,true);}
   });
   for(const id of ['eth-dhcp','wifi-dhcp'])$(id).addEventListener('change',networkEditable);
@@ -101,6 +131,8 @@
   });
   $('network-form').addEventListener('submit',e=>{
     e.preventDefault();
+    try{validateNetwork('eth');validateNetwork('wifi');}
+    catch(err){message('network-result',err.message,true);return;}
     if(!confirm('Applying network settings may disconnect this website. Continue?'))return;
     const eth={dhcpEnabled:bool('eth-dhcp'),ipAddress:val('eth-ip'),subnetMask:val('eth-mask'),gateway:val('eth-gateway'),dns:val('eth-dns')};
     const wifi={ssid:val('wifi-ssid'),dhcpEnabled:bool('wifi-dhcp'),ipAddress:val('wifi-ip'),subnetMask:val('wifi-mask'),gateway:val('wifi-gateway'),dns:val('wifi-dns')};
@@ -117,7 +149,7 @@
   $('logger-form').addEventListener('submit',e=>{
     e.preventDefault();
     try {
-      const changes={enabled:bool('logger-enabled'),intervalSec:num('logger-interval',0.001,1e8),server:val('logger-server'),port:num('logger-port',1,65535,true),database:val('logger-db'),user:val('logger-user'),tableName:val('logger-table'),connectionTimeoutSec:num('logger-conn',1,86400,true),commandTimeoutSec:num('logger-command',1,86400,true)};
+      const changes={enabled:bool('logger-enabled'),intervalSec:num('logger-interval',0.001,2147483),server:val('logger-server'),port:num('logger-port',1,65535,true),database:val('logger-db'),user:val('logger-user'),tableName:val('logger-table'),connectionTimeoutSec:num('logger-conn',1,2147483647,true),commandTimeoutSec:num('logger-command',1,2147483647,true)};
       if(val('logger-password'))changes.password=val('logger-password');
       save('logger',changes);
     }catch(err){message('logger-result',err.message,true);}

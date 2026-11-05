@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SigCore UC | Chart Recorder</title>
+  <link rel="stylesheet" href="/css/site.css?v=8">
+  <link rel="stylesheet" href="/vendor/uplot/uPlot.min.css">
+  <link rel="stylesheet" href="/css/chart-recorder.css?v=1">
+  <script src="/js/site-nav.js?v=chart1" defer></script>
+  <script src="/vendor/uplot/uPlot.iife.min.js" defer></script>
+  <script src="/js/chart-recorder.js?v=5" defer></script>
+</head>
+<body>
+<header class="site-header" data-site-header></header>
+<main class="site-main wide chart-page">
+  <header class="page-head"><div><h1>Chart Recorder</h1><p>SigCore UC analog inputs</p></div><div id="status" role="status">Connecting…</div></header>
+  <div class="toolbar">
+    <button id="live">Live</button>
+    <button id="earlier" title="Move backward by half a window">Earlier</button>
+    <button id="later" title="Move forward by half a window">Later</button>
+    <button id="zoom-in" title="Shorter time span">Zoom in</button>
+    <button id="zoom-out" title="Longer time span">Zoom out</button>
+    <label>Window <select id="window">
+      <option value="60">1 minute</option><option value="300">5 minutes</option>
+      <option value="1800">30 minutes</option><option value="3600">1 hour</option>
+      <option value="21600">6 hours</option><option value="86400">24 hours</option>
+      <option value="604800">7 days</option>
+    </select></label>
+    <span id="window-label"></span>
+  </div>
+  <div class="plot-shell"><div id="chart" aria-label="Time series chart of analog inputs"></div></div>
+  <div class="traces" id="traces"></div>
+  <div class="toolbar scale-controls">
+    <label><input type="checkbox" id="autoscale"> Auto-scale values</label>
+    <label>Min <input type="number" id="scale-min" step="any"></label>
+    <label>Max <input type="number" id="scale-max" step="any"></label>
+    <button id="apply-scale">Apply scale</button>
+  </div>
+  <details class="recorder-options">
+    <summary>Recorder settings</summary>
+    <p>Changing recording interval or memory capacity clears recorded history.</p>
+    <div class="toolbar">
+      <label>Recording interval (seconds) <input type="number" id="record-interval" min="0.1" max="60" step="0.1"></label>
+      <label>History memory (MiB) <input type="number" id="history-memory" min="16" max="1024" step="1"></label>
+      <button id="apply-recorder">Save recorder settings</button>
+    </div>
+    <p id="recorder-status"></p>
+  </details>
+  <p class="hint">Drag the chart horizontally to move through history. Use the mouse wheel over the chart to zoom. Select Live to return to current measurements.</p>
+</main>
+<footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

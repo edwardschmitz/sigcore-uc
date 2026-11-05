@@ -5,9 +5,10 @@
   'use strict';
   const links = [
     ['Dashboard', 'index.html'],
-    ['Logs', 'logviewer.php'],
     ['Control', 'control.html'],
+    ['Chart Recorder', 'chart-recorder.html'],
     ['Properties', 'configuration.html'],
+    ['Logs', 'logviewer.php'],
     ['Device', 'device.html'],
     ['Support', 'support.html'],
     ['Contact', 'contact.html']

@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SigCore UC – Early Access</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .hero {
+            width: 100%;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 50%;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .headline {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .sub {
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #0f766e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background: #0d5f59;
+            }
+
+        .micro {
+            font-size: 14px;
+            color: #777;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="24ed1392-77e8-4294-876a-e55dc3d9f56e"></script></head>
+<body>
+
+    <!-- Step 1 -->
+    <div class="card" id="step1">
+
+        <img src="images/sigcore-uc-logo.png" alt="SigCore UC" class="logo">
+
+        <img src="images/top-view.jpg" alt="SigCore UC hardware" class="hero">
+
+
+        <div class="headline">
+            If your test setup takes longer to build than to run, something’s broken
+        </div>
+
+        <div class="sub">
+            <p>
+                SigCore UC is a control system built specifically for test setups
+            </p>
+        </div>
+
+        <form id="leadForm">
+            <input id="email" type="email" placeholder="you@example.com" required>
+            <button type="submit">Get notified when it launches</button>
+        </form>
+
+        <div class="micro">
+            Follow the build as it moves toward launch.
+        </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="card hidden" id="step2">
+        <h1>Click <strong>Subscribe</strong> on the next page to follow the project</h1>
+        <button id="continueBtn">Continue to Crowd Supply</button>
+    </div>
+
+    <script>
+        let capturedEmail = "";
+
+        document.getElementById("leadForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            capturedEmail = document.getElementById("email").value;
+
+            document.getElementById("step1").classList.add("hidden");
+            document.getElementById("step2").classList.remove("hidden");
+        });
+
+        document.getElementById("continueBtn").addEventListener("click", function () {
+            window.location.href =
+                "https://www.crowdsupply.com/en-z-em/sigcore-uc?email=" + encodeURIComponent(capturedEmail);
+        });
+    </script>
+
+</body>
+</html>

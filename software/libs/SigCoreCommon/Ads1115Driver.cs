@@ -6,6 +6,8 @@ using System.Threading;
 namespace SigCoreCommon {
 
     public class Ads1115Driver : IDisposable, II2cDeviceDriver {
+        public const int MinSamplesPerChannel = 1;
+        public const int MaxSamplesPerChannel = 100;
 
         public enum InputMultiplexer : byte {
             AIN0 = 0x04,
@@ -89,8 +91,9 @@ namespace SigCoreCommon {
         public double ReadChannel(int channel, int samplesPerChannel) {
             if (channel < 0 || channel >= channelMap.Length)
                 throw new ArgumentOutOfRangeException(nameof(channel));
-            if (samplesPerChannel < 1)
-                throw new ArgumentOutOfRangeException(nameof(samplesPerChannel));
+            if (samplesPerChannel < MinSamplesPerChannel || samplesPerChannel > MaxSamplesPerChannel)
+                throw new ArgumentOutOfRangeException(nameof(samplesPerChannel), samplesPerChannel,
+                    $"Sample count must be between {MinSamplesPerChannel} and {MaxSamplesPerChannel}.");
 
             int delayMs = GetConversionDelayMs();
             InputMultiplexer mux = channelMap[channel];

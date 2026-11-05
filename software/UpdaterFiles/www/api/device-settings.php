@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/_bridge.php';
+require_once __DIR__ . '/_input-validation.php';
 $method = $_SERVER['REQUEST_METHOD'] ?? '';
 $kind = $_GET['kind'] ?? '';
 if (!in_array($kind, ['system','network','logger'], true) || !in_array($method, ['GET','PUT'], true)) {
@@ -22,6 +23,10 @@ error_log(sprintf('[SigCore device-settings] request: kind=%s method=%s', $kind,
 try {
     $path = '/api/device-settings/' . $kind;
     $body = $method === 'GET' ? null : file_get_contents('php://input');
+    if ($method === 'PUT') {
+        $data = decode_config_input($body === false ? '' : $body);
+        validate_device_settings_input($kind, $data);
+    }
     $result = bridge_request($method, $path, $body === false ? '' : $body);
     $status = (int)($result['status'] ?? 502);
     $responseBody = (string)($result['body'] ?? '');

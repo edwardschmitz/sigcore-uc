@@ -137,11 +137,21 @@ namespace SigCoreCommon {
                 throw new Exception("Error Reading Relay Config");
             }
 
-            // Analog inputs
+            // Analog inputs: repair invalid legacy properties before applying
+            // them. Do not discard other persisted settings on this device.
+            bool repairedAnalogAveraging = false;
             JArray analogIns = storedConfig["analogInputs"] as JArray;
             if (analogIns != null) {
                 foreach (JObject ainObj in analogIns) {
                     AInConfigPayload payload = new AInConfigPayload(ainObj);
+                    if (payload.AveragingSamples < A_IN.MinAveragingSamples ||
+                        payload.AveragingSamples > A_IN.MaxAveragingSamples) {
+                        EventLog.Warn("Configuration", "AnalogAveragingRecovered",
+                            $"AI{payload.Channel + 1} had an invalid averaging count of " +
+                            $"{payload.AveragingSamples}. Restoring 1 sample.");
+                        payload.AveragingSamples = A_IN.MinAveragingSamples;
+                        repairedAnalogAveraging = true;
+                    }
                     AnalogIn.FromPayload(payload);
                 }
             } else {
@@ -208,6 +218,17 @@ namespace SigCoreCommon {
             }
 
             SetupSnapshot();
+
+            // Persist the repaired setting so the fault does not recur on reboot.
+            // If persistence fails, acquisition still starts with the safe value.
+            if (repairedAnalogAveraging) {
+                try {
+                    SaveConfig();
+                } catch (Exception ex) {
+                    EventLog.Error("Configuration", "AnalogAveragingRepairSaveFailed",
+                        "Recovered analog averaging is active but could not be saved.", ex);
+                }
+            }
 
             // Start background sampling
             StartAnalogLoop();
@@ -520,6 +541,13 @@ namespace SigCoreCommon {
             return AnalogIn.ToPayload(channel);
         }
         public void SetAInConfig(AInConfigPayload payload) {
+            if (payload == null)
+                throw new ArgumentNullException(nameof(payload));
+            if (payload.Channel > 3)
+                throw new ArgumentOutOfRangeException(nameof(payload.Channel));
+            // A bad request must never stop the running acquisition loop.
+            A_IN.ValidateAveragingSamples(payload.AveragingSamples);
+
             StopAnalogLoop();
             try {
                 AnalogIn.FromPayload(payload);
@@ -1198,7 +1226,10 @@ namespace SigCoreCommon {
             }
 
             public void Save(JObject config) {
-                if (!IsValid(config)) {
+                // The structural validity check used during loading is deliberately
+                // tolerant so invalid legacy settings can be repaired in Initialize.
+                // Writes, however, must never persist an out-of-range sample count.
+                if (!IsValid(config) || !HasValidAnalogAveraging(config)) {
                     _log.Error(
                         "Configuration",
                         "InvalidConfigurationSaveRejected",
@@ -1331,6 +1362,25 @@ namespace SigCoreCommon {
 
             private static bool HasCount(JToken token, int expectedCount) {
                 return token is JArray array && array.Count == expectedCount;
+            }
+
+            private static bool HasValidAnalogAveraging(JObject config) {
+                if (!(config["analogInputs"] is JArray analogInputs))
+                    return false;
+
+                foreach (JToken item in analogInputs) {
+                    if (!(item is JObject analogInput))
+                        return false;
+                    try {
+                        var payload = new AInConfigPayload(analogInput);
+                        if (payload.AveragingSamples < A_IN.MinAveragingSamples ||
+                            payload.AveragingSamples > A_IN.MaxAveragingSamples)
+                            return false;
+                    } catch {
+                        return false;
+                    }
+                }
+                return true;
             }
 
             // ─────────────────────────

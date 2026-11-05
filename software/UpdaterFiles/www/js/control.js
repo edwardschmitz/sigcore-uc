@@ -13,7 +13,7 @@
   const field = (c,key,fallback='') => c?.[key] ?? fallback;
   const shortName = (kind,i) => kind.toUpperCase()+(i+1);
   const displayName = (kind,i) => {const name=field(cfg[kind][i],'name','');return typeof name==='string'?name.trim():'';};
-  const prec = (kind,i) => {const p=Number(cfg[kind][i]?.precision);return Number.isInteger(p)&&p>=0&&p<=8?p:3;};
+  const prec = (kind,i) => {const p=Number(cfg[kind][i]?.precision);return Number.isInteger(p)&&p>=0&&p<=9?p:3;};
   const units = (kind,i) => {const u=field(cfg[kind][i],'units','V');return String(u||'V');};
   const format=(v,kind,i)=>typeof v==='number'&&Number.isFinite(v)?v.toFixed(prec(kind,i)):'—';
   const parseResponse=async r=>{const raw=await r.text();let data;try{data=JSON.parse(raw);}catch{throw new Error(`HTTP ${r.status}: unexpected response`);}if(!r.ok)throw new Error(data.error||`HTTP ${r.status}`);return data;};

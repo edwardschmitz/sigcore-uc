@@ -66,19 +66,17 @@
                      Margin="5,2" Padding="5,2"/>
 
             <!-- Averaging -->
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Averaging:" 
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Averaging (1-100):" 
                        VerticalAlignment="Center" TextAlignment="Right"
                        Margin="5,2" Padding="5,2"/>
-            <TextBox Grid.Row="3" Grid.Column="1"
-                     Text="{Binding AveragingSamples, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox x:Name="AveragingSamplesBox" Grid.Row="3" Grid.Column="1"
                      Margin="5,2" Padding="5,2"/>
 
             <!-- Precision -->
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Precision:" 
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Precision (0-9):" 
                        VerticalAlignment="Center" TextAlignment="Right"
                        Margin="5,2" Padding="5,2"/>
-            <TextBox Grid.Row="4" Grid.Column="1"
-                     Text="{Binding Precision, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox x:Name="PrecisionBox" Grid.Row="4" Grid.Column="1"
                      Margin="5,2" Padding="5,2"/>
 
             <!-- Display Format -->

@@ -1,0 +1,23 @@
+{
+  "product_source": "../web/public_html",
+  "state_directory": ".publisher-state",
+  "exclude": [
+    ".git",
+    ".vs",
+    "__pycache__",
+    "Thumbs.db",
+    ".DS_Store",
+    "*.bak",
+    "*.tmp",
+    "*.pyc"
+  ],
+  "targets": {
+    "product": {
+      "host": "191.96.56.11",
+      "user": "u637891956",
+      "port": 65002,
+      "remote_path": "/home/u637891956/domains/sigcoreuc.com/public_html",
+      "identity_file": "../../keys/sigcore_deploy"
+    }
+  }
+}

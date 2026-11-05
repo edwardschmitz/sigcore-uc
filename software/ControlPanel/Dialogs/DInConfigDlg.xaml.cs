@@ -21,6 +21,12 @@ namespace ControlPanel.Dialogs {
             InitializeComponent();
         }
         private void Ok_Click(object sender, RoutedEventArgs e) {
+            // Zero debounce is valid: it disables debouncing.
+            if (!DialogInputValidation.Validate(this,
+                DialogInputValidation.NumericRule.Whole("DebounceMs", "Debounce interval (ms)", 0)) ||
+                !DialogInputValidation.CommitBindings(this))
+                return;
+
             DialogResult = true;
             Close();
         }

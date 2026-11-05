@@ -78,6 +78,72 @@
     },
     ao:{display:[['FixedPoint',0],['Scientific',1]],mode:[['Voltage',0],['PWM',1]]}
   };
+  // Match Control Panel validation. Limits without a published hardware maximum
+  // are intentionally not invented here; the Core remains authoritative.
+  const numericRules = {
+    di: { debounce: {label:'Debounce', integer:true, min:0} },
+    ai: {
+      avgSamples:{label:'Averaging', integer:true, min:1, max:100},
+      precision:{label:'Precision', integer:true, min:0, max:9},
+      m:{label:'Calibration slope', integer:false},
+      b:{label:'Calibration offset', integer:false}
+    },
+    ao: {
+      precision:{label:'Precision', integer:true, min:0, max:9},
+      voltM:{label:'Voltage scale', integer:false},
+      voltB:{label:'Voltage offset', integer:false}
+    },
+    pid: {
+      kp:{label:'Kp', integer:false}, ki:{label:'Ki', integer:false}, kd:{label:'Kd', integer:false},
+      outputMin:{label:'Output minimum', integer:false},
+      outputMax:{label:'Output maximum', integer:false},
+      pvMin:{label:'PV minimum', integer:false},
+      pvMax:{label:'PV maximum', integer:false},
+      pvSource:{label:'PV source channel', integer:true, min:0, max:3},
+      outputDestination:{label:'Output destination channel', integer:true, min:0, max:3},
+      integralLimit:{label:'Integral limit', integer:false, min:0}
+    }
+  };
+  const ruleFor = key => numericRules[active?.spec.kind]?.[key];
+  function invalidNumber(input, message){
+    input.focus(); input.select();
+    throw new Error(message);
+  }
+  function validateNumber(input, key, rule){
+    const name=rule?.label || key;
+    const text=input.value.trim();
+    const value=Number(text);
+    if(!text || !Number.isFinite(value) || !input.validity.valid)
+      invalidNumber(input, `${name} must be a valid number.`);
+    if(rule?.integer && (!Number.isInteger(value) || !Number.isSafeInteger(value)))
+      invalidNumber(input, `${name} must be a whole number.`);
+    if(rule?.min!==undefined && value<rule.min || rule?.max!==undefined && value>rule.max){
+      const limits=rule.min!==undefined && rule.max!==undefined ?
+        `from ${rule.min} to ${rule.max}` : rule.min!==undefined ?
+        `at least ${rule.min}` : `at most ${rule.max}`;
+      invalidNumber(input, `${name} must be ${limits}.`);
+    }
+    return value;
+  }
+  function validateCalibration(config){
+    if(active.spec.kind!=='ai')return;
+    if(config.calType===3){
+      const text=String(config.polyString ?? '').trim();
+      if(!text || !text.split(',').every(s=>s.trim() && Number.isFinite(Number(s.trim()))))
+        throw new Error('Polynomial calibration must contain finite numbers separated by commas.');
+    }else if(config.calType===2){
+      const text=String(config.pieceWiseString ?? '').trim();
+      const pairs=text.split(',').map(s=>s.trim().split(':').map(v=>v.trim()));
+      if(pairs.length<2 || pairs.some(p=>p.length!==2 || !p[0] || !p[1] || !p.every(v=>Number.isFinite(Number(v)))))
+        throw new Error('Piecewise calibration requires at least two valid input:output pairs.');
+      const inputs=pairs.map(p=>Number(p[0]));
+      if(new Set(inputs).size!==inputs.length)
+        throw new Error('Piecewise calibration inputs must be unique.');
+      // The Core expects the input points in ascending order.
+      config.pieceWiseString=pairs.sort((a,b)=>Number(a[0])-Number(b[0]))
+        .map(p=>p.join(':')).join(', ');
+    }
+  }
   function addField(key,label,value){
     const wrap=document.createElement('div');wrap.className='config-field';
     const id='cfg-'+key;const caption=document.createElement('label');caption.htmlFor=id;caption.textContent=label;
@@ -95,9 +161,11 @@
       input.value=String(value);wrap.append(caption,input);
     } else {
       input=(value!==null && typeof value==='object')?document.createElement('textarea'):document.createElement('input');
-      if(typeof value==='number'){
-        input.type='number';input.step=Number.isInteger(value)?'1':'any';
-        if(['debounce','avgSamples','precision'].includes(key))input.min='0';
+      if(typeof value==='number' || ruleFor(key)){
+        const rule=ruleFor(key);
+        input.type='number';input.step=rule ? (rule.integer?'1':'any') : (Number.isInteger(value)?'1':'any');
+        if(rule?.min!==undefined)input.min=String(rule.min);
+        if(rule?.max!==undefined)input.max=String(rule.max);
       }else if(input.tagName==='INPUT'){input.type='text';if(String(value).length>80)wrap.classList.add('is-wide')}
       if(input.tagName==='TEXTAREA')wrap.classList.add('is-wide');
       input.value=value==null?'':(typeof value==='object'?JSON.stringify(value,null,2):String(value));wrap.append(caption,input);
@@ -149,19 +217,17 @@
     for(const input of fields.querySelectorAll('[data-key]')){
       const key=input.dataset.key, type=input.dataset.originalType;
       if(type==='boolean'){updated[key]=input.checked;continue;}
-      if(type==='number'){
-        if(input.value.trim()==='')throw new Error(`${key} is required`);
-        const value=Number(input.value);
-        if(!Number.isFinite(value)||!input.validity.valid)throw new Error(`Invalid number for ${key}`);
-        updated[key]=value;continue;
+      if(type==='number' || ruleFor(key)){
+        updated[key]=validateNumber(input,key,ruleFor(key));continue;
       }
       if(type==='object' && original[key]!==null){try{updated[key]=JSON.parse(input.value)}catch{throw new Error(`Invalid JSON for ${key}`)};continue;}
       updated[key]=input.value;
     }
     if(active.spec.kind==='pid'){
-      if(updated.outputMin>updated.outputMax)throw new Error('Output minimum must not exceed maximum');
-      if(updated.pvMin>updated.pvMax)throw new Error('PV minimum must not exceed maximum');
+      if(updated.outputMin>=updated.outputMax)throw new Error('Output minimum must be less than output maximum.');
+      if(updated.pvMin>=updated.pvMax)throw new Error('PV minimum must be less than PV maximum.');
     }
+    validateCalibration(updated);
     return updated;
   }
   form.addEventListener('submit',async event=>{

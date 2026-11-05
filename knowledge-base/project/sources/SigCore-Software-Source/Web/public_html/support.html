@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support | SigCore UC</title>
+    <link rel="stylesheet" href="styles.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="24ed1392-77e8-4294-876a-e55dc3d9f56e"></script></head>
+<body>
+    <div id="header-container"></div>
+
+    <script>
+        fetch("header.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("header-container").innerHTML = data)
+            .catch(error => console.error("Error loading the header:", error));
+    </script>
+
+    <main class="main-content">
+        <div class="section-title"><span class="large-text">Support</span></div>
+        <p class="support-intro">Documentation and technical references for SigCore UC.</p>
+        <div class="card-container">
+            <a href="reference/control-panel-reference.html" class="card-link-wrapper">
+                <div class="card"><div class="card-content">
+                    <div class="image-container"><img src="images/software.png" alt="SigCore UC Control Panel"></div>
+                    <h2>Control Panel Reference</h2>
+                    <p>Connect to your controller, monitor inputs, operate outputs, and configure the Control Panel.</p>
+                    <div class="view-article-button">Control Panel Reference</div>
+                </div></div>
+            </a>
+            <a href="reference/hardware-reference.html" class="card-link-wrapper">
+                <div class="card"><div class="card-content">
+                    <div class="image-container"><img src="images/angle-view.jpg" alt="SigCore UC controller"></div>
+                    <h2>Device Guide</h2>
+                    <p>Connect and configure your SigCore UC, including digital and analog I/O, relays, and networking.</p>
+                    <div class="view-article-button">Device Guide</div>
+                </div></div>
+            </a>
+            <a href="reference/api-reference.html" class="card-link-wrapper">
+                <div class="card"><div class="card-content">
+                    <div class="image-container"><img src="images/dotnet-software.jpg" alt=".NET software development"></div>
+                    <h2>.NET API Reference</h2>
+                    <p>Use the SigCoreSystem library from C# to connect, control I/O, configure PID loops, and receive events.</p>
+                    <div class="view-article-button">.NET API Reference</div>
+                </div></div>
+            </a>
+        </div>
+        <div class="privacy-support-link">
+            <h2>Automatic Updates &amp; Privacy</h2>
+            <p>Learn how SigCore UC updates its software, what information is sent during an update, and what data stays on your device.</p>
+            <p><a href="automatic-updates.html">Read the Automatic Updates &amp; Privacy reference</a></p>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script>
+        fetch("footer.html")
+            .then(response => response.text())
+            .then(data => document.getElementById("footer-container").innerHTML = data)
+            .catch(error => console.error("Error loading the footer:", error));
+    </script>
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.querySelector(".nav-menu");
+            menu.classList.toggle("show");
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="ControlPanel.Parts.PartSystem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:ControlPanel.Controls"
+             xmlns:local="clr-namespace:ControlPanel.Parts"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="900">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="Server Running:" FontSize="16" FontWeight="Bold"
+                   Margin="5,2"/>
+        <controls:ButtonCheckBox IsChecked="{Binding Path=Running}"
+                                 Grid.Column="0" Grid.Row="2"
+                                 Padding="20,2" 
+                                 Margin="5,2"
+                                 />
+            <!--PIDs-->
+        <TextBlock Text="PIDs" Grid.Row="3" Grid.Column="0"
+                   Margin="5,20,5,2"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   />
+        <Button Content="Add PID" 
+                FontSize="16"
+                FontWeight="Bold"
+                Margin="5,2" Grid.Column="0" Grid.Row="4" Padding="10,2"
+                Command="{Binding Path=AddCmd}"
+                />
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+              Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2">
+            <ItemsControl ItemsSource="{Binding Pids}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <controls:PidLoopControl Margin="5,5"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,113 @@
+﻿<Window x:Class="ControlPanel.Dialogs.DInConfigDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Digital Input Configuration"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        FontSize="14"
+        FontFamily="Segoe UI">
+
+    <Border CornerRadius="8"
+            BorderBrush="#888"
+            BorderThickness="1"
+            Padding="10"
+            Background="White"
+            Margin="10">
+        <Border.Effect>
+            <DropShadowEffect Color="#805C40" Opacity=".4" BlurRadius="10" ShadowDepth="6"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Header -->
+            <TextBlock Text="Digital Input Configuration"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Grid.ColumnSpan="2"
+                       HorizontalAlignment="Center"
+                       Margin="5,0,5,10"/>
+
+            <!-- Name -->
+            <TextBlock Text="Name:"
+                       Grid.Row="1"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <TextBox Grid.Row="1"
+                     Grid.Column="1"
+                     Margin="5,2"
+                     Padding="5,2"
+                     Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Debounce -->
+            <TextBlock Text="Debounce (ms):"
+                       Grid.Row="2"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <TextBox Grid.Row="2"
+                     Grid.Column="1"
+                     Width="80"
+                     Margin="5,2"
+                     Padding="5,2"
+                     HorizontalAlignment="Left"
+                     Text="{Binding DebounceMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Inverted -->
+            <TextBlock Text="Inverted Logic:"
+                       Grid.Row="3"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       TextAlignment="Right"
+                       Margin="5,2"
+                       Padding="5,2"/>
+            <CheckBox Grid.Row="3"
+                      Grid.Column="1"
+                      IsChecked="{Binding Inverted, Mode=TwoWay}"
+                      VerticalAlignment="Bottom"
+                      Margin="10,2"
+                      Padding="5,10"/>
+
+            <!-- Buttons -->
+            <StackPanel Grid.Row="4"
+                        Grid.ColumnSpan="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Margin="5,10,5,0">
+                <Button Content="OK"
+                        Width="80"
+                        Margin="5,2"
+                        Padding="5,2"
+                        IsDefault="True"
+                        Click="Ok_Click"/>
+                <Button Content="Cancel"
+                        Width="80"
+                        Margin="5,2"
+                        Padding="5,2"
+                        IsCancel="True"/>
+            </StackPanel>
+
+        </Grid>
+    </Border>
+</Window>

@@ -11,6 +11,13 @@ namespace ControlPanel.Dialogs {
         }
 
         private void Ok_Click(object sender, RoutedEventArgs e) {
+            if (!DialogInputValidation.Validate(this,
+                DialogInputValidation.NumericRule.Whole("Precision", "Precision", 0, 9),
+                DialogInputValidation.NumericRule.Real("VoltageScaleM", "Voltage scale"),
+                DialogInputValidation.NumericRule.Real("VoltageScaleB", "Voltage offset")) ||
+                !DialogInputValidation.CommitBindings(this))
+                return;
+
             DialogResult = true;
             Close();
         }
