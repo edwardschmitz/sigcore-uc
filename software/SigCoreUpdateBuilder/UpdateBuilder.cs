@@ -16,10 +16,12 @@ namespace SigCoreUpdateBuilder {
         private readonly string serverName = "sigcoreserver";
         private readonly string bridgeName = "WebBridge";
         private readonly string updaterName = "SigCoreUpdater";
+        private readonly string modbusBridgeName = "ModbusBridge";
 
         private readonly string serverSrc;
         private readonly string bridgeSrc;
         private readonly string updaterSrc;
+        private readonly string modbusBridgeSrc;
         private readonly string updaterFilesSrc;
         private readonly string webSrc;
         private readonly string publicKeyPath;
@@ -47,6 +49,7 @@ namespace SigCoreUpdateBuilder {
             serverSrc = Path.Combine(buildRoot, @"server\publish\sigcoreserver");
             bridgeSrc = Path.Combine(buildRoot, @"webbridge\publish\WebBridge");
             updaterSrc = Path.Combine(buildRoot, @"updater\publish\SigCoreUpdater");
+            modbusBridgeSrc = Path.Combine(buildRoot, @"modbusbridge\publish\ModbusBridge");
             updaterFilesSrc = Path.Combine(repoRoot, @"software\UpdaterFiles");
             webSrc = Path.Combine(updaterFilesSrc, "www");
 
@@ -69,6 +72,7 @@ namespace SigCoreUpdateBuilder {
             Console.WriteLine($"  Server source        : {serverSrc}");
             Console.WriteLine($"  WebBridge source     : {bridgeSrc}");
             Console.WriteLine($"  Updater source       : {updaterSrc}");
+            Console.WriteLine($"  ModbusBridge source  : {modbusBridgeSrc}");
             Console.WriteLine($"  Additional files     : {updaterFilesSrc}");
             Console.WriteLine($"  Website source       : {webSrc}");
             Console.WriteLine($"  Public key           : {publicKeyPath}");
@@ -88,7 +92,8 @@ namespace SigCoreUpdateBuilder {
                 executables = new string[] {
                     serverName,
                     bridgeName,
-                    updaterName
+                    updaterName,
+                    modbusBridgeName
                 },
                 version = version,
                 revision = revision
@@ -105,6 +110,7 @@ namespace SigCoreUpdateBuilder {
             CopyFile(serverSrc, Path.Combine(tempRoot, serverName), "SigCore Server");
             CopyFile(bridgeSrc, Path.Combine(tempRoot, bridgeName), "WebBridge");
             CopyFile(updaterSrc, Path.Combine(tempRoot, updaterName), "SigCore Updater");
+            CopyFile(modbusBridgeSrc, Path.Combine(tempRoot, modbusBridgeName), "ModbusBridge");
             // Include all additional release files (including www and installation-tasks.json).
             // Do not allow them to overwrite generated config.json or published executables.
             ReportAction("Copy additional release files");
@@ -185,7 +191,8 @@ namespace SigCoreUpdateBuilder {
                         Executables = new List<string> {
                             serverName,
                             bridgeName,
-                            updaterName
+                            updaterName,
+                            modbusBridgeName
                         }
                     }
                 }
@@ -218,11 +225,13 @@ namespace SigCoreUpdateBuilder {
             string serverPath = Path.Combine(root, serverName);
             string bridgePath = Path.Combine(root, bridgeName);
             string updaterPath = Path.Combine(root, updaterName);
+            string modbusBridgePath = Path.Combine(root, modbusBridgeName);
 
             RequireFile(configPath, "config.json");
             RequireFile(serverPath, serverName);
             RequireFile(bridgePath, bridgeName);
             RequireFile(updaterPath, updaterName);
+            RequireFile(modbusBridgePath, modbusBridgeName);
             RequireFile(Path.Combine(root, "installation-tasks.json"), "installation-tasks.json");
             if (!Directory.Exists(Path.Combine(root, "www"))) {
                 throw new DirectoryNotFoundException("Required release website directory is missing: www");
@@ -246,6 +255,13 @@ namespace SigCoreUpdateBuilder {
                 throw new InvalidDataException(
                     $"Extracted config revision mismatch. Expected={revision}, Actual={configRevision}"
                 );
+            }
+
+            string[]? configuredExecutables = config.executables?.ToObject<string[]>();
+            if (configuredExecutables == null ||
+                !configuredExecutables.Contains(modbusBridgeName, StringComparer.Ordinal)) {
+                throw new InvalidDataException(
+                    $"Extracted release config.json does not include {modbusBridgeName}.");
             }
 
             Console.WriteLine("  Release payload validation passed.");
