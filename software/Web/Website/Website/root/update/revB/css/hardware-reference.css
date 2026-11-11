@@ -1,0 +1,27 @@
+/* Device Hardware Reference: extends the existing device-site design. */
+html{scroll-behavior:smooth}
+.hardware-guide{max-width:1480px}
+.guide-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:30px;align-items:start}
+.guide-toc{position:sticky;top:92px;max-height:calc(100vh - 110px);overflow:auto;display:flex;flex-direction:column;gap:2px;padding:8px 0 20px}
+.toc-kicker{font-size:.72rem;letter-spacing:.1em;font-weight:800;color:var(--accent);padding:4px 10px 12px}
+.guide-toc a{display:block;padding:8px 10px;color:var(--text);text-decoration:none;border-left:3px solid transparent;font-size:.91rem}
+.guide-toc a:hover,.guide-toc a:focus-visible{border-left-color:var(--accent);color:var(--accent);background:#ffffff70}
+.guide-body{min-width:0;display:flex;flex-direction:column;gap:22px}
+.guide-card{padding:28px 34px;scroll-margin-top:94px}
+.guide-card h2{margin:0 0 16px;color:var(--accent);font-size:1.55rem}
+.guide-card h3{margin:23px 0 9px;font-size:1.12rem;color:#4a3939}
+.guide-card p,.guide-card li{line-height:1.65}
+.guide-card p{margin:0 0 16px}
+.guide-card ul,.guide-card ol{padding-left:23px;margin:10px 0 20px}
+.guide-card li+li{margin-top:9px}
+.guide-card p:last-child{margin-bottom:0}
+.guide-note{border-left:4px solid #ad8c80;background:#fff7ef;padding:13px 16px;border-radius:0 6px 6px 0}
+.spec-chips{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 21px}
+.spec-chips span{border:1px solid var(--border);background:#fff;border-radius:7px;padding:9px 12px;font-weight:700;font-size:.9rem}
+.guide-table-wrap{overflow-x:auto;margin:14px 0 22px}
+.guide-table-wrap table{width:100%;border-collapse:collapse;min-width:460px;font-size:.94rem}
+.guide-table-wrap th{text-align:left;color:#533;background:#eae1d8;border-bottom:2px solid var(--border)}
+.guide-table-wrap th,.guide-table-wrap td{padding:11px 13px;border-bottom:1px solid var(--border);vertical-align:top}
+.guide-table-wrap tbody tr:nth-child(even){background:#ffffff70}
+.guide-card code{font-family:Consolas,monospace;background:#fff;padding:2px 5px;border-radius:4px}
+@media(max-width:800px){.guide-layout{grid-template-columns:1fr}.guide-toc{position:static;max-height:none;display:block;padding:8px 0}.guide-toc a{display:inline-block;border-left:0;border-bottom:2px solid transparent;padding:7px 9px}.guide-toc a:hover{border-bottom-color:var(--accent);border-left-color:transparent}.guide-card{padding:23px 19px}}

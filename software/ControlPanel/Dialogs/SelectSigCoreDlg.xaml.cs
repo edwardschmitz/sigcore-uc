@@ -23,9 +23,11 @@ namespace ControlPanel.Dialogs {
 
         private readonly List<DeviceListItem> deviceList = new();
         private readonly List<DeviceListItem> arpList = new();
+        private readonly bool discoveryFailed;
 
-        public SelectSigCoreDlg(IEnumerable<SigCoreDevice> devices) {
+        public SelectSigCoreDlg(IEnumerable<SigCoreDevice> devices, bool discoveryFailed = false) {
             InitializeComponent();
+            this.discoveryFailed = discoveryFailed;
 
             foreach (SigCoreDevice device in devices) {
                 deviceList.Add(new DeviceListItem {
@@ -208,6 +210,13 @@ namespace ControlPanel.Dialogs {
 
             DeviceList.ItemsSource = null;
             DeviceList.ItemsSource = all;
+
+            DiscoveryStatus.Visibility = all.Count == 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            DiscoveryStatus.Text = discoveryFailed
+                ? "Automatic discovery failed. Enter a device IP address or scan the subnet."
+                : "No devices found automatically. Enter a device IP address or scan the subnet.";
         }
 
         private void DeviceList_MouseDoubleClick(

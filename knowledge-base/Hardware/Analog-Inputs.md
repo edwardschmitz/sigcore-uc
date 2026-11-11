@@ -177,6 +177,10 @@ A `SigCoreSystem` instance must first be connected as described in the public AP
 
 The private WebBridge source defines `GET /api/config/ai/{channel}` and `PUT /api/config/ai/{channel}` and includes `analogInputs` within `GET /api/state`. The browser-facing PHP route may differ. A config PUT requires all allowed fields inside a `config` object, and its success payload explicitly says `confirmed: false`; a subsequent GET is needed for readback.
 
+![Analog Input Configuration dialog showing name, units, averaging, precision, display, range and calibration type.](../Images/Control-Panel/analog-input-properties.png)
+
+*Figure 1. Analog Input Configuration from the supplied public Control Panel Reference. The screenshot illustrates the UI; it does not resolve the documented current-range discrepancy.*
+
 User interfaces: the Windows Control Panel has a dedicated analog input configuration dialog with structured polynomial and MultiPoint editors. The on-device Properties page has per-channel settings; its exact set of fields and validation need review against the installed website build. The current customer-facing Control Panel Reference should be used for operating instructions, subject to the explicit current-range discrepancy in section 10.
 
 ## 9. Application guidance, limitations and diagnosis
@@ -236,6 +240,6 @@ All software paths below are relative to `Project/Sources/SigCore-Software-Sourc
 
 - [System Architecture](../Architecture/System-Architecture.md)
 - [Calibration and Scaling](../Core-Software/Calibration-and-Scaling.md) (placeholder)
-- [Sensors and Signal Conditioning](../Applied-Engineering/Sensors-and-Signal-Conditioning.md) (placeholder)
-- [Electrical Specifications](../Reference/Electrical-Specifications.md) (placeholder)
+- Sensors and Signal Conditioning (planned chapter; not yet authored)
+- Electrical Specifications (planned chapter; not yet authored)
 - Planned images `HW-008` through `HW-011` in [IMAGE-INVENTORY](../Images/IMAGE-INVENTORY.md). No unverified diagram is included in this batch.

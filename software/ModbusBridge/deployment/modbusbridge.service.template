@@ -1,0 +1,19 @@
+# TEMPLATE ONLY. Integrate with existing SigCore Launcher/Updater service policy.
+# The project publishes self-contained linux-arm64 as a single executable.
+# Modbus TCP is unauthenticated: restrict access to trusted networks only.
+[Unit]
+Description=SigCore ModbusBridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=REPLACE_WITH_SIGCORE_SERVICE_USER
+WorkingDirectory=REPLACE_WITH_INSTALLED_MODBUSBRIDGE_DIRECTORY
+ExecStart=REPLACE_WITH_INSTALLED_MODBUSBRIDGE_DIRECTORY/ModbusBridge --config REPLACE_WITH_INSTALLED_MODBUSBRIDGE_DIRECTORY/config/modbusbridge.json
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

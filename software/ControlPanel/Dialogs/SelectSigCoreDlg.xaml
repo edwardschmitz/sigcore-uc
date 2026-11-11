@@ -141,43 +141,53 @@
                          Tag="xxx.xxx.xxx.xxx"
                          TextChanged="IPAddress_TextChanged"/>
 
-                <ListView x:Name="DeviceList"
-                          Grid.Column="2"
-                          Grid.Row="2"
-                          Margin="10,2"
-                          Width="600"
-                          Height="200"
-                          FontWeight="Bold"
-                          MouseDoubleClick="DeviceList_MouseDoubleClick"
-                          SelectionChanged="DeviceList_SelectionChanged">
+                <Grid Grid.Column="2"
+                      Grid.Row="2">
+                    <ListView x:Name="DeviceList"
+                              Margin="10,2"
+                              Width="600"
+                              Height="200"
+                              FontWeight="Bold"
+                              MouseDoubleClick="DeviceList_MouseDoubleClick"
+                              SelectionChanged="DeviceList_SelectionChanged">
 
-                    <ListView.View>
-                        <GridView>
+                        <ListView.View>
+                            <GridView>
 
-                            <GridViewColumn Header="Name"
-                                            Width="220"
-                                            DisplayMemberBinding="{Binding Device.Name}"/>
+                                <GridViewColumn Header="Name"
+                                                Width="220"
+                                                DisplayMemberBinding="{Binding Device.Name}"/>
 
-                            <GridViewColumn Header="Address"
-                                            Width="140"
-                                            DisplayMemberBinding="{Binding Device.Address}"/>
+                                <GridViewColumn Header="Address"
+                                                Width="140"
+                                                DisplayMemberBinding="{Binding Device.Address}"/>
 
-                            <GridViewColumn Header="Version"
-                                            Width="80"
-                                            DisplayMemberBinding="{Binding Device.Version}"/>
+                                <GridViewColumn Header="Version"
+                                                Width="80"
+                                                DisplayMemberBinding="{Binding Device.Version}"/>
 
-                            <GridViewColumn Header="Status"
-                                            Width="80">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Style="{StaticResource ReadyTextStyle}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
+                                <GridViewColumn Header="Status"
+                                                Width="80">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Style="{StaticResource ReadyTextStyle}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
 
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                    <TextBlock x:Name="DiscoveryStatus"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Width="450"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               Foreground="#555"
+                               Visibility="Collapsed"/>
+                </Grid>
 
             </Grid>
 

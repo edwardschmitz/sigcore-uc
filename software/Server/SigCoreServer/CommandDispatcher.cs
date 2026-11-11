@@ -43,7 +43,6 @@ namespace SigCoreServer {
         }
 
         public SigCoreMessage HandlePing(JObject payload, ulong msgId, ISession session) {
-
             return SigCoreMessage.CreatePong(msgId);
         }
 
@@ -202,6 +201,8 @@ namespace SigCoreServer {
 
         public SigCoreMessage HandleSubscribe(JObject payload, ulong msgId, ISession session) {
             bool added = _subscribers.TryAdd(session, true);
+            if (session is ClientSession clientSession)
+                clientSession.MarkSubscribed();
 
             _log.Info(
                 "Subscription",
@@ -216,6 +217,8 @@ namespace SigCoreServer {
                 return;
 
             if (_subscribers.TryRemove(session, out _)) {
+                if (session is ClientSession clientSession)
+                    clientSession.MarkUnsubscribed();
                 _log.Info(
                     "Subscription",
                     "SubscriberRemoved",

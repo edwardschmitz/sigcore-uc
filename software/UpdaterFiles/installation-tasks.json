@@ -19,6 +19,25 @@
           ]
         }
       ]
+    },
+    {
+      "id": "allow-unprivileged-modbus-port-502",
+      "check": {
+        "command": "/bin/sh",
+        "arguments": [
+          "-c",
+          "test \"$(cat /proc/sys/net/ipv4/ip_unprivileged_port_start)\" = 502 && test -f /etc/sysctl.d/99-sigcore-modbus.conf && grep -qx 'net.ipv4.ip_unprivileged_port_start = 502' /etc/sysctl.d/99-sigcore-modbus.conf"
+        ]
+      },
+      "commands": [
+        {
+          "command": "/bin/sh",
+          "arguments": [
+            "-c",
+            "printf '%s\\n' 'net.ipv4.ip_unprivileged_port_start = 502' > /etc/sysctl.d/99-sigcore-modbus.conf && printf '%s\\n' '502' > /proc/sys/net/ipv4/ip_unprivileged_port_start"
+          ]
+        }
+      ]
     }
   ]
 }

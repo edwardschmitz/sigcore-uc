@@ -1,0 +1,11 @@
+{
+  "ListenAddress": "127.0.0.1",
+  "Port": 1502,
+  "UnitId": 1,
+  "Provider": "Simulated",
+  "CoreHost": "127.0.0.1",
+  "CorePort": 7020,
+  "RequestTimeoutSeconds": 10,
+  "MaxConcurrentClients": 16,
+  "Backlog": 16
+}

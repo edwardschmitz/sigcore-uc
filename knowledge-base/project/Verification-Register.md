@@ -4,50 +4,51 @@ All documents start unverified. Mark **Verified** only after checking implementa
 
 | Chapter | Draft | Evidence linked | Reviewed | AI tested | Notes |
 |---|---|---|---|---|---|
-| [`Architecture/Product-Overview.md`](../Architecture/Product-Overview.md) | No | No | No | No | Placeholder |
+| [`Architecture/Product-Overview.md`](../Architecture/Product-Overview.md) | **Yes** | **Yes** | No | No | 0.1.14 source-drafted; Rev B product purpose, I/O inventory, client options, engineering boundaries, representative applications and source authority. Release-specific engineering review pending. |
 | [`Architecture/System-Architecture.md`](../Architecture/System-Architecture.md) | **Yes** | **Yes** | No | No | First source-based draft; release/version and installation details pending |
-| [`Architecture/Revisions-and-Feature-Availability.md`](../Architecture/Revisions-and-Feature-Availability.md) | No | No | No | No | Placeholder |
-| [`Hardware/Hardware-Overview.md`](../Hardware/Hardware-Overview.md) | No | No | No | No | Placeholder |
-| [`Hardware/Power-and-Protection.md`](../Hardware/Power-and-Protection.md) | No | No | No | No | Placeholder |
-| [`Hardware/Connectors-and-Pinouts.md`](../Hardware/Connectors-and-Pinouts.md) | No | No | No | No | Placeholder |
+| [`Architecture/Software-Architecture.md`](../Architecture/Software-Architecture.md) | **Yes** | **Yes** | No | No | Source-grounded runtime/process/data/persistence and update boundaries; deployment and logger architecture need verification |
+| [`Architecture/Revisions-and-Feature-Availability.md`](../Architecture/Revisions-and-Feature-Availability.md) | **Yes** | **Yes** | No | No | 0.1.14 source-drafted; Rev A/B/C hardware vs software versions, implementation evidence, shipping uncertainty, protocol compatibility and roadmap distinctions. Release-specific engineering review pending. |
+| [`Hardware/Hardware-Overview.md`](../Hardware/Hardware-Overview.md) | **Yes** | **Yes** | No | No | Rev B source-based first draft; PCB dimensions and as-built power population need engineering review |
+| [`Hardware/Power-and-Protection.md`](../Hardware/Power-and-Protection.md) | **Yes** | **Yes** | No | No | 0.1.14 source-drafted; 5 V power distribution, Pi/logic rails, 2.500 V reference, schematic protection, as-built regulator uncertainty and power loss. Release-specific engineering review pending. |
+| [`Hardware/Connectors-and-Pinouts.md`](../Hardware/Connectors-and-Pinouts.md) | **Yes** | **Yes** | No | No | 0.1.14 source-drafted; Evaluation-unit overlay and connector design labels, relay COM/NO/NC, reference returns, wiring limits and outstanding terminal orientation sign-off. Release-specific engineering review pending. |
 | [`Hardware/Analog-Inputs.md`](../Hardware/Analog-Inputs.md) | **Yes** | **Yes** | No | No | Mismatched range nomenclature and current-unit interpretation; review required |
-| [`Hardware/Analog-Outputs.md`](../Hardware/Analog-Outputs.md) | No | No | No | No | Placeholder |
-| [`Hardware/Digital-Inputs.md`](../Hardware/Digital-Inputs.md) | No | No | No | No | Placeholder |
-| [`Hardware/Relay-Outputs.md`](../Hardware/Relay-Outputs.md) | No | No | No | No | Placeholder |
-| [`Hardware/Internal-Interfaces.md`](../Hardware/Internal-Interfaces.md) | No | No | No | No | Placeholder |
-| [`Hardware/Mechanical-and-Assembly.md`](../Hardware/Mechanical-and-Assembly.md) | No | No | No | No | Placeholder |
-| [`Core-Software/Processes-and-Lifecycle.md`](../Core-Software/Processes-and-Lifecycle.md) | No | No | No | No | Placeholder |
-| [`Core-Software/Data-Model-and-Configuration.md`](../Core-Software/Data-Model-and-Configuration.md) | No | No | No | No | Placeholder |
-| [`Core-Software/Operating-Modes-and-Safety.md`](../Core-Software/Operating-Modes-and-Safety.md) | No | No | No | No | Placeholder |
-| [`Core-Software/Measurement-and-Control-Timing.md`](../Core-Software/Measurement-and-Control-Timing.md) | No | No | No | No | Placeholder |
-| [`Core-Software/Calibration-and-Scaling.md`](../Core-Software/Calibration-and-Scaling.md) | No | No | No | No | Placeholder |
-| [`Core-Software/PID-Control.md`](../Core-Software/PID-Control.md) | No | No | No | No | Placeholder |
-| [`Core-Software/Logging-and-History.md`](../Core-Software/Logging-and-History.md) | No | No | No | No | Placeholder |
-| [`Core-Software/Updates-and-Recovery.md`](../Core-Software/Updates-and-Recovery.md) | No | No | No | No | Placeholder |
-| [`User-Interfaces/Control-Panel.md`](../User-Interfaces/Control-Panel.md) | No | No | No | No | Placeholder |
-| [`User-Interfaces/Device-Website.md`](../User-Interfaces/Device-Website.md) | No | No | No | No | Placeholder |
-| [`User-Interfaces/Status-and-Diagnostics.md`](../User-Interfaces/Status-and-Diagnostics.md) | No | No | No | No | Placeholder |
-| [`Programming/Discovery-and-Connections.md`](../Programming/Discovery-and-Connections.md) | No | No | No | No | Placeholder |
-| [`Programming/DotNet-API.md`](../Programming/DotNet-API.md) | No | No | No | No | Placeholder |
-| [`Programming/HTTP-API-and-WebBridge.md`](../Programming/HTTP-API-and-WebBridge.md) | No | No | No | No | Placeholder |
-| [`Programming/Python-Integration.md`](../Programming/Python-Integration.md) | No | No | No | No | Placeholder |
-| [`Programming/Integration-Patterns.md`](../Programming/Integration-Patterns.md) | No | No | No | No | Placeholder |
-| [`Operations/Installation-and-Commissioning.md`](../Operations/Installation-and-Commissioning.md) | No | No | No | No | Placeholder |
-| [`Operations/Networking-and-Access.md`](../Operations/Networking-and-Access.md) | No | No | No | No | Placeholder |
-| [`Operations/Configuration-and-Restore.md`](../Operations/Configuration-and-Restore.md) | No | No | No | No | Placeholder |
-| [`Operations/Maintenance-and-Service.md`](../Operations/Maintenance-and-Service.md) | No | No | No | No | Placeholder |
-| [`Operations/Troubleshooting.md`](../Operations/Troubleshooting.md) | No | No | No | No | Placeholder |
-| [`Applied-Engineering/Sensors-and-Signal-Conditioning.md`](../Applied-Engineering/Sensors-and-Signal-Conditioning.md) | No | No | No | No | Placeholder |
-| [`Applied-Engineering/Actuators-and-Loads.md`](../Applied-Engineering/Actuators-and-Loads.md) | No | No | No | No | Placeholder |
-| [`Applied-Engineering/Data-Acquisition-and-Monitoring.md`](../Applied-Engineering/Data-Acquisition-and-Monitoring.md) | No | No | No | No | Placeholder |
-| [`Applied-Engineering/Control-Applications.md`](../Applied-Engineering/Control-Applications.md) | No | No | No | No | Placeholder |
-| [`Applied-Engineering/External-System-Integration.md`](../Applied-Engineering/External-System-Integration.md) | No | No | No | No | Placeholder |
-| [`Applied-Engineering/Worked-Designs.md`](../Applied-Engineering/Worked-Designs.md) | No | No | No | No | Placeholder |
-| [`Reference/Electrical-Specifications.md`](../Reference/Electrical-Specifications.md) | No | No | No | No | Placeholder |
-| [`Reference/Protocol-and-Data-Reference.md`](../Reference/Protocol-and-Data-Reference.md) | No | No | No | No | Placeholder |
-| [`Reference/Events-and-Errors.md`](../Reference/Events-and-Errors.md) | No | No | No | No | Placeholder |
-| [`Reference/Glossary.md`](../Reference/Glossary.md) | No | No | No | No | Placeholder |
-| [`Reference/Known-Limitations.md`](../Reference/Known-Limitations.md) | No | No | No | No | Placeholder |
+| [`Hardware/Analog-Outputs.md`](../Hardware/Analog-Outputs.md) | **Yes** | **Yes** | No | No | Source-grounded draft; scaling direction conflicts with public reference; config save zeros output |
+| [`Hardware/Digital-Inputs.md`](../Hardware/Digital-Inputs.md) | **Yes** | **Yes** | No | No | Source-grounded draft; check maximum terminal voltage, no galvanic isolation, debounce validation, startup logic |
+| [`Hardware/Relay-Outputs.md`](../Hardware/Relay-Outputs.md) | **Yes** | **Yes** | No | No | Source-grounded draft; fail-safe not applied in reviewed Core, logical vs coil state, inversion writeback, contact rating/BOM pending |
+| [`Hardware/Internal-Interfaces.md`](../Hardware/Internal-Interfaces.md) | **Yes** | **Yes** | No | No | 0.1.14 source-drafted; Pi GPIO/I2C electrical map, six peripheral addresses, Core hardware ownership, internal signal paths and noncustomer buses. Release-specific engineering review pending. |
+| [`Hardware/Mechanical-and-Assembly.md`](../Hardware/Mechanical-and-Assembly.md) | **Yes** | **Yes** | No | No | 0.1.14 source-drafted; Rev B physical construction, Gerber ~230x150 mm outline, enclosure/service boundaries, assembly evidence and unknown installation dimensions. Release-specific engineering review pending. |
+| [`Core-Software/Processes-and-Lifecycle.md`](../Core-Software/Processes-and-Lifecycle.md) | **Yes** | **Yes** | No | No | Source-grounded lifecycle draft; deployment unit files, health policy, graceful child stop and READY activation need confirmation |
+| [`Core-Software/Data-Model-and-Configuration.md`](../Core-Software/Data-Model-and-Configuration.md) | **Yes** | **Yes** | No | No | Source-based 0.1.9 draft; Core config file/schema, runtime vs persisted values, WebBridge cache, backup and restore boundaries. Review and version matching required |
+| [`Core-Software/Operating-Modes-and-Safety.md`](../Core-Software/Operating-Modes-and-Safety.md) | **Yes** | **Yes** | No | No | Source-based 0.1.9 draft; AO modes, PID automatic/enable flags, relay logic and explicitly unverified safety behavior. Review and version matching required |
+| [`Core-Software/Measurement-and-Control-Timing.md`](../Core-Software/Measurement-and-Control-Timing.md) | **Yes** | **Yes** | No | No | Source-based 0.1.9 draft; Sequential analog sampling, ADS1115 delays, DI polling, PID cadence, logger and recorder rates. Review and version matching required |
+| [`Core-Software/Calibration-and-Scaling.md`](../Core-Software/Calibration-and-Scaling.md) | **Yes** | **Yes** | No | No | Source-based 0.1.9 draft; AI calibration functions, multipoint endpoint extrapolation, polynomial ordering and AO scaling conflict. Review and version matching required |
+| [`Core-Software/PID-Control.md`](../Core-Software/PID-Control.md) | **Yes** | **Yes** | No | No | Source-based 0.1.9 draft; Four PID controllers, routing, P/I/D algorithm, clamping, ramps and unresolved mode transitions. Review and version matching required |
+| [`Core-Software/Logging-and-History.md`](../Core-Software/Logging-and-History.md) | **Yes** | **Yes** | No | No | Source-based 0.1.9 draft; Core SQL snapshots, event logs, WebBridge RAM chart recorder, history resampling and security findings. Review and version matching required |
+| [`Core-Software/Updates-and-Recovery.md`](../Core-Software/Updates-and-Recovery.md) | **Yes** | **Yes** | No | No | Source-grounded 0.1.10 draft; Updater package validation, release dispositions, Launcher probation/fallback, telemetry and OS tasks. Shipping version/review required |
+| [`User-Interfaces/Control-Panel.md`](../User-Interfaces/Control-Panel.md) | **Yes** | **Yes** | No | No | Source-grounded 0.1.10 draft; Windows desktop operation, discovery, live I/O, configuration dialogs, reconnection and device actions. Shipping version/review required |
+| [`User-Interfaces/Device-Website.md`](../User-Interfaces/Device-Website.md) | **Yes** | **Yes** | No | No | Source-grounded 0.1.10 draft; Device-site Apache/PHP/WebBridge chain, dashboard, control, chart recorder, properties, logs and settings. Shipping version/review required |
+| [`User-Interfaces/Status-and-Diagnostics.md`](../User-Interfaces/Status-and-Diagnostics.md) | **Yes** | **Yes** | No | No | Source-grounded 0.1.10 draft; Core status, WebBridge cached state, logger diagnostics, error semantics and troubleshooting. Shipping version/review required |
+| [`Programming/Discovery-and-Connections.md`](../Programming/Discovery-and-Connections.md) | **Yes** | **Yes** | No | No | Source-grounded 0.1.10 draft; mDNS, port/address selection, SigCoreSystem managed connections, manual IP limitations and diagnostics. Shipping version/review required |
+| [`Programming/DotNet-API.md`](../Programming/DotNet-API.md) | **Yes** | **Yes** | No | No | Source-grounded 0.1.11 draft; SigCoreCommon managed connection, requests, writes, subscriptions, configuration and PID client semantics. Verify customer release and example packaging. |
+| [`Programming/HTTP-API-and-WebBridge.md`](../Programming/HTTP-API-and-WebBridge.md) | **Yes** | **Yes** | No | No | Source-grounded 0.1.11 draft; Device website PHP routes to private WebBridge, JSON schemas, channel writes, settings and chart history. Verify customer release and example packaging. |
+| [`Programming/Python-Integration.md`](../Programming/Python-Integration.md) | **Yes** | **Yes** | No | No | Source-grounded 0.1.11 draft; Verified HTTP integration from Python, pending example-distribution verification and native Core protocol limitations. Verify customer release and example packaging. |
+| [`Programming/Integration-Patterns.md`](../Programming/Integration-Patterns.md) | **Yes** | **Yes** | No | No | Source-grounded 0.1.11 draft; Telemetry, PID supervision, discrete I/O, logging, multi-client ownership, retries and safe external design. Verify customer release and example packaging. |
+| [`Operations/Installation-and-Commissioning.md`](../Operations/Installation-and-Commissioning.md) | **Yes** | **Yes** | No | No | 0.1.12 source-drafted; Power-up, Windows setup, first connection, safe I/O commissioning, acceptance records and installation boundaries. Requires release-specific engineering review. |
+| [`Operations/Networking-and-Access.md`](../Operations/Networking-and-Access.md) | **Yes** | **Yes** | No | No | 0.1.12 source-drafted; DHCP/static addressing, mDNS versus Core reachability, Apache/PHP/WebBridge paths and deployment access boundaries. Requires release-specific engineering review. |
+| [`Operations/Configuration-and-Restore.md`](../Operations/Configuration-and-Restore.md) | **Yes** | **Yes** | No | No | 0.1.12 source-drafted; Persistent JSON configuration, backup/restore scope, secret handling, deferred restart, factory reset and validation. Requires release-specific engineering review. |
+| [`Operations/Maintenance-and-Service.md`](../Operations/Maintenance-and-Service.md) | **Yes** | **Yes** | No | No | 0.1.12 source-drafted; Service records, signed updates, restart/power boundaries, logging, field-service limitations and escalation. Requires release-specific engineering review. |
+| [`Operations/Troubleshooting.md`](../Operations/Troubleshooting.md) | **Yes** | **Yes** | No | No | 0.1.12 source-drafted; Symptom-based diagnosis for discovery, connection, website, I/O, PID, logger, restore and updates. Requires release-specific engineering review. |
+| [`Applied-Engineering/Sensors-and-Signal-Conditioning.md`](../Applied-Engineering/Sensors-and-Signal-Conditioning.md) | **Yes** | **Yes** | No | No | 0.1.13 source-drafted; Compatible sensor output forms, DI/AI conditioning, voltage/current examples, calibration and fault handling. Release and engineering verification needed. |
+| [`Applied-Engineering/Actuators-and-Loads.md`](../Applied-Engineering/Actuators-and-Loads.md) | **Yes** | **Yes** | No | No | 0.1.13 source-drafted; Relay load interfaces, AO voltage/PWM drivers, external protection, contact versus logical state and feedback. Release and engineering verification needed. |
+| [`Applied-Engineering/Data-Acquisition-and-Monitoring.md`](../Applied-Engineering/Data-Acquisition-and-Monitoring.md) | **Yes** | **Yes** | No | No | 0.1.13 source-drafted; Acquisition rates, live/cached/history/SQL paths, timestamps, data quality, chart resampling and read-only monitoring. Release and engineering verification needed. |
+| [`Applied-Engineering/Control-Applications.md`](../Applied-Engineering/Control-Applications.md) | **Yes** | **Yes** | No | No | 0.1.13 source-drafted; Core PID control, sequence supervision, writer ownership, fault responses and external safety boundaries. Release and engineering verification needed. |
+| [`Applied-Engineering/External-System-Integration.md`](../Applied-Engineering/External-System-Integration.md) | **Yes** | **Yes** | No | No | 0.1.13 source-drafted; .NET, browser PHP/WebBridge and database boundaries, discovery, adapter design, authorization and command semantics. Release and engineering verification needed. |
+| [`Applied-Engineering/Worked-Designs.md`](../Applied-Engineering/Worked-Designs.md) | **Yes** | **Yes** | No | No | 0.1.13 source-drafted; Illustrative AO-to-AI, thermal PID, pump/valve sequencing and durable monitoring designs with commissioning checks. Release and engineering verification needed. |
+| [`Reference/Electrical-Specifications.md`](../Reference/Electrical-Specifications.md) | **Yes** | **Yes** | No | No | 0.1.15 source-drafted; Rev B electrical ratings and explicit gaps; power, digital and analog I/O, contacts, signal references and source classification. Release-specific engineering review pending. |
+| [`Reference/Protocol-and-Data-Reference.md`](../Reference/Protocol-and-Data-Reference.md) | **Yes** | **Yes** | No | No | 0.1.15 source-drafted; TCP JSON envelope, version-scoped command IDs, PHP/WebBridge route schemas, data units and acknowledgment semantics. Release-specific engineering review pending. |
+| [`Reference/Events-and-Errors.md`](../Reference/Events-and-Errors.md) | **Yes** | **Yes** | No | No | 0.1.15 source-drafted; Core alerts, TCP and HTTP errors, structured log events, update dispositions and diagnostic interpretation. Release-specific engineering review pending. |
+| [`Reference/Glossary.md`](../Reference/Glossary.md) | **Yes** | **Yes** | No | No | 0.1.15 source-drafted; Consistent terminology for hardware, Core, APIs, control state, versions, history and AI answers. Release-specific engineering review pending. |
+| [`Reference/Known-Limitations.md`](../Reference/Known-Limitations.md) | **Yes** | **Yes** | No | No | 0.1.15 source-drafted; Published limits, source-snapshot defects, unresolved ratings, deployment gaps and software-version caveats. Release-specific engineering review pending. |
 
 ## Evidence entry format
 
@@ -60,7 +61,7 @@ All documents start unverified. Mark **Verified** only after checking implementa
 
 ## First-source-pass findings (2026-11-02)
 
-Evidence paths are relative to `Project/Sources/` unless otherwise stated. `SigCore-Software-Source/` refers to extracted files in that subfolder of the development source package. This register is INTERNAL and must not be bundled into the customer distribution.
+Evidence paths are relative to `project/sources/` unless otherwise stated. `SigCore-Software-Source/` refers to extracted files in that subfolder of the development source package. This register is INTERNAL and must not be bundled into the customer distribution.
 
 | ID | Topic | Evidence / observation | Disposition | Priority |
 |---|---|---|---|---|
@@ -76,3 +77,166 @@ Evidence paths are relative to `Project/Sources/` unless otherwise stated. `SigC
 ### Review policy
 
 `Draft: Yes / Evidence linked: Yes` means a document was assembled from located evidence. It **does not** mean the behavior has been independently tested on a unit, reviewed by the product engineer or approved for customer release. Preserve identified contradictions instead of choosing an unverified preferred interpretation.
+
+
+## Analog output drafting findings (2026-11-06)
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-009 | AO scaling direction | Public Control Panel Reference says `Display=m×V+b` (and inverse to command); `A_OUT.SetAnalogValue` applies `V=engineering×m+b`; desktop UI min/max also implies a different interpretation. | **Unresolved.** Align software, UI and documentation; verify nondefault `m`, `b`. | High |
+| KB-010 | AO config-save zeroing | `A_OUT.SetConfig` calls `SetMode`, which zeros the active voltage/PWM signal on any config set, including display-only changes. | **Implemented in snapshot.** Confirm intended operational behavior and warn about transitions. | High |
+| KB-011 | AO zero-scale input | `A_OUT.GetAnalogValue` divides by `VoltageScaleM`; no explicit `m≠0` check seen in reviewed config setter. | **Unresolved.** Add/verify range validation in the release. | Medium |
+| KB-012 | AO automatic-mode exclusivity | `SetFromPID` guards on `IsAuto`, but `HardwareManager.SetAOutValue` does not reject manual/API set when automatic. | **Source fact.** Document possible competing writers; confirm operational expectations. | Medium |
+| KB-013 | AO as-built electrical performance | No verified field terminal current drive, supply sensitivity, or output accuracy measurements in snapshot. | **Not characterized.** Do not invent ratings. | Non-blocking limitation |
+
+## Digital-input drafting findings (2026-11-06)
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-014 | Digital input electrical rating | Product Hardware Reference specifies OFF ≤ 1 V and ON ≥ 2 V, but does not publish the maximum permissible terminal voltage. Older product page mentions 24 V; protection-device voltage is not a rating. | **Unresolved.** Publish a reviewed continuous voltage/current rating and approved wiring arrangements. | High |
+| KB-015 | False isolation claim | Sheet 5 text describes eight “isolated” input channels; schematic ties transistor stages to shared `GND` with MCP23008 and field reference. No galvanic barrier shown. | **Schematic discrepancy.** Do not claim galvanic isolation; correct circuit notes/customer docs. | High |
+| KB-016 | Digital input resistor population | Eight transistor stages show 150 kΩ and 470 kΩ resistors plus grey 24 kΩ positions; sheet notes state 150 kΩ/24 kΩ divider. | **Unresolved.** Compare drawing, PCB population/BOM and measured thresholds. | Medium |
+| KB-017 | Debounce input validation | `D_IN.FromPayload` checks channel but does not validate `DebounceMs`; WebBridge requires complete DI fields but does not enforce an application-specific range; website numeric input minimum is 0. | **Source fact.** Establish/implement supported positive range and document response to zero/negative/large values. | Medium |
+| KB-018 | Initial DI state timing | `CurrentStates` starts false and `_lastTransition` starts `DateTime.MinValue`, so initially active input may be accepted without a full debounce interval. | **Source fact, unmeasured.** Confirm desired startup/edge behavior. | Medium |
+| KB-019 | DI timing and website refresh | Core requests 1 ms task delay between polling cycles; website display uses roughly 450 ms normal polling. | **Source fact.** Do not imply hard 1 ms scan or guaranteed pulse width; characterize only if a rating is needed. | Non-blocking limitation |
+
+## Relay-output drafting findings (2026-11-06)
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-020 | Fail-safe configuration not applied | Public Control Panel Reference describes `Fail-Safe State` for faults; Core stores and serializes `FailSafeState` but reviewed runtime code contains no fault path applying it. | **High-priority discrepancy.** Implement/verify explicitly defined fault behavior, or correct/remove the customer promise. | High |
+| KB-021 | Reported logical state vs energization | Public .NET reference describes `GetRelayAsync(true)` as energized. `RELAY_OUT.GetState` returns `_states[channel]`, while `InvertedLogic=true` drives the opposite GPIO/coil condition. | **Documentation discrepancy.** Correct API semantics and explicitly distinguish software state from measured coil/contact state. | High |
+| KB-022 | Inversion settings not applied immediately | `RELAY_OUT.FromPayload` updates `InvertedLogic` without rewriting hardware. `ChangeState` ignores requests that match stored logical `_states`, so outputs can remain physically inconsistent with the new inversion until a real transition or initialization. | **Implemented behavior.** Decide policy, apply mapping or warn, and verify UI NO/NC indications after changes. | High |
+| KB-023 | Factory-reset physical state | `FactoryResetRelays` reverts inversion then calls `ChangeState(ch,false)`. If logical state already false, its no-op path may leave physical coil still high from prior inversion. | **Potential interaction.** Verify correction of physical outputs under state/config mismatches. | High |
+| KB-024 | Relay contact electrical ratings | Published Hardware Reference states `120 VAC / 10 A`; source schematic depicts 5 V coils and SPDT contacts. No reviewed DC/inductive load ratings, inrush, terminal path ratings or full system electrical conformity evidence. | **Incomplete specification.** Publish approved load-specific ratings/conditions, prevent blanket inference from generic relay model. | Medium |
+| KB-025 | Schematic first-relay model mismatch | Rev B sheet 4 labels `RLY101` value `FF` while other relay symbols show `SRD-05VDC-SL-C`; drawing notes say all relay type SRD-05VDC-SL-C. | **Drawing/BOM clarification.** Confirm assembly model of RLY101 and grey component population. | Medium |
+
+## Hardware-overview drafting findings (2026-11-06)
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-026 | PCB board-outline dimension mismatch | `Gerber_BoardOutlineLayer.GKO` (2026-08-15) coordinates imply about **230 × 150 mm**; earlier project planning identified **250 × 150 mm**. These are not the same dimensions. | **Reconcile** against exact manufactured PCB revision and enclosure drawing before publishing mechanical dimensions or machining instructions. | High |
+| KB-027 | As-built analog power-conversion path | Schematic sheet 3 depicts `LMR62421` boost and `MIC5205` regulator and `REF3025` reference. The design drawing alone does not establish whether the boost is populated/active in shipped units; project notes indicate it may have been bypassed. | **Confirm as-built supply path, actual rails and parts population.** Do not promise a +9 V external supply or regulated output characteristics from schematic text. | Medium |
+| KB-028 | Published 5 V power supply rating incomplete | Hardware Reference specifies 5 V DC but no operating current budget, allowable voltage tolerance, peak/inrush, reverse polarity rating or supply ripple threshold. | **Engineering specification needed** before a recommended supply model/current rating can be considered authoritative. | Medium |
+| KB-029 | Connector and environmental ratings absent | Overlay/photos identify groups but do not prove physical pin order, enclosure dimensions, wire gauge/torque, isolation certification, ingress rating or EMC/surge withstand. | **Defer exact installation ratings** to verified connector/mechanical source material and approved tests; do not derive from photo or individual chip markings. | Medium |
+
+## Software-architecture drafting findings (2026-11-06)
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-030 | Logger process ownership | Reviewed `HardwareManager.Initialize()` starts `MYSQL_LOGGER` work inside Core. Project plans refer to a separate logger process, which is not evidenced in this snapshot. | **Verify deployed release topology.** Avoid claiming an independent logger service until confirmed. | Medium |
+| KB-031 | READY release activation trigger | `SigCoreUpdater.Updater` prepares release and marks it `READY`; `SigCoreLauncher` selects eligible versions on startup. Reviewed Updater path does not directly activate or restart Launcher. | **Confirm deployed activation orchestration and timing.** Do not promise immediate cutover when update is downloaded. | Medium |
+| KB-032 | Release probation semantics | Launcher checks configured process survival for 30 s, then marks `GOOD`; post-probation supervision checks every 2 s. No I/O health test shown in this path. | **Document limitation.** Determine whether other external acceptance checks exist. | Medium |
+| KB-033 | Actual service and network topology | Source establishes Core bind `0.0.0.0:7020` and WebBridge bind `127.0.0.1:8080`, but installed systemd units, Apache config, firewall and executable list not present in examined tree. | **Deployment evidence needed** for default exposure, service ordering and Updater supervision. | Medium |
+
+## Process-lifecycle drafting findings (2026-11-06)
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-034 | Forced child termination | `SigCoreLauncher/Launcher.cs` stops configured children with `Kill(entireProcessTree: true)` and waits up to 5 s; no application-level drain, Core graceful shutdown or explicit output safety transition in that path. | **Review intended shutdown semantics.** Do not promise graceful cleanup or hardware fail-safe on forced process exit. | High |
+| KB-035 | Core stop/disposal policy | `Server/SigCoreServer/Program.cs` constructs Core, starts TCP listener, then awaits `Task.Delay(Timeout.Infinite)` without explicit token, stop or dispose path. | **Review lifecycle and OS stop integration.** Installed systemd unit semantics not verified. | Medium |
+| KB-036 | Ready release selection timing | Updater prepares releases and marks `READY`; Launcher selects highest READY/GOOD on its own startup. No direct activation/restart signal in the reviewed Updater loop. | **Confirm deployed restart/selection mechanism** before promising automatic immediate installation. | Medium |
+| KB-037 | Health versus process survival | Launcher probation and post-probation restart check child `HasExited`, not endpoint responsiveness, Core handshake, hardware activity or chart operation. | **Document precisely.** Decide whether separate functional acceptance or watchdog checks are needed. | Medium |
+| KB-038 | Persistence and chart lifetime | WebBridge caches Core state and holds chart samples in RAM; settings persist in `webbridge-chart.json`; configuration changes to recording interval/memory allocation reset recorder buffer. | **Source fact.** Test recovery and ensure customer explanations distinguish chart RAM from SQL logs. | Medium |
+| KB-039 | Installation task retry boundary | `InstallationTaskRunner.RunAsync` runs active release task file on Updater startup; failures are logged without blocking update polling and retried on next Updater startup, with completion IDs in `completed-tasks.json`. | **Source fact.** Verify service restart cadence and installed task set. | Low |
+
+## Core software batch findings (2026-11-06, v0.1.9)
+
+All observations concern the **supplied unversioned source snapshot** and are not claims that a currently installed 2.0.27 device is affected. Credentials are not reproduced in this register.
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-040 | Hard-coded MySQL credentials | `libs/SigCoreCommon/MYSQL_LOGGER.cs` embeds database connection credentials in the header and snapshot connection paths rather than constructing the connection from its configurable fields. | **Security/functional defect.** Remove literals, use configured secrets securely, rotate affected credentials, verify deployed code. | Critical |
+| KB-041 | Password in backup content | `WebBridge/Endpoints/BackupRestoreEndpoints.cs` excludes `global` and `network` but includes `logger`; `LoggerConfigPayload` includes a `password` property. | **Sensitive export.** Review backup handling, transport/access control, encryption or secret redaction. | High |
+| KB-042 | Analog averaging algorithm revision mismatch | Supplied `A_IN.cs` and `Ads1115Driver.ReadChannel()` still average N consecutive conversions for each channel in a four-channel pass; later project work specified one channel per iteration plus per-channel moving buffer and validation 1..100. | **Identify current deployed source.** Do not publish batch-averaging as the current release implementation until reconciled. | High |
+| KB-043 | Startup value restoration flag not evidenced | `useLastKnownValues` stored in `global`, but no application of it to rehydrate live relay/AO states was found in reviewed initialization. | **Verify/implement or clarify** before promising last state restoration. | High |
+| KB-044 | PID reset on mode change appears inactive | PID `resetOnModeChange` is serializable but has no operational call path; separate `ResetIntegralToOutput` has no observed caller. | **Verify** mode transitions and desired bumpless transfer. | Medium |
+| KB-045 | PID runtime PV clamp no-op | `PidLoopModel.Compute()` assigns clamped PV, while `PID_LOOP.ConfigRuntime.PV` setter is empty; actual read is from AI. | **Fix or document** ineffective PV min/max clamp before relying on limits. | High |
+| KB-046 | PID output collisions | Multiple enabled PID channels can select same AO destination; `PID_LOOP` code does not enforce exclusive routing. | **Review** arbitration policy and configuration validation. | Medium |
+| KB-047 | MySQL logger's configured settings not honored | Connection strings in `MYSQL_LOGGER` are hard-coded, while `LoggerConfigPayload` exposes host/port/db/user/password fields. | **Fix together with KB-040** and integration-test against an independent database. | High |
+| KB-048 | ADC converter rate differs from aggregate sampling | `Ads1115Driver.ReadChannel` waits for mux/first discarded conversion and each averaged read on four sequential channels. `Low=8`, `Medium=32`, `High=475` are converter data rates, not per-channel guarantees. | **Document distinction.** Measure current deployed effective channel rate if a performance specification is required. | Medium |
+| KB-049 | Chart Recorder memory/retention | `ChartSample` has timestamp plus four doubles (40 B); 1024 MiB limit gives approx 311 days at 1 s, not full year, before overhead and gaps. | **Derived estimate only.** Test process memory pressure and actual retention in target hardware. | Medium |
+| KB-050 | Persisted global object is narrower than model | `SystemConfigPayload.ToFramPayload` saves five fields, omitting e.g. `isPIDOpen`, `systemPassword` despite corresponding properties in the model. | **Confirm intended semantics** and clarify undocumented persistence. | Medium |
+| KB-051 | Poorly validated logger interval | Logger interval is accepted into `DataLoggerConfig` without a positive-range check at Core boundary; negative/invalid intervals may cause delay exceptions. | **Validate** interval and preserve reliable logging loop. | Medium |
+| KB-052 | Resampling suppresses extrema | WebBridge history uses last reading in each populated output bucket, otherwise interpolation, with null for unbracketed points. | **Document faithfully.** Chart is not lossless raw export; consider distinct peaks/min-max display if appropriate. | Non-blocking limitation |
+
+## Update, UI, status and discovery batch findings (2026-11-06, v0.1.10)
+
+Source-specific observations are for the **supplied unversioned snapshot**. They are not assertions that the installed Rev B device or latest Control Panel still exhibits a defect.
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-053 | Manual-IP picker blocked when discovery empty | `ControlPanel/MainWindowVM.cs` returns after zero `SigCoreDiscovery` results, before creating `SelectSigCoreDlg`, so the dialog's manual address and Scan Subnet controls cannot be used through Connect in that case. | **Verify/fix in shipping Control Panel.** Show picker even if no mDNS results. | High |
+| KB-054 | Discovery `Ready` implies only TCP reachability | `libs/SigCoreCommon/SigCoreDiscovery.cs` sets `Ready=true` after TCP 7020 connect test; no handshake/hardware check. `SelectSigCoreDlg` marks typed IPv4 `Ready` without probing. | **Clarify UI/documentation.** Validate protocol and status after connection. | Medium |
+| KB-055 | Public device-site control access not established | WebBridge endpoint mapping and PHP control/configuration proxies in reviewed source show no application authentication middleware; installed Apache/firewall/authentication configuration not provided. | **Security deployment review required before Internet exposure.** Verify boundaries, auth/TLS and intended public demo policy without assuming the website is protected. | High |
+| KB-056 | Live I/O cache can outlive Core connection | `WebBridge/CoreState.cs` retains last received arrays; `/api/state` includes connection state, but does not clear all values on disconnect. | **Label freshness.** UIs must distinguish stale cache data from live Core status. | Medium |
+| KB-057 | Observed telemetry narrowness | `SigCoreUpdater/UpdateEventReporter.cs` implements optional `DOWNLOADED` reporting; additional `READY`, `GOOD`, `FAILED`, `REGRESSED` events discussed in project plans are not wired in the reviewed Updater/Launcher snapshot. | **Reconcile with deployed release and public policy.** Do not claim complete event pipeline based solely on this snapshot. | High |
+| KB-058 | Manual/automatic update activation trigger unresolved | Updater marks target `READY`; Launcher selects on startup. Supplied update loop does not explicitly restart Launcher. | **Verify installed service choreography and release activation timing** before customer instructions. | Medium |
+| KB-059 | Chart browser and recorder both hold display history | WebBridge holds RAM-only samples, while browser builds interpolated display series and applies live point updates; visible traces are not a raw lossless export. | **Document distinction.** Preserve source records for scientific/diagnostic evidence where required. | Low |
+| KB-060 | Core status vs dashboard metric semantics | `OsManager.cs` calculates CPU load from 15-minute load average per processor and memory from `MemAvailable`; dashboard may simplify fields. | **Keep metric definitions.** Avoid presenting them as instant CPU utilization or RAM directly free. | Low |
+
+## Programming and integration batch findings (2026-11-06, v0.1.11)
+
+These observations are for the **supplied, unversioned development snapshot**. They are not proof the deployed Rev B release remains affected; no passwords or credential values are reproduced here.
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-061 | Sensitive network and logger settings returned by API | `WebBridge/Endpoints/DeviceSettingsEndpoints.cs` `PublicNetwork` and `PublicLogger` clone entire config objects. The `GET /api/device-settings/network` response can include Wi-Fi PSK and `GET /api/device-settings/logger` can include DB password. `UpdaterFiles/www/api/device-settings.php` proxies these reads to remote PHP consumers. | **Verify actual exposure/authorization before publishing or operating public-facing endpoints.** Restrict administrative settings and redact secrets in read responses, as appropriate to the approved demo/deployment policy. | Critical |
+| KB-062 | Python example distribution not evidenced in snapshot | No `.py` file or Python client implementation found in supplied source snapshot, despite separately completed Python and C# API examples. | **Verify both finished examples are included in released installation/package**, with version-compatible instructions and dependencies. Do not claim absent examples are not written. | Medium |
+| KB-063 | HTTP configuration payload semantics differ by route | `WebBridge/Endpoints/ConfigurationEndpoints.cs` requires every allowed field in a `PUT /api/config/{kind}/{channel}` body under `config`. `DeviceSettingsEndpoints.cs` accepts a partial update for `PUT /api/device-settings/{kind}`. | **Document distinction.** Test complete config round trips, concurrent edits, and related output side effects. | Medium |
+| KB-064 | HTTP command write result is not physical confirmation | `RelayEndpoints.cs`, `AnalogOutputEndpoints.cs`, `PIDEndpoints.cs` and configuration writes return `accepted:true`, `confirmed:false` after Core send-only calls. | **Do not present command acknowledgement as coil/contact or voltage measurement.** Validate through appropriate readbacks and external feedback. | Medium |
+| KB-065 | WebBridge chart-history timestamps use mixed units | `ChartRecorder.Query` takes `start/length` in Unix **milliseconds** while output `data[0]` timestamps are Unix **seconds**. It uses last-in-bucket or interpolation; unbracketed/nonfinite is JSON null. | **Explicit docs and integration tests** for unit handling, missing values and resampling artifacts. | Medium |
+| KB-066 | Read-only route vs admin route boundary | `StatusEndpoints.cs` sanitizes `/api/network` to omit PSK; `DeviceSettingsEndpoints.cs` does not redact corresponding `/api/device-settings/network` response. The PHP proxies offer both. | **Keep status API distinct from administrative config API.** Test URL-level access policy and log redaction. | High |
+| KB-067 | Possible hidden write effects when saving full configuration | Configuration channel PUT rewrites full records. Reviewed AO Core config save can zero output; relay polarity reapplication is tracked as a separate fix. | **Warn integrators and validate current release.** Re-read before writes, avoid routine unattended config saves on active equipment. | High |
+
+## Operations batch findings (2026-11-06, v0.1.12)
+
+Statements below refer to the **supplied unversioned source snapshot**, not necessarily the latest deployed Rev B build. The Operations chapters give non-destructive diagnostic guidance only where a verified customer service procedure is absent.
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-068 | Power and installation limits incomplete | `hardware-reference.html` gives 5 V DC but no approved current, input tolerance, mating connector/wire/torque or environment limits. | **Hardware sign-off needed** before replacing general commissioning cautions with rated supply/field wiring instructions. | High |
+| KB-069 | Network intent versus applied OS state | `NetworkManager.SetConfig` only persists intended payload; `OsManager.ApplyNetworkConfig` uses separate OS commands, whose activation timing and result propagation are not proven by a settings write. | **Verify deployed network apply behavior** and recovery after address changes; document whether reconnect/reboot is necessary. | Medium |
+| KB-070 | Configuration export omits global/network | `BackupRestoreEndpoints` filters `global`, `network`; exported `logger` may include DB password. | **Secure administrative backup** and clarify scope; test release/version compatibility. | High |
+| KB-071 | Restore acknowledges before recovery | `POST /api/config-restore` replaces JSON and queues delayed Launcher service restart after HTTP response; response includes `accepted` and `restarting`, not completion. | **Integration test on shipped image** with actual output safety and graceful restart and valid/invalid backup. | High |
+| KB-072 | Restart acceptance is not postcondition | `RestartEndpoints` runs `systemctl reboot --no-block` and responds on successful request submission, not after observed reboot and Core readiness. | **Document and test restart completion** separately; avoid relying on process exit for field safety. | Medium |
+| KB-073 | OS and app recovery scope distinct | Factory defaults, configuration restore, release rollback, hardware SD imaging and SQL history have different effects and owners. | **Approve field service playbooks** for current release, with identity preservation and rollback requirements. | Medium |
+| KB-074 | Freshness of operational diagnostics | `StatusEndpoints` provides fresh Core `/api/status`, but `/api/state` may retain previously cached values when Core disconnected; text `/api/logs` reads a bounded 2 MiB tail. | **Use connection flags and event times**; do not mistake stale UI for a live signal or missing text log for lost SQL. | Medium |
+| KB-075 | Relay and analog fixes are version-sensitive | Existing subsystem chapters documented relay inversion and previous analog averaging defects; some fixes may already be implemented outside the unversioned snapshot. | **Reconcile against installed release** before labeling behavior as outstanding. | Medium |
+
+## Applied Engineering batch findings (2026-11-06, v0.1.13)
+
+These are integration implications of already recorded source findings plus the new worked examples. They **do not** assert previously unverified as-shipped behavior.
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-076 | Sensor signal versus reported units | Supplied Rev B Hardware Reference lists voltage, low-level voltage and 4–20 mA classes, while current-path implementation and enum names differ from customer reference. | **Resolve current-mode raw-unit mapping** using deployed build and independently known test points before publishing calibration instructions for 4–20 mA. | High |
+| KB-077 | Signal-level versus load-power output | A_OUT drives selectable 0–5 V/PWM paths; relay outputs provide dry contacts. No end-to-end load current/impedance ratings demonstrated for arbitrary external actuators. | **Require application-specific external drivers and reviewed electrical limits**; do not publish generic heater, motor or solenoid direct-drive wiring. | High |
+| KB-078 | Physical feedback absent | Relay logical readback and AO configured output values are Core software state. Neither is independent measurement of relay contacts, analog output terminals or commanded machine motion. | **Model commanded versus observed feedback separately** in worked designs and future AI answers. | High |
+| KB-079 | Multi-client actuator ownership | Source permits multiple clients/PID destinations to address same AO; direct API command during auto operation and write acknowledgments have no exclusive ownership guarantee. | **Document explicit writer/owner and handoff policy** and verify arbitration in deployed version. | High |
+| KB-080 | Time-series provenance and loss | Chart Recorder has in-RAM history and resamples buckets; SQL logger stores separate snapshots, and source topology is version-sensitive. | **Do not claim permanent chart retention, raw per-conversion output, or complete history across restarts**; confirm deployed logger. | Medium |
+| KB-081 | Worked examples are not certified designs | Bench loopback, thermal PID and supervisory valve/pump examples were drafted as *illustrative* patterns with independent feedback and safety requirements; no as-built application was verified. | **Keep application assumptions and required commissioning checks explicit**. Approval requires actual installation ratings, software release and independent test evidence. | High |
+| KB-082 | Device chart screenshot provenance | Source contains `Screenshot 2026-11-02 165645.png` showing Chart Recorder and sample curves; now copied unchanged into the image library. | **Illustration only**. Displayed graph is not guaranteed acquisition fidelity, timing or output accuracy. | Informational |
+
+## Architecture and remaining Hardware batch findings (2026-11-06, v0.1.14)
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-083 | Field connector pin-1 and wire assignment | Rev B top overlay identifies channel groups; sheets 1–5 include schematic connector symbols but no reviewed, as-assembled terminal-to-net continuity table or orientation. | **Do not publish a fully enumerated field pinout** until verified against populated Rev B and connector mating drawing. | High |
+| KB-084 | Product power supply approval | Public Hardware Reference gives 5 V DC; no approved supply current, input tolerance, wire gauge, connector torque or installation derating. | **Engineering sign-off needed**; component TVS/ferrite does not imply an overall protection specification. | High |
+| KB-085 | Regulator/boost as-built population | Schematic sheet 3 includes `LMR62421`, `MIC5205`, `REF3025` and `+9VPS`/`+5V12 POWER` labels; deployment notes indicate a boost path may be bypassed. | **Verify populated Rev B PCB and power-route measurements** before stating intermediate-rail capabilities. | High |
+| KB-086 | PCB size conflict | Supplied Aug 15 Gerber outline extents approx X 0–229.997 mm, Y 0–149.987 mm; earlier summary says 250 × 150 mm. | **Use ~230 × 150 mm as fabrication evidence; confirm actual shipped board and enclosure**. | Medium |
+| KB-087 | Unsupported roadmap inference | Rev C proposed RP2040, display and version-selection changes; supplied documents are Rev B snapshot and customer references. | **Present Rev C as planned only**; do not promise current feature availability or migration behavior. | Medium |
+| KB-088 | Overlay provenance | `top-overlay.pdf` is marked "Evaluation Unit / Not for Resale". It supplies contact names but lacks approved physical installation pin-1 annotation, clearance and material specification. | **Image for channel identification, not an installation drawing**. | Medium |
+| KB-089 | Internal bus interface | Pi `/dev/i2c-1` and address map appear in Core, with separate I2C GPIO expanders. | **Treat bus as Core-owned internal implementation**, not customer-supported industrial communications endpoint. | Medium |
+
+## Reference batch findings (2026-11-06, v0.1.15)
+
+| ID | Topic | Evidence / observation | Disposition | Priority |
+|---|---|---|---|---|
+| KB-090 | Canonical numeric protocol scope | Supplied `SigCoreProtocol.cs` defines `MsgType` numeric IDs 0–61 with gaps 48/49 and `ProtocolVersion=12`; `SigCoreProtocol.Encode` serializes newline-delimited JSON. | **Version-match deployed Core and managed client before publishing a frozen protocol reference.** Do not introduce protocol changes to Rev B. | Medium |
+| KB-091 | Inconsistent Core/HTTP acknowledgment | Core setters return null instead of command success responses; WebBridge often returns `accepted:true,confirmed:false`. | **Never equate accepted/transport success with relay, AO or load confirmation.** | High |
+| KB-092 | Units mismatch in history response | HTTP chart history receives Unix milliseconds for start/duration and returns data time array in Unix seconds; values can be null. | **Document/test mixed units in client integrations**, include resampling semantics. | Medium |
+| KB-093 | No complete certified electrical rating sheet | Published nominal 5 V supply, DI thresholds, relay 120 VAC/10 A and analog signal classes do not specify all required hardware electrical/installation limits. | **Resolve ratings and connector pinout against actual assembled Rev B and approved reference.** | High |
+| KB-094 | Error catalog not stable public contract | Core `Error` carries human-readable exception text, and WebBridge uses endpoint-specific HTTP statuses and error bodies. | **Recommend code/HTTP-status-first handling with redacted diagnostics, not exact message-string parsing.** | Medium |
+| KB-095 | Defect status is source-snapshot-only | Current source archive lacks precise release/commit mapping; relay inversion, averaging, security and logger topology may differ from deployed updates. | **Release-compare and retest before marking limitations active or fixed.** | High |

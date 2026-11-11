@@ -126,14 +126,14 @@ The supplied Launcher source selects and activates a release, reads `/opt/sigcor
 
 ## 8. Evidence
 
-The paths below are relative to the supplied development-source folder `Project/Sources/SigCore-Software-Source/`, except where stated.
+The paths below are relative to the supplied development-source folder `project/sources/SigCore-Software-Source/`, except where stated.
 
 | Claim group | Primary evidence |
 |---|---|
-| I/O counts and documented hardware | `Project/Sources/documentation/hardware-reference.html` (identical to public product-site reference snapshot), `Project/Sources/hardware/SCH_Schematic1_2026-08-15.pdf`, `Project/Sources/hardware/top-overlay.pdf` |
+| I/O counts and documented hardware | `project/sources/documentation/hardware-reference.html` (identical to public product-site reference snapshot), `project/sources/hardware/SCH_Schematic1_2026-08-15.pdf`, `project/sources/hardware/top-overlay.pdf` |
 | Core TCP and session transport | `Server/SigCoreServer/SigCoreServer.cs`, `Server/SigCoreServer/ClientSession.cs`, `libs/SigCoreCommon/SigCoreProtocol.cs` |
 | I/O and persistent config | `libs/SigCoreCommon/HardwareManager.cs` and its `Config` class |
-| Client API and discovery | `libs/SigCoreCommon/SigCoreSystem.cs`, `libs/SigCoreCommon/SigCoreDiscovery.cs`, `Project/Sources/documentation/api-reference.html` |
+| Client API and discovery | `libs/SigCoreCommon/SigCoreSystem.cs`, `libs/SigCoreCommon/SigCoreDiscovery.cs`, `project/sources/documentation/api-reference.html` |
 | Private bridge and browser proxy | `WebBridge/Program.cs`, `WebBridge/CoreState.cs`, `WebBridge/Endpoints/StatusEndpoints.cs`, `UpdaterFiles/www/api/_bridge.php` |
 | Chart history | `WebBridge/ChartRecorder.cs` |
 | Release supervision | `SigCoreLauncher/Launcher.cs`, `SigCoreLauncher/ReleaseManager.cs`, `SigCoreUpdater/` |
@@ -142,7 +142,7 @@ The paths below are relative to the supplied development-source folder `Project/
 
 Deepen the individual topics in [Processes and Lifecycle](../Core-Software/Processes-and-Lifecycle.md), [Data Model and Configuration](../Core-Software/Data-Model-and-Configuration.md), [Logging and History](../Core-Software/Logging-and-History.md), [Discovery and Connections](../Programming/Discovery-and-Connections.md), and [HTTP API and WebBridge](../Programming/HTTP-API-and-WebBridge.md).
 
-Engineering review is still required for installation/service definitions, the snapshot's exact release identity, Modbus feature status, network exposure defaults, and complete process-failure handling. See the internal [Verification Register](../Project/Verification-Register.md).
+Engineering review is still required for installation/service definitions, the snapshot's exact release identity, Modbus feature status, network exposure defaults, and complete process-failure handling. See the internal [Verification Register](../project/Verification-Register.md).
 
 ## Images
 

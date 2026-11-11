@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.IO;
+using System.Security.Cryptography;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -154,6 +156,7 @@ namespace ControlPanel {
         public ICommand GetStatusCmd { get; }
 
         public MainWindowVM(SigCoreCommon.SigCoreSystem system) {
+            ConnectionDiagnosticLog.WriteAssemblyIdentity(typeof(MainWindowVM).Assembly);
             this.system = system;
             system.AnalogInChanged += OnAnalogInChanged;
             system.DigitalInChanged += OnDigitalInChanged;
@@ -161,6 +164,10 @@ namespace ControlPanel {
             system.AnalogOutChanged += OnAnalogOutChanged;
             system.LoggerStatusChanged += OnLoggerStatusChanged;
             system.ConnectionStateChanged += OnConnectionStateChanged;
+            // Subscribe before attempting connection so the first timeout/warning
+            // is captured even if the normal warning UI is not attached yet.
+            system.ConnectionWarning += msg =>
+                ConnectionDiagnosticLog.Write("ConnectionWarning", $"target={_targetIp} state={system.ConnectionState} message={msg}");
             //system.PIDCurValChanged += OnPIDChanged;
 
             Relays = new ObservableCollection<RelayChannel> {
@@ -216,6 +223,7 @@ namespace ControlPanel {
 
             UserPrefs prefs = UserPrefs.Load();
 
+            ConnectionDiagnosticLog.Write("Startup", $"AutoReconnect={prefs.AutoReconnect} LastIp={prefs.LastIp ?? ""}");
             if (prefs.AutoReconnect) {
                 _ = AutoConnect(prefs.LastIp);
             } else {
@@ -230,6 +238,7 @@ namespace ControlPanel {
         }
 
         private Task AutoConnect(string ip) {
+            ConnectionDiagnosticLog.Write("AutoConnect", $"target={ip}");
             if (string.IsNullOrWhiteSpace(ip)) {
                 DiscoverSigCore_Click();
                 return Task.CompletedTask;
@@ -434,13 +443,19 @@ namespace ControlPanel {
         private async Task StartManagedConnectionAsync(string ipAddress) {
             _targetIp = ipAddress;
             ConnectionStatus = "Connecting";
+            long startTicks = System.Diagnostics.Stopwatch.GetTimestamp();
+            ConnectionDiagnosticLog.Write("StartManagedConnection", $"target={ipAddress}");
 
             try {
                 await system.StartAsync(ipAddress);
+                ConnectionDiagnosticLog.Write("StartManagedConnectionCompleted",
+                    $"target={ipAddress} elapsedMs={System.Diagnostics.Stopwatch.GetElapsedTime(startTicks).TotalMilliseconds:F0}");
             } catch (OperationCanceledException) {
+                ConnectionDiagnosticLog.Write("StartManagedConnectionCanceled", $"target={ipAddress}");
                 // A deliberate Stop() or a switch to another device cancels
                 // the current managed connection attempt.
             } catch (Exception ex) {
+                ConnectionDiagnosticLog.Write("StartManagedConnectionFailed", $"target={ipAddress} exception={ex}");
                 Application.Current.Dispatcher.Invoke(() => {
                     ConnectionStatus = "Connection Fault";
                     MessageBox.Show(
@@ -455,17 +470,21 @@ namespace ControlPanel {
             _ = DiscoverSigCore_ClickAsync();
         }
         private async Task DiscoverSigCore_ClickAsync() {
+            ConnectionDiagnosticLog.Write("DiscoveryBegin", $"state={system.ConnectionState} target={_targetIp}");
             try {
                 SetDim(true);
 
-                SigCoreDiscovery discovery = new SigCoreDiscovery();
-
-                IReadOnlyList<SigCoreDevice> devices =
-                    await discovery.DiscoverAsync();
-
-                if (devices.Count == 0) {
-                    MessageBox.Show("No SigCore UC devices found on the network.", "Discovery");
-                    return;
+                // Keep manual IP connection available when mDNS finds no devices
+                // or discovery fails. The selection dialog supports an empty list.
+                IReadOnlyList<SigCoreDevice> devices;
+                try {
+                    SigCoreDiscovery discovery = new SigCoreDiscovery();
+                    devices = await discovery.DiscoverAsync() ?? Array.Empty<SigCoreDevice>();
+                    ConnectionDiagnosticLog.Write("DiscoveryComplete", $"count={devices.Count}");
+                } catch (Exception ex) {
+                    ConnectionDiagnosticLog.Write("DiscoveryFailed", ex.ToString());
+                    System.Diagnostics.Debug.WriteLine($"SigCore discovery failed: {ex}");
+                    devices = Array.Empty<SigCoreDevice>();
                 }
 
                 SelectSigCoreDlg dlg = new SelectSigCoreDlg(devices);
@@ -474,15 +493,20 @@ namespace ControlPanel {
                 if (dlg.ShowDialog() == true && dlg.SelectedDevice != null) {
                     SigCoreDevice selected = dlg.SelectedDevice;
 
+                    ConnectionDiagnosticLog.Write("DiscoverySelection",
+                        $"address={selected.Address} ready={selected.Ready} existingTarget={_targetIp}");
                     if (!selected.Ready || string.IsNullOrWhiteSpace(selected.Address))
                         return;
 
+                    ConnectionDiagnosticLog.Write("StopForNewSelection", $"target={_targetIp}");
                     system.Stop();
                     _ = StartManagedConnectionAsync(selected.Address);
                 }
             } catch (Exception ex) {
+                ConnectionDiagnosticLog.Write("DiscoveryDialogFailed", ex.ToString());
                 MessageBox.Show("Connection failed: " + ex.Message, "Error");
             } finally {
+                ConnectionDiagnosticLog.Write("DiscoveryEnd", $"state={system.ConnectionState}");
                 SetDim(false);
             }
         }
@@ -501,7 +525,11 @@ namespace ControlPanel {
         }
 
         private void OnConnected(string ipAddress) {
+            ConnectionDiagnosticLog.Write("InitializeComponentsBegin", $"target={ipAddress}");
             InitializeComponents();
+            // InitializeComponents schedules asynchronous requests; this marker
+            // does not imply that those requests have completed successfully.
+            ConnectionDiagnosticLog.Write("InitializeComponentsScheduled", $"target={ipAddress}");
             IPAddress = ipAddress;
             if (string.IsNullOrEmpty(ControlPanelVersion)) {
                 var v = typeof(MainWindowVM).Assembly.GetName().Version;
@@ -511,6 +539,7 @@ namespace ControlPanel {
             ConnectionStatus = "Connected";
         }
         private void OnConnectionStateChanged(SigCoreConnectionState state) {
+            ConnectionDiagnosticLog.Write("ConnectionStateChanged", $"target={_targetIp} state={state}");
             Application.Current.Dispatcher.Invoke(() => {
                 switch (state) {
                     case SigCoreConnectionState.Connecting:
@@ -548,5 +577,52 @@ namespace ControlPanel {
     }
     public interface IDimmer {
         void SetDim(bool isDimmed);
+    }
+}
+
+namespace ControlPanel {
+    // Local, bounded diagnostics: independent of Core and of the device's SQL
+    // logger, so the record survives even when the TCP connection is unusable.
+    internal static class ConnectionDiagnosticLog {
+        private static readonly object FileLock = new object();
+        private const long MaxFileBytes = 2 * 1024 * 1024;
+        private static readonly string DirectoryPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SigCoreUC");
+        private static readonly string FilePath = Path.Combine(DirectoryPath, "connection-diagnostics.log");
+
+        public static void Write(string eventName, string details) {
+            try {
+                lock (FileLock) {
+                    Directory.CreateDirectory(DirectoryPath);
+                    if (File.Exists(FilePath) && new FileInfo(FilePath).Length >= MaxFileBytes) {
+                        File.Copy(FilePath, FilePath + ".1", true);
+                        File.Delete(FilePath);
+                    }
+                    File.AppendAllText(FilePath,
+                        $"{DateTimeOffset.Now:yyyy-MM-ddTHH:mm:ss.fffzzz} " +
+                        $"pid={Environment.ProcessId} event={eventName} {details}{Environment.NewLine}");
+                }
+            } catch {
+                // Logging failures must never affect the connection or the UI.
+            }
+        }
+
+        public static void WriteAssemblyIdentity(System.Reflection.Assembly assembly) {
+            try {
+                string location = assembly.Location;
+                string digest = "unavailable";
+                string modified = "unavailable";
+                if (!string.IsNullOrEmpty(location) && File.Exists(location)) {
+                    using FileStream stream = File.OpenRead(location);
+                    digest = Convert.ToHexString(SHA256.HashData(stream));
+                    modified = File.GetLastWriteTimeUtc(location).ToString("O");
+                }
+                Write("ControlPanelProcessStarted",
+                    $"assembly={assembly.GetName().Name} version={assembly.GetName().Version} " +
+                    $"location={location} modifiedUtc={modified} sha256={digest}");
+            } catch (Exception ex) {
+                Write("AssemblyIdentityFailed", ex.ToString());
+            }
+        }
     }
 }

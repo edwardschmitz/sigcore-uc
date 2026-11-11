@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SigCore UC | Live Values</title><link rel="stylesheet" href="/css/site.css?v=6"><script src="/js/site-nav.js?v=shell2" defer></script>
+</head><body>
+<header class="site-header" data-site-header></header>
+<main class="site-main"><div class="page-heading"><h1>Live Values</h1><p>Real-time device I/O</p></div>
+<div id="connection" class="connection">Connecting...</div><div id="error" class="error"></div>
+<section class="page-section"><h2>Analog Inputs</h2><div id="analogInputs" class="io-grid"></div></section>
+<section class="page-section"><h2>Digital Inputs</h2><div id="digitalInputs" class="io-grid"></div></section>
+<section class="page-section"><h2>Relays</h2><div id="relays" class="io-grid"></div></section>
+<section class="page-section"><h2>Analog Outputs</h2><div id="analogOutputs" class="io-grid"></div></section>
+<details class="raw-state"><summary>Raw state</summary><pre id="rawState"></pre></details></main>
+<footer class="site-footer" data-site-footer></footer>
+    <script>
+        const POLL_MS = 500;
+
+        function card(title, value) {
+            const div = document.createElement('div');
+            div.className = 'io-card';
+
+            const heading = document.createElement('h3');
+            heading.textContent = title;
+
+            const val = document.createElement('div');
+            val.className = 'value';
+            val.textContent = value;
+
+            div.appendChild(heading);
+            div.appendChild(val);
+
+            return div;
+        }
+
+        function renderArray(containerId, prefix, values, formatter) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            if (!Array.isArray(values)) {
+                return;
+            }
+
+            values.forEach((value, index) => {
+                container.appendChild(
+                    card(prefix + (index + 1), formatter(value, index))
+                );
+            });
+        }
+
+        function formatNumber(value) {
+            const n = Number(value);
+
+            if (!Number.isFinite(n)) {
+                return String(value);
+            }
+
+            return n.toFixed(3);
+        }
+
+        function render(state) {
+            const connection = state.connection || {};
+            document.getElementById('connection').textContent =
+                'Core: ' + (connection.state || 'Unknown');
+
+            renderArray(
+                'analogInputs',
+                'AI',
+                state.analogInputs,
+                value => formatNumber(value)
+            );
+
+            renderArray(
+                'digitalInputs',
+                'DI',
+                state.digitalInputs,
+                value => value ? 'ON' : 'OFF'
+            );
+
+            renderArray(
+                'relays',
+                'R',
+                state.relays,
+                value => value ? 'ON' : 'OFF'
+            );
+
+            const aoValues =
+                state.analogOutputs && Array.isArray(state.analogOutputs.values)
+                    ? state.analogOutputs.values
+                    : [];
+
+            const aoAuto =
+                state.analogOutputs && Array.isArray(state.analogOutputs.auto)
+                    ? state.analogOutputs.auto
+                    : [];
+
+            renderArray(
+                'analogOutputs',
+                'AO',
+                aoValues,
+                (value, index) => {
+                    const mode = aoAuto[index] ? 'AUTO' : 'MANUAL';
+                    return formatNumber(value) + ' (' + mode + ')';
+                }
+            );
+
+            document.getElementById('rawState').textContent =
+                JSON.stringify(state, null, 2);
+        }
+
+        async function poll() {
+            const error = document.getElementById('error');
+
+            try {
+                const response = await fetch('/api/state.php', {
+                    cache: 'no-store'
+                });
+
+                const text = await response.text();
+
+                let data;
+
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    throw new Error(
+                        'Invalid response from /api/state.php:\n' + text
+                    );
+                }
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.error || ('HTTP ' + response.status)
+                    );
+                }
+
+                error.textContent = '';
+                render(data);
+            } catch (ex) {
+                document.getElementById('connection').textContent =
+                    'Core: unavailable';
+
+                error.textContent = ex.message;
+            } finally {
+                window.setTimeout(poll, POLL_MS);
+            }
+        }
+
+        poll();
+    </script>
+</body></html>

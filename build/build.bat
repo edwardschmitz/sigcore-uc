@@ -24,6 +24,7 @@ echo Publishing...
 rem Existing Raspberry Pi build sequence. Do not change these publish settings.
 call :publish "Server" "software\Server\SigCoreServer\SigCoreServer.csproj" || goto :fail
 call :publish "WebBridge" "software\WebBridge\WebBridge.csproj" || goto :fail
+call :publish "ModbusBridge" "software\ModbusBridge\ModbusBridge.csproj" || goto :fail
 call :publish "Updater" "software\SigCoreUpdater\SigCoreUpdater.csproj" || goto :fail
 call :publish "Launcher" "software\SigCoreLauncher\SigCoreLauncher.csproj" || goto :fail
 

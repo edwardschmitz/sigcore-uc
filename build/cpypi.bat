@@ -25,10 +25,11 @@ ssh %PI% "sudo systemctl stop sigcorelauncher.service" >nul || goto :deployfail
 
 scp -q "build\server\publish\sigcoreserver" %PI%:/tmp/sigcoreserver || goto :deployfail
 scp -q "build\webbridge\publish\WebBridge" %PI%:/tmp/WebBridge || goto :deployfail
+scp -q "build\modbusbridge\publish\ModbusBridge" %PI%:/tmp/ModbusBridge || goto :deployfail
 scp -q "build\updater\publish\SigCoreUpdater" %PI%:/tmp/SigCoreUpdater || goto :deployfail
 scp -q "build\launcher\publish\SigCoreLauncher" %PI%:/tmp/SigCoreLauncher || goto :deployfail
 
-ssh %PI% "sudo install -m 755 /tmp/sigcoreserver %REMOTE_VERSION_DIR%/sigcoreserver && sudo install -m 755 /tmp/WebBridge %REMOTE_VERSION_DIR%/WebBridge && sudo install -m 755 /tmp/SigCoreUpdater %REMOTE_VERSION_DIR%/SigCoreUpdater && sudo install -m 755 /tmp/SigCoreLauncher /opt/sigcore/SigCoreLauncher && rm -f /tmp/sigcoreserver /tmp/WebBridge /tmp/SigCoreUpdater /tmp/SigCoreLauncher" >nul || goto :deployfail
+ssh %PI% "sudo install -m 755 /tmp/sigcoreserver %REMOTE_VERSION_DIR%/sigcoreserver && sudo install -m 755 /tmp/WebBridge %REMOTE_VERSION_DIR%/WebBridge && sudo install -m 755 /tmp/ModbusBridge %REMOTE_VERSION_DIR%/ModbusBridge && sudo install -m 755 /tmp/SigCoreUpdater %REMOTE_VERSION_DIR%/SigCoreUpdater && sudo install -m 755 /tmp/SigCoreLauncher /opt/sigcore/SigCoreLauncher && rm -f /tmp/sigcoreserver /tmp/WebBridge /tmp/ModbusBridge /tmp/SigCoreUpdater /tmp/SigCoreLauncher" >nul || goto :deployfail
 
 ssh %PI% "sudo systemctl start sigcorelauncher.service" >nul || goto :deployfail
 

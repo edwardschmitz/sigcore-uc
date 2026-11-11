@@ -97,7 +97,15 @@ namespace SigCoreCommon {
             if (channel > 7)
                 throw new ArgumentOutOfRangeException(nameof(channel));
 
+            bool wasInverted = _config[channel].InvertedLogic;
             _config[channel].FromPayload(payload);
+
+            if (wasInverted != _config[channel].InvertedLogic) {
+                // Reapply the existing logical state with the new polarity.
+                // ChangeState() cannot do this because the logical state has not changed.
+                IOStates[channel] = ToHardwareState(channel, _states[channel]);
+                SendOutputs();
+            }
         }
 
         public RelayConfigPayload ToPayload(uint channel) {

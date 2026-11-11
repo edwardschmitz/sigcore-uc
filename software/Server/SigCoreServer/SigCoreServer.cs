@@ -39,6 +39,13 @@ namespace SigCoreServer {
                     throw new InvalidOperationException("Listener not bound after Start()");
                 }
 
+                // One stable identity record per server process. Session IDs
+                // restart at 1 when Core restarts, so PID and version matter.
+                _log.Info("ConnectionDiagnostics", "ListenerReady",
+                    $"pid={Environment.ProcessId} port=7020 " +
+                    $"assembly={typeof(SigCoreServer).Assembly.GetName().Name} " +
+                    $"version={typeof(SigCoreServer).Assembly.GetName().Version}.");
+
             } catch (SocketException ex) {
                 log.Error("Network", "ListenerStartFailed", $"Unable to start TCP listener on port 7020. SocketError={ex.SocketErrorCode}", ex);
                 throw;

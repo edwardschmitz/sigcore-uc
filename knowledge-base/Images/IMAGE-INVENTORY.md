@@ -1,0 +1,31 @@
+# Image Inventory
+
+Approved, source-grounded image assets added to the knowledge base development tree. All Markdown links are relative and case-sensitive.
+
+| Image | Used in | Origin | Interpretation |
+|---|---|---|---|
+| [Controller Top View](Hardware/top-view.jpg) | [`Hardware/Hardware-Overview.md`](../Hardware/Hardware-Overview.md) | `project/sources/images/top-view.jpg` | Actual supplied controller photo: relative connector group positions only; NOT a terminal pinout or measurement record |
+| [Rev B Enclosure Open](Hardware/rev-b-enclosure-open.jpg) | [`Hardware/Hardware-Overview.md`](../Hardware/Hardware-Overview.md) | `project/sources/images/rev-b-enclosure-open.jpg` | Actual supplied assembly photo: board, relays, Pi; not an as-built BOM or environmental rating |
+| [Control Panel Main Window](Control-Panel/main-window.png) | [`User-Interfaces/Control-Panel.md`](../User-Interfaces/Control-Panel.md) | `project/sources/documentation/images/main-window.png` | Actual desktop main window; device identity, labels, output values and version shown are examples, not defaults |
+| [Device Connection Dialog](Control-Panel/connection.png) | [`User-Interfaces/Control-Panel.md`](../User-Interfaces/Control-Panel.md) | `project/sources/documentation/images/connection.png` | Actual device selection dialog; network addresses and listed devices in capture are illustrative |
+| [Network Settings](Control-Panel/network-settings.png) | [`User-Interfaces/Control-Panel.md`](../User-Interfaces/Control-Panel.md) | `project/sources/documentation/images/network-settings.png` | Desktop network settings; screenshot is source-documentation illustration with masked credential; do not infer active IP or factory settings |
+| [System Properties](Control-Panel/system-properties.png) | [`Core-Software/Data-Model-and-Configuration.md`](../Core-Software/Data-Model-and-Configuration.md) | `project/sources/documentation/images/system-properties.png` | Actual system properties dialog; captured software/version and frequency are illustrative, not defaults |
+| [PID Configuration](Control-Panel/pid-properties.png) | [`Core-Software/PID-Control.md`](../Core-Software/PID-Control.md), [`Core-Software/Operating-Modes-and-Safety.md`](../Core-Software/Operating-Modes-and-Safety.md) | `project/sources/documentation/images/pid-properties.png` | Actual PID configuration dialog; example tuning numbers are not commissioning recommendations |
+| [Analog Input Configuration](Control-Panel/analog-input-properties.png) | [`Hardware/Analog-Inputs.md`](../Hardware/Analog-Inputs.md) | `project/sources/documentation/images/analog-input-properties.png` | UI illustration only; some documented modes require verification |
+| [Analog Output Configuration](Control-Panel/analog-output-properties.png) | [`Hardware/Analog-Outputs.md`](../Hardware/Analog-Outputs.md) | `project/sources/documentation/images/analog-output-properties.png` | UI illustration only; scaling behavior currently conflicts with Core code |
+| [Digital Input Configuration](Control-Panel/digital-input-properties.png) | [`Hardware/Digital-Inputs.md`](../Hardware/Digital-Inputs.md) | `project/sources/documentation/images/digital-input-properties.png` | Desktop dialog reference for name, debounce and inversion |
+| [Rev B DI Transistor Conditioning](Hardware/digital-input-conditioning-revb.png) | [`Hardware/Digital-Inputs.md`](../Hardware/Digital-Inputs.md) | Crop of `project/sources/hardware/SCH_Schematic1_2026-08-15.pdf`, sheet 5 | Actual eight-channel circuit excerpt; NOT a terminal pinout or galvanically isolated circuit |
+| [Relay Configuration](Control-Panel/relay-properties.png) | [`Hardware/Relay-Outputs.md`](../Hardware/Relay-Outputs.md) | `project/sources/documentation/images/relay-properties.png` | Actual desktop settings dialog; fail-safe option exists but fault application not demonstrated |
+| [Rev B Relay Driver and Contact Circuit](Hardware/relay-drivers-revb.png) | [`Hardware/Relay-Outputs.md`](../Hardware/Relay-Outputs.md) | Crop of `project/sources/hardware/SCH_Schematic1_2026-08-15.pdf`, sheet 4 | Eight-relay schematic excerpt, **not** an approved terminal orientation or field wiring drawing |
+
+| [Device Chart Recorder](User-Interfaces/chart-recorder.png) | [`Applied-Engineering/Data-Acquisition-and-Monitoring.md`](../Applied-Engineering/Data-Acquisition-and-Monitoring.md), [`Applied-Engineering/Worked-Designs.md`](../Applied-Engineering/Worked-Designs.md) | `project/sources/images/Screenshot 2026-11-02 165645.png` | Actual device website Chart Recorder screenshot; example analog traces, not an ADC accuracy or permanent logging record |
+
+| [Rev B Top Overlay](Hardware/rev-b-top-overlay.png) | [`Hardware/Connectors-and-Pinouts.md`](../Hardware/Connectors-and-Pinouts.md), [`Hardware/Mechanical-and-Assembly.md`](../Hardware/Mechanical-and-Assembly.md) | Rendering of `project/sources/hardware/top-overlay.pdf` | Evaluation-unit artwork, not verified physical pin-1 orientation or connector mating drawing |
+| [Power and I2C schematic](Hardware/power-i2c-sheet1-revb.png) | [`Hardware/Power-and-Protection.md`](../Hardware/Power-and-Protection.md) | Crop of `project/sources/hardware/SCH_Schematic1_2026-08-15.pdf`, sheet 1 | Design drawing, no signed-off supply input ratings |
+| [Analog Power and Reference schematic](Hardware/analog-power-reference-revb.png) | [`Hardware/Power-and-Protection.md`](../Hardware/Power-and-Protection.md) | Crop of `project/sources/hardware/SCH_Schematic1_2026-08-15.pdf`, sheet 3 | REF3025 and regulator designs, as-built population not proven |
+
+When answering a question where one of these images is relevant, follow [`AI-Instructions/Instructions.md`](../AI-Instructions/Instructions.md) and include the actual image in the response.
+
+Additional circuit diagrams, wiring illustrations, and photographs should be selected on a chapter-by-chapter basis, with source and revision identified. Do not substitute an illustrative image for an electrically verified wiring diagram.
+
+The supplied MySQL Logger settings screenshot is not embedded in the development KB because it contains environment-specific server/user details. Create an approved sanitized example before distributing such a screenshot.
